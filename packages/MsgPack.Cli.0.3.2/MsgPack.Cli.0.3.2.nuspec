@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MsgPack.Cli</id>
+    <version>0.3.2</version>
+    <title>MessagePack for CLI</title>
+    <authors>FUJIWARA,  Yusuke</authors>
+    <owners>FUJIWARA,  Yusuke</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/msgpack/msgpack-cli</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>MessagePack is fast, compact, and interoperable binary serialization format.
+This library provides MessagePack serialization/deserialization APIs.</description>
+    <releaseNotes>This release implements issue#128 related specs based on update proposal v5.</releaseNotes>
+    <copyright>Copyright 2010-2013 FUJIWARA, Yusuke, all rights reserved.</copyright>
+    <language />
+    <tags>Serialization MessagePack MsgPack</tags>
+  </metadata>
+</package>
