@@ -7,19 +7,28 @@ using namespace msgpack;
 
 #define	BYTES	msgpack::type::raw_ref
 
+class Material
+{
+public:
+	string	MaterialName;
+	int		MaterialIndex; //index as known by the mesh (i.e. the material slot)
+
+	MSGPACK_DEFINE(MaterialName, MaterialIndex);
+};
+
 class MaxMesh
 {
 public:	
 	int		NumVertices;
-	int		VerticesLengthInBytes;
 	BYTES   Vertices;
 
 	int		NumFaces;
-	int		FacesLengthInBytes;
 	BYTES	Faces;
 	BYTES	FaceMaterialIDs;
 
-	MSGPACK_DEFINE(NumVertices, VerticesLengthInBytes, Vertices, NumFaces, FacesLengthInBytes, Faces, FaceMaterialIDs);
+	vector<Material> Materials;
+
+	MSGPACK_DEFINE(NumVertices, Vertices, NumFaces, Faces, FaceMaterialIDs, Materials);
 };
 
 

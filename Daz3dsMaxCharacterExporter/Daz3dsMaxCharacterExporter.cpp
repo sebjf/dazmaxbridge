@@ -18,27 +18,28 @@ void    MyDazExporter::getDefaultOptions( DzFileIOSettings *options ) const
 	
 }
 
-MaxMesh	processMesh(DzFacetMesh* mesh)
+MaxMesh	MyDazExporter::processMesh(DzObject* obj)
 {
+	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
+
 	MaxMesh myMesh;
 
 	// Collect the vertices into a float array - each vertex is three floats so its a simple copy
 
 	myMesh.NumVertices = mesh->getNumVertices();
-	myMesh.VerticesLengthInBytes = myMesh.NumVertices * VERTEX_SIZE_IN_BYTES;
-	myMesh.Vertices.size = myMesh.VerticesLengthInBytes;
-	myMesh.Vertices.ptr = (char*)malloc(myMesh.VerticesLengthInBytes);
-	memcpy((void*)myMesh.Vertices.ptr, mesh->getVerticesPtr(), myMesh.VerticesLengthInBytes);
+	myMesh.Vertices.size = myMesh.NumVertices * VERTEX_SIZE_IN_BYTES;
+	myMesh.Vertices.ptr = (char*)malloc(myMesh.Vertices.size);
+	memcpy((void*)myMesh.Vertices.ptr, mesh->getVerticesPtr(), myMesh.Vertices.size);
 
 	// Collect the faces into an int array - each facet contains a number of properties such as material indices so split them out
 
 	myMesh.NumFaces = mesh->getNumFacets();
-	myMesh.FacesLengthInBytes = myMesh.NumFaces * FACE_SIZE_IN_BYTES;
-	myMesh.Faces.ptr = (char*)malloc(myMesh.FacesLengthInBytes);
-	myMesh.Faces.size = myMesh.FacesLengthInBytes;
-
-	myMesh.FaceMaterialIDs.ptr = (char*)malloc(myMesh.NumFaces * FACE_MATERIAL_ID_SIZE_IN_BYTES);
+	myMesh.Faces.size = myMesh.NumFaces * FACE_SIZE_IN_BYTES;
+	myMesh.Faces.ptr = (char*)malloc(myMesh.Faces.size);
 	myMesh.FaceMaterialIDs.size = myMesh.NumFaces * FACE_MATERIAL_ID_SIZE_IN_BYTES;
+	myMesh.FaceMaterialIDs.ptr = (char*)malloc(myMesh.FaceMaterialIDs.size);
+
+	vector<int> materialsToProcess;
 
 	DzFacet* facets = mesh->getFacetsPtr();
 	for(int i = 0; i < myMesh.NumFaces; i++)
@@ -49,6 +50,30 @@ MaxMesh	processMesh(DzFacetMesh* mesh)
 		((int*)myMesh.Faces.ptr)[(i * 4) + 3] = facets[i].m_vertIdx[3];
 
 		((int*)myMesh.FaceMaterialIDs.ptr)[i] = facets[i].m_materialIdx;
+
+		if(std::find(materialsToProcess.begin(),materialsToProcess.end(),facets[i].m_materialIdx) == materialsToProcess.end())
+		{
+			materialsToProcess.push_back(facets[i].m_materialIdx);
+		}
+	}
+
+	DzShape* shape = obj->getCurrentShape();
+
+	for(int i = 0; i < materialsToProcess.size(); i++)
+	{
+		Material myMaterial;
+
+		myMaterial.MaterialIndex = materialsToProcess[i];
+		
+		DzMaterialFaceGroup* material_group = mesh->getMaterialGroup(myMaterial.MaterialIndex);
+		myMaterial.MaterialName = material_group->getName();
+
+		DzMaterial* material = shape->findMaterial(material_group->getName());
+		
+		//now store the material properties
+
+
+		myMesh.Materials.push_back(myMaterial);
 	}
 
 	return myMesh;
@@ -66,14 +91,12 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 		return DZ_INVALID_SELECTION_ERROR;
 	}
 
-	DzVertexMesh* mesh = object->getCachedGeom();
-
-	if(!mesh->inherits("DzFacetMesh"))
+	if(!object->getCachedGeom()->inherits("DzFacetMesh"))
 	{
 		return DZ_INVALID_SELECTION_ERROR;
 	}
 	
-	MaxMesh myMesh = processMesh((DzFacetMesh*)mesh);
+	MaxMesh myMesh = processMesh(object);
 
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);

@@ -12,11 +12,15 @@
 #include "dzvertexmesh.h"
 #include "dzfacetshape.h"
 #include "dzfacetmesh.h"
+#include "dzmaterial.h"
+#include "dzbasicmaterialarea.h"
+#include "dzfacegroup.h"
 
 #include <QtCore\qfile.h>
 
-
 using namespace std;
+
+class MaxMesh; //forward declaration because we can't use Types.h because Winsock_2 is used in types (try it and see...)
 
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
@@ -39,6 +43,8 @@ protected:
 
 private:
 
+	MaxMesh	processMesh(DzObject* mesh);
+	
 
 
 };

@@ -7,22 +7,29 @@ using MsgPack.Serialization;
 
 namespace MaxBridgeLib
 {
+    public class Material
+    {
+        [MessagePackMember(0)]
+	    public string MaterialName;
+        [MessagePackMember(1)]
+	    public int MaterialIndex; //index as known by the mesh (i.e. the material slot)
+    }
+
     public class MaxMesh
     {
         [MessagePackMember(0)]
         public int NumVertices;
         [MessagePackMember(1)]
-        public int VerticesLengthInBytes;
-        [MessagePackMember(2)]
         public byte[] Vertices;
 
-        [MessagePackMember(3)]
+        [MessagePackMember(2)]
         public int NumFaces;
-        [MessagePackMember(4)]
-        public int FacesLengthInBytes;
-        [MessagePackMember(5)]
+        [MessagePackMember(3)]
         public byte[] Faces;
-        [MessagePackMember(6)]
+        [MessagePackMember(4)]
         public byte[] FaceMaterialIDs;
+
+        [MessagePackMember(5)]
+        public List<Material> Materials;
     }
 }

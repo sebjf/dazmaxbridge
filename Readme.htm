@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Daz-to-Max Readme</title>
+</head>
+<body>
+<br style="font-family: Calibri;">
+<span style="font-family: Calibri;">Welcome to the
+Daz-to-3DSMax Pipeline</span><br style="font-family: Calibri;">
+<br style="font-family: Calibri;">
+<span style="font-family: Calibri;">The purpose of this
+project is to provide a clean pipeline between Daz and Max, enabling
+Daz's&nbsp;rich figure creation tools and content library to be
+utilised in powerful 3D modeller and renderer that is Max.<br>
+<br>
+<span style="font-weight: bold;">Overview</span><br>
+<br>
+This project consists of four components:<br>
+</span>
+<ul style="font-family: Calibri;">
+  <li><span style="font-weight: bold;">The Daz Plugin</span><br>
+This unmanaged C++ plugin appears to Daz as an exporter, based on a
+QObject (Daz uses Qt throughout). It is responsible for collecting the
+data from Daz via the Daz provided SDK and packing it into a binary
+stream.</li>
+  <li><span style="font-weight: bold;">The Serialiser</span><br>
+MessagePack is a cross-language serialiser/deserialiser/message
+interchange format similar to JSON that can be used to exchange binary
+data. Implementations of it in C++ and C# are used to get the scene
+data between the Daz Plugin and the managed layer. It handles all the
+serialisation, deserialisation, and file layout.</li>
+  <li><span style="font-weight: bold;">The Managed
+Layer</span><br>
+Once the plugin has packed the scene data, the <span
+ style="font-style: italic;">managed</span> <span
+ style="font-style: italic;">layer</span> uses
+MessagePack to unpack them into a structure in 'managed space' that can
+be accessed by CLR based programs (guess which ones...)</li>
+  <li><span style="font-weight: bold;">The MaxScript</span><br>
+Finally, a MaxScript script loads the .NET library (the managed layer)
+and uses its methods to read the scene data into Max, using the Max API
+to create and configure objects.</li>
+</ul>
+<span style="font-family: Calibri;">Project Status</span><br
+ style="font-family: Calibri;">
+<br style="font-family: Calibri;">
+<span style="font-family: Calibri;">The project has not
+been released (that means it isn't anywhere near an alpha stage let
+alone anywhere else)</span><br style="font-family: Calibri;">
+<br style="font-family: Calibri;">
+<br>
+<span style="font-weight: bold;">The Daz Plugin</span><br>
+    <p>
+        &nbsp;</p>
+    <p>
+        &nbsp;</p>
+</body>
+</html>
