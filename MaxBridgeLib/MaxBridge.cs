@@ -56,6 +56,50 @@ namespace MaxBridgeLib
             return BlockCast<int>(myMesh.FaceMaterialIDs);
         }
 
+        public int GetHighestMaterialSlot()
+        {
+            int max = 0;
+            foreach (Material m in myMesh.Materials){
+                if (m.MaterialIndex > max)
+                    max = m.MaterialIndex;
+            }
+            return max;
+        }
+
+        public int GetNumMaterials()
+        {
+            return myMesh.Materials.Count;
+        }
+
+        public int GetMaterialSlot(int material)
+        {
+            return myMesh.Materials[material].MaterialIndex;
+        }
+
+        public string GetMaterialName(int material)
+        {
+            return myMesh.Materials[material].MaterialName;
+        }
+
+        public string GetMaterialProperty(int material, string property)
+        {
+            return myMesh.Materials[material].MaterialProperties[property];
+        }
+
+        public string[] GetMaterialProperties(int material)
+        {
+            return myMesh.Materials[material].MaterialProperties.Keys.ToArray();
+        }
+
+        public string Test2(string str)
+        {
+            return "success";
+        }
+        public string Test3(int i, int i2)
+        {
+            return "success";
+        }
+
         private T[] BlockCast<T>(byte[] source)
         {
             var array = new T[source.Length / Marshal.SizeOf(typeof(T))];

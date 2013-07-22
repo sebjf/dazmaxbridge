@@ -12,7 +12,9 @@ namespace MaxBridgeLib
         [MessagePackMember(0)]
 	    public string MaterialName;
         [MessagePackMember(1)]
-	    public int MaterialIndex; //index as known by the mesh (i.e. the material slot)
+	    public int MaterialIndex;   //index as known by the mesh (i.e. the material slot)
+        [MessagePackMember(2)]
+        public Dictionary<string, string> MaterialProperties;
     }
 
     public class MaxMesh

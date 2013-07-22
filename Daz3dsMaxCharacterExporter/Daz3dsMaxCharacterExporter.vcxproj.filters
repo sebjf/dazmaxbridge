@@ -43,6 +43,9 @@
     <ClCompile Include="moc\Daz3dsMaxCharacterExporter_moc.cpp">
       <Filter>moc</Filter>
     </ClCompile>
+    <ClCompile Include="material_processing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Daz3dsMaxCharacterExporter.h">

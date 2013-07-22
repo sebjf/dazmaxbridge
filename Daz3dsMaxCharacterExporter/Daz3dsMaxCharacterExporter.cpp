@@ -18,7 +18,7 @@ void    MyDazExporter::getDefaultOptions( DzFileIOSettings *options ) const
 	
 }
 
-MaxMesh	MyDazExporter::processMesh(DzObject* obj)
+MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 {
 	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
 
@@ -69,9 +69,17 @@ MaxMesh	MyDazExporter::processMesh(DzObject* obj)
 		myMaterial.MaterialName = material_group->getName();
 
 		DzMaterial* material = shape->findMaterial(material_group->getName());
-		
-		//now store the material properties
 
+		if(material == NULL)
+		{
+			printf("Unable to find material.");
+		}
+		
+		if(material->inherits("DzDefaultMaterial"))
+		{
+			//now store the material properties
+			myMaterial.MaterialProperties = getMaterialProperties((DzDefaultMaterial*)material);
+		}
 
 		myMesh.Materials.push_back(myMaterial);
 	}
@@ -96,7 +104,7 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 		return DZ_INVALID_SELECTION_ERROR;
 	}
 	
-	MaxMesh myMesh = processMesh(object);
+	MaxMesh myMesh = getMesh(object);
 
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);

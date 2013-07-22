@@ -10,10 +10,11 @@ using namespace msgpack;
 class Material
 {
 public:
-	string	MaterialName;
-	int		MaterialIndex; //index as known by the mesh (i.e. the material slot)
+	string				MaterialName;
+	int					MaterialIndex;		//index as known by the mesh (i.e. the material slot)
+	map<string,string>	MaterialProperties;
 
-	MSGPACK_DEFINE(MaterialName, MaterialIndex);
+	MSGPACK_DEFINE(MaterialName, MaterialIndex, MaterialProperties);
 };
 
 class MaxMesh

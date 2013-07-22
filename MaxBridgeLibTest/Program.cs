@@ -17,7 +17,7 @@ namespace MaxBridgeLibTest
             float[] verts  = bridge.GetVertices();
             int facet_count = bridge.GetNumFaces();
             int[] facets = bridge.GetFaces();
-
+            string[] matprops = bridge.GetMaterialProperties(1);
         }
     }
 }

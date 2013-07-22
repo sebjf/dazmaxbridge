@@ -15,6 +15,8 @@
 #include "dzmaterial.h"
 #include "dzbasicmaterialarea.h"
 #include "dzfacegroup.h"
+#include "dzdefaultmaterial.h"
+#include "dztexture.h"
 
 #include <QtCore\qfile.h>
 
@@ -43,8 +45,8 @@ protected:
 
 private:
 
-	MaxMesh	processMesh(DzObject* mesh);
-	
+	MaxMesh	getMesh(DzObject* mesh);
+	map<string,string> getMaterialProperties(DzDefaultMaterial* material);
 
 
 };

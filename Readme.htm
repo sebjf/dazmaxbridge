@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
   <meta content="text/html; charset=ISO-8859-1"
@@ -52,9 +52,54 @@ alone anywhere else)</span><br style="font-family: Calibri;">
 <br style="font-family: Calibri;">
 <br>
 <span style="font-weight: bold;">The Daz Plugin</span><br>
-    <p>
-        &nbsp;</p>
-    <p>
-        &nbsp;</p>
+<p></p>
+<p style="font-weight: bold;">The Managed Layer</p>
+<p>The managed layer should do as little as possible, as it is
+intended only as a tool to for MaxScript to interact with the data
+structure provided by the Daz plugin. To put it another way, if a third
+application, such as Blender, were to be supported, a new Blender
+plugin would be created that used a MessagePack implementation to read
+the data provided by the Daz plugin, rather than use the managed layer.</p>
+<p>Its responsibilities are:</p>
+<p>1. Deserialise the stream (as MaxScript does not have a
+MessagePack implementation)</p>
+<p>2. Present the data using a small subset of basic types (as
+expanded on below, MaxScript supports transferring only simple types
+between it and .NET)</p>
+<p>This allows the managed layer to be highly coupled to the
+MaxScript implementation to make both as simple as possible.</p>
+<p></p>
+<p style="font-weight: bold;">
+The MaxScript</p>
+<p>
+The MaxScript script is the last stage and the one that creates and
+configures the objects in 3DS Max. MaxScript has the ability to load
+.NET DLLs, create objects, and interact with their methods and
+properties. This opens up a great deal of functionality beyond
+MaxScript, for example, creating tools to speed up tasks such as image
+processing. Passing data between .NET and MaxScript however is limited
+to a few basic types (numbers &amp; strings) with no support for
+arbitrary data types.&nbsp;</p>
+<p>MaxScript then has four responsibilities:</p>
+<p>1.&nbsp;Pull the data from the library in the form of
+basic value types and unpack it into 3DSMax native types (e.g. float[3]
+to Point3)</p>
+<p>2. Convert all the 0 based indices to 1 based indices</p>
+<p>3.&nbsp;Create the 3DSMax objects (meshes, materials,
+skins)</p>
+<p>4. Convert Daz settings to Max settings</p>
+<p>The interpretation of values such as opacity, and specular
+power, will change between renderers and applications, so the final
+stage is to convert these material parameters from Daz to Max. This is
+done in MaxScript as well.</p>
+MaxScript is by far the slowest stage of the pipeline. It could be
+replaced with a C++ plugin (Autodesk provide an SDK) - the
+functionality in the script is not complex - which would increase speed
+significantly, however Maxscript does have some advantages:<br>
+<br>
+1. It is compatiable with all versions of 3DS Max (plugins must be
+recompiled)<br>
+2. It allows each user to edit how the data is used (e.g. new material
+types or skinning techniques) without needing the plugin source
 </body>
 </html>
