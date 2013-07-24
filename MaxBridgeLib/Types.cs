@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 using MsgPack;
 using MsgPack.Serialization;
 
@@ -28,6 +29,19 @@ namespace MaxBridgeLib
 	    int		MaterialId;
     };
      */
+
+    /* Remember this comes from MessagePack in a raw byte array */
+    [StructLayout(LayoutKind.Explicit)]
+    unsafe public struct Face
+    {
+        [FieldOffset(0)]
+        public fixed int PositionVertices[4];
+        [FieldOffset(sizeof(int) * 4)]
+        public fixed int TextureVertices[4];
+        [FieldOffset(sizeof(int) * 8)]
+        public int MaterialId;       
+
+    }
 
     /*
     class MaxMesh
@@ -67,5 +81,7 @@ namespace MaxBridgeLib
 
         [MessagePackMember(6)]
         public List<Material> Materials;
+
+        public Face[] TriangulatedFaces = null;
     }
 }

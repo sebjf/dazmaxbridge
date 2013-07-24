@@ -49,26 +49,26 @@ struct	GeometryProcessor
 	
 	fn GetFaceData
 	=(
-		local faceCount			= myBridge.GetNumFaces()
-		local faceData			= myBridge.GetFaces()
+		local faceCount			= myBridge.GetNumTriangulatedFaces()
+		local faceData			= myBridge.GetTriangulatedFaces()
 		
 		faceVertexIndices = #()
 		faceTextureIndices = #()
 		faceMaterials 		= #()
 		
+		progressUpdate 25.0
+		
 		local ptr = 1;
 		
-		for i = 0 to (faceCount-1) do
+		for i = 0 to ((faceCount-1)) do
 		(
 			fv1 = faceData[ptr + 0] + 1
 			fv2 = faceData[ptr + 1] + 1
 			fv3 = faceData[ptr + 2] + 1
-			fv4 = faceData[ptr + 3] + 1
 			
 			ft1 = faceData[ptr + 4] + 1
 			ft2 = faceData[ptr + 5] + 1
 			ft3 = faceData[ptr + 6] + 1
-			ft4 = faceData[ptr + 7] + 1 
 			
 			fmid = faceData[ptr + 8] + 1;
 			
@@ -77,12 +77,6 @@ struct	GeometryProcessor
 			append faceVertexIndices 		( [ fv1, fv2, fv3 ] )
 			append faceTextureIndices 	( [ ft1, ft2, ft3 ] )
 			append faceMaterials 			fmid
-			
-			if(fv4 > 0)do(
-				append faceVertexIndices 		( [ fv1, fv3, fv4 ] ) 
-				append faceTextureIndices 	( [ ft1, ft3, ft4 ] )
-				append faceMaterials 			fmid
-			)
 		)			
 		
 		return #(faceVertexIndices, faceTextureIndices, faceMaterials)

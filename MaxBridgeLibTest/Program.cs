@@ -19,6 +19,8 @@ namespace MaxBridgeLibTest
             int[] facets = bridge.GetFaces();
             string[] matprops = bridge.GetMaterialProperties(1);
             string s = bridge.GetMaterialProperty(0, "BaseOpacity");
+            int tfc = bridge.GetNumTriangulatedFaces();
+            int[] f = bridge.GetTriangulatedFaces();
         }
     }
 }
