@@ -9,8 +9,11 @@ can be iterated in .NET*/
 
 string PropertyToString(QString v)
 {
-	QByteArray b = v.toLatin1();
-	return b.data();
+	return v;
+	QByteArray b = v.toUtf8();
+	char* s_data = b.data();
+	string s = string(s_data);
+	return s;
 }
 
 string PropertyToString(QColor& v)
@@ -39,7 +42,7 @@ string PropertyToString(DzTexture* v)
 	if( v == NULL){
 		return "";
 	}
-	PropertyToString( v->getFilename() );
+	return PropertyToString( v->getFilename() );
 }
 
 string PropertyToString(bool v)
@@ -103,3 +106,4 @@ map<string,string> MyDazExporter::getMaterialProperties(DzDefaultMaterial* mater
 
 	return properties;
 }
+

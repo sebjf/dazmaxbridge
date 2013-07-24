@@ -38,7 +38,17 @@ namespace MaxBridgeLib
 
         public float[] GetVertices()
         {
-            return BlockCast<float>(myMesh.Vertices);
+            return myMesh.Vertices.ToArray();
+        }
+
+        public int GetNumTextureVertices()
+        {
+            return myMesh.NumTextureCoordinates;
+        }
+
+        public float[] GetTextureVertices()
+        {
+            return myMesh.TextureCoordinates.ToArray();
         }
 
         public int GetNumFaces()
@@ -49,11 +59,6 @@ namespace MaxBridgeLib
         public int[] GetFaces()
         {
             return BlockCast<int>(myMesh.Faces);
-        }
-
-        public int[] GetFaceMaterialIDs()
-        {
-            return BlockCast<int>(myMesh.FaceMaterialIDs);
         }
 
         public int GetHighestMaterialSlot()
@@ -81,9 +86,22 @@ namespace MaxBridgeLib
             return myMesh.Materials[material].MaterialName;
         }
 
+        public string GetMaterialType(int material)
+        {
+            return myMesh.Materials[material].MaterialType;
+        }
+
         public string GetMaterialProperty(int material, string property)
         {
             return myMesh.Materials[material].MaterialProperties[property];
+        }
+
+        public string TryGetMaterialProperty(int material, string property)
+        {
+            if (myMesh.Materials[material].MaterialProperties.ContainsKey(property))
+                return myMesh.Materials[material].MaterialProperties[property];
+            else
+                return "";
         }
 
         public string[] GetMaterialProperties(int material)
@@ -91,13 +109,9 @@ namespace MaxBridgeLib
             return myMesh.Materials[material].MaterialProperties.Keys.ToArray();
         }
 
-        public string Test2(string str)
+        public string[] GetMaterialValues(int material)
         {
-            return "success";
-        }
-        public string Test3(int i, int i2)
-        {
-            return "success";
+            return myMesh.Materials[material].MaterialProperties.Values.ToArray();
         }
 
         private T[] BlockCast<T>(byte[] source)

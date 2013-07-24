@@ -1,10 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
-  <title>Daz-to-Max Readme</title>
-</head>
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Daz-to-Max Readme</title></head>
+
 <body>
 <br style="font-family: Calibri;">
 <span style="font-family: Calibri;">Welcome to the
@@ -33,9 +31,7 @@ data between the Daz Plugin and the managed layer. It handles all the
 serialisation, deserialisation, and file layout.</li>
   <li><span style="font-weight: bold;">The Managed
 Layer</span><br>
-Once the plugin has packed the scene data, the <span
- style="font-style: italic;">managed</span> <span
- style="font-style: italic;">layer</span> uses
+Once the plugin has packed the scene data, the <span style="font-style: italic;">managed</span> <span style="font-style: italic;">layer</span> uses
 MessagePack to unpack them into a structure in 'managed space' that can
 be accessed by CLR based programs (guess which ones...)</li>
   <li><span style="font-weight: bold;">The MaxScript</span><br>
@@ -43,8 +39,7 @@ Finally, a MaxScript script loads the .NET library (the managed layer)
 and uses its methods to read the scene data into Max, using the Max API
 to create and configure objects.</li>
 </ul>
-<span style="font-family: Calibri;">Project Status</span><br
- style="font-family: Calibri;">
+<span style="font-family: Calibri;">Project Status</span><br style="font-family: Calibri;">
 <br style="font-family: Calibri;">
 <span style="font-family: Calibri;">The project has not
 been released (that means it isn't anywhere near an alpha stage let
@@ -100,6 +95,5 @@ significantly, however Maxscript does have some advantages:<br>
 1. It is compatiable with all versions of 3DS Max (plugins must be
 recompiled)<br>
 2. It allows each user to edit how the data is used (e.g. new material
-types or skinning techniques) without needing the plugin source
-</body>
-</html>
+types or skinning techniques) without needing the plugin source<br><br><br style="font-weight: bold;"><span style="font-weight: bold;">To Do List</span><br><br>1. Complete Standard Properties Mapping in MaxScript<br>2. Use QMetaObject to process DzShaderMaterials<br>3. Add Proper Error Checking<br>4. Manually Increase MaxScript Heap Size&nbsp;to improve performance of first run<br>
+</body></html>

@@ -14,24 +14,58 @@ namespace MaxBridgeLib
         [MessagePackMember(1)]
 	    public int MaterialIndex;   //index as known by the mesh (i.e. the material slot)
         [MessagePackMember(2)]
+        public string MaterialType;
+        [MessagePackMember(3)]
         public Dictionary<string, string> MaterialProperties;
     }
+
+    /*
+    struct Face
+    {
+    public:
+	    int		PositionVertices[4];
+	    int		TextureVertices[4];
+	    int		MaterialId;
+    };
+     */
+
+    /*
+    class MaxMesh
+    {
+    public:	
+	    int NumVertices;
+	    vector<float>	Vertices;
+
+	    int NumTextureCoordinates;
+	    vector<float>	TextureCoordinates;
+
+	    int		NumFaces;
+	    BYTES	Faces;
+
+	    vector<Material> Materials;
+
+	    MSGPACK_DEFINE(NumVertices, Vertices, NumTextureCoordinates, TextureCoordinates, NumFaces, Faces, Materials);
+    };
+    */
 
     public class MaxMesh
     {
         [MessagePackMember(0)]
         public int NumVertices;
         [MessagePackMember(1)]
-        public byte[] Vertices;
+        public List<float> Vertices;
 
         [MessagePackMember(2)]
-        public int NumFaces;
+        public int NumTextureCoordinates;
         [MessagePackMember(3)]
-        public byte[] Faces;
-        [MessagePackMember(4)]
-        public byte[] FaceMaterialIDs;
+        public List<float> TextureCoordinates;
 
+        [MessagePackMember(4)]
+        public int NumFaces;
         [MessagePackMember(5)]
+        public byte[] Faces;
+
+        [MessagePackMember(6)]
         public List<Material> Materials;
     }
 }

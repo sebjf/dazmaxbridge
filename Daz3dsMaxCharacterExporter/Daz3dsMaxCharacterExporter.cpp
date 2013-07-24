@@ -4,8 +4,9 @@
 #include "Types.h"
 
 #define		VERTEX_SIZE_IN_BYTES			(sizeof(DzPnt3))
-#define		FACE_SIZE_IN_BYTES				(sizeof(int) * 4)
+#define		FACE_SIZE_IN_BYTES				(sizeof(Face))
 #define		FACE_MATERIAL_ID_SIZE_IN_BYTES	(sizeof(int))
+#define		FLOATS_PER_VERTEX				3
 
 
 QString VecToString(DzVec3 v)
@@ -27,35 +28,54 @@ MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 	// Collect the vertices into a float array - each vertex is three floats so its a simple copy
 
 	myMesh.NumVertices = mesh->getNumVertices();
-	myMesh.Vertices.size = myMesh.NumVertices * VERTEX_SIZE_IN_BYTES;
-	myMesh.Vertices.ptr = (char*)malloc(myMesh.Vertices.size);
-	memcpy((void*)myMesh.Vertices.ptr, mesh->getVerticesPtr(), myMesh.Vertices.size);
+	myMesh.Vertices.assign( (float*)mesh->getVerticesPtr(), (float*)mesh->getVerticesPtr() + (myMesh.NumVertices * FLOATS_PER_VERTEX) );
+
+	DzMap* uvMap = mesh->getUVs();
+	myMesh.NumTextureVertices = uvMap->getNumValues();
+	switch(uvMap->getType())
+	{
+	case DzMap::FLOAT_MAP:
+		myMesh.TextureVertices.assign( uvMap->getFloatArrayPtr(), uvMap->getFloatArrayPtr() + myMesh.NumTextureVertices );
+		break;
+	case DzMap::FLOAT2_MAP:
+		myMesh.TextureVertices.assign( (float*)uvMap->getPnt2ArrayPtr(), (float*)uvMap->getPnt2ArrayPtr() + (myMesh.NumTextureVertices * 2) );
+		break;
+	case DzMap::FLOAT3_MAP:
+		myMesh.TextureVertices.assign( (float*)uvMap->getPnt3ArrayPtr(), (float*)uvMap->getPnt3ArrayPtr() + (myMesh.NumTextureVertices * 3) );
+		break;
+	}
 
 	// Collect the faces into an int array - each facet contains a number of properties such as material indices so split them out
 
 	myMesh.NumFaces = mesh->getNumFacets();
 	myMesh.Faces.size = myMesh.NumFaces * FACE_SIZE_IN_BYTES;
 	myMesh.Faces.ptr = (char*)malloc(myMesh.Faces.size);
-	myMesh.FaceMaterialIDs.size = myMesh.NumFaces * FACE_MATERIAL_ID_SIZE_IN_BYTES;
-	myMesh.FaceMaterialIDs.ptr = (char*)malloc(myMesh.FaceMaterialIDs.size);
 
 	vector<int> materialsToProcess;
+
+	Face* faces = (Face*)myMesh.Faces.ptr;
 
 	DzFacet* facets = mesh->getFacetsPtr();
 	for(int i = 0; i < myMesh.NumFaces; i++)
 	{
-		((int*)myMesh.Faces.ptr)[(i * 4) + 0] = facets[i].m_vertIdx[0];
-		((int*)myMesh.Faces.ptr)[(i * 4) + 1] = facets[i].m_vertIdx[1];
-		((int*)myMesh.Faces.ptr)[(i * 4) + 2] = facets[i].m_vertIdx[2];
-		((int*)myMesh.Faces.ptr)[(i * 4) + 3] = facets[i].m_vertIdx[3];
+		faces[i].PositionVertices[0] = facets[i].m_vertIdx[0];
+		faces[i].PositionVertices[1] = facets[i].m_vertIdx[1];
+		faces[i].PositionVertices[2] = facets[i].m_vertIdx[2];
+		faces[i].PositionVertices[3] = facets[i].m_vertIdx[3];
 
-		((int*)myMesh.FaceMaterialIDs.ptr)[i] = facets[i].m_materialIdx;
+		faces[i].TextureVertices[0] = facets[i].m_uvwIdx[0];
+		faces[i].TextureVertices[1] = facets[i].m_uvwIdx[1];
+		faces[i].TextureVertices[2] = facets[i].m_uvwIdx[2];
+		faces[i].TextureVertices[3] = facets[i].m_uvwIdx[3];
+
+		faces[i].MaterialId = facets[i].m_materialIdx;
 
 		if(std::find(materialsToProcess.begin(),materialsToProcess.end(),facets[i].m_materialIdx) == materialsToProcess.end())
 		{
 			materialsToProcess.push_back(facets[i].m_materialIdx);
 		}
 	}
+
 
 	DzShape* shape = obj->getCurrentShape();
 
@@ -75,10 +95,23 @@ MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 			printf("Unable to find material.");
 		}
 		
+		myMaterial.MaterialType = material->className();
+
 		if(material->inherits("DzDefaultMaterial"))
 		{
 			//now store the material properties
 			myMaterial.MaterialProperties = getMaterialProperties((DzDefaultMaterial*)material);
+		}
+
+		if(material->inherits("DzShaderMaterial"))
+		{
+			const QMetaObject* mo = material->metaObject();
+			int mc = mo->methodCount();
+			vector<string> methodNames;
+			for(int i = mo->methodOffset(); i < mc; i++)
+			{
+				methodNames.push_back(string( mo->method(i).signature()));
+			}
 		}
 
 		myMesh.Materials.push_back(myMaterial);

@@ -1,6 +1,8 @@
 #ifndef DAZ_CHARACTER_EXPORTER
 #define DAZ_CHARACTER_EXPORTER
 
+#pragma warning (error: 4715)
+
 #include <dzscene.h>
 #include "dzexporter.h"
 #include "dznode.h"
@@ -15,10 +17,14 @@
 #include "dzmaterial.h"
 #include "dzbasicmaterialarea.h"
 #include "dzfacegroup.h"
+#include "dzshaderbrick.h"
+#include "dzshadermixerutility.h"
 #include "dzdefaultmaterial.h"
 #include "dztexture.h"
+#include "dzmap.h"
 
 #include <QtCore\qfile.h>
+#include <QtCore\qmetaobject.h>
 
 using namespace std;
 
