@@ -22,6 +22,7 @@
 #include "dzdefaultmaterial.h"
 #include "dztexture.h"
 #include "dzmap.h"
+#include "dzproperty.h"
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>

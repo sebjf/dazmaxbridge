@@ -103,6 +103,21 @@ MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 			myMaterial.MaterialProperties = getMaterialProperties((DzDefaultMaterial*)material);
 		}
 
+		int propertyCount = material->getNumProperties();
+
+		vector<QString> propertyNames;
+		vector<QString> propertyTypes;
+
+		for(int i = 0; i < propertyCount; i++)
+		{
+			DzProperty* prop = material->getProperty(i);
+
+			OutputDebugString(prop->getName());
+			OutputDebugString(prop->metaObject()->className());
+			OutputDebugString("\n\n");
+
+		}
+
 		if(material->inherits("DzShaderMaterial"))
 		{
 			const QMetaObject* mo = material->metaObject();
