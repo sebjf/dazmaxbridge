@@ -1,7 +1,6 @@
 // Daz3dsMaxCharacterExporter.cpp : Defines the exported functions for the DLL application.
 //
 #include "Daz3dsMaxCharacterExporter.h"
-#include "Types.h"
 
 #define		VERTEX_SIZE_IN_BYTES			(sizeof(DzPnt3))
 #define		FACE_SIZE_IN_BYTES				(sizeof(Face))
@@ -108,30 +107,91 @@ MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 	return myMesh;
 }
 
+DzSkeleton* findBoneSkeleton(DzNode* node)
+{
+	DzNode* theParent = node->getNodeParent();
+	if(theParent->inherits("DzSkeleton"))
+	{
+		return (DzSkeleton*)theParent;
+	}
+	return findBoneSkeleton(theParent);
+}
+
+MaxMesh MyDazExporter::getSkinnedFigure(DzObject* node)
+{
+	return getMesh(node); //for now we dont do skinning so just export the figure
+}
+
+MaxMesh MyDazExporter::getStaticMesh(DzObject* node)
+{
+	return getMesh(node);
+}
+
+void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
+{
+	if(node->inherits("DzBone"))
+	{
+		//its a bone so find the parent skeleton and that will be the figure to export
+		node = findBoneSkeleton(node);
+	}
+
+	DzObject* object = node->getObject();
+	if(object != NULL)
+	{
+		//this node has geometry so its something we want to export
+		if(object->getCachedGeom()->inherits("DzFacetMesh"))
+		{
+			if(find(processedNodes.begin(), processedNodes.end(), node) != processedNodes.end()){
+				//if we have already encountered this node (which we might have done if the user has selected multiple bones in same skeleton for example), abort.
+				return;
+			}
+
+			processedNodes.push_back(node);
+
+			if(node->inherits("DzSkeleton"))
+			{
+				scene.Items.push_back( getSkinnedFigure(object) );
+			}
+			else
+			{
+				scene.Items.push_back( getStaticMesh(object) );
+			}
+		}
+	}
+
+	DzNodeListIterator nodeIterator = node->nodeChildrenIterator();
+	while(nodeIterator.hasNext())
+	{
+		DzNode* node = nodeIterator.next();
+		resolveSelectedDzNode(node);		
+	}
+}
+
+void	MyDazExporter::Reset()
+{
+	MaxScene newScene;
+	scene = newScene;
+
+	vector<DzNode*> newProcessedNodes;	
+	processedNodes = newProcessedNodes;
+}
+
 DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *options )
 {
-	DzNode* selection = dzScene->getPrimarySelection();
-	DzSkeleton* skeleton = selection->getSkeleton();
+	Reset();
 
-	DzObject* object = selection->getObject();
-
-	if( object == NULL )
+	DzNodeListIterator nodeIterator = dzScene->selectedNodeListIterator();
+	while(nodeIterator.hasNext())
 	{
-		return DZ_INVALID_SELECTION_ERROR;
+		DzNode* node = nodeIterator.next();
+		resolveSelectedDzNode(node);		
 	}
-
-	if(!object->getCachedGeom()->inherits("DzFacetMesh"))
-	{
-		return DZ_INVALID_SELECTION_ERROR;
-	}
-	
-	MaxMesh myMesh = getMesh(object);
 
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
 
 	msgpack::sbuffer sbuf;
-	msgpack::pack(sbuf, myMesh);
+	msgpack::pack(sbuf, scene);
 	myFile.write(sbuf.data(), sbuf.size());
 
 	myFile.close();

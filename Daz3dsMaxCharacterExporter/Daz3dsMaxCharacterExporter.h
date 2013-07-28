@@ -3,6 +3,8 @@
 
 #pragma warning (error: 4715)
 
+#include "Types.h"
+
 #include <dzscene.h>
 #include "dzexporter.h"
 #include "dznode.h"
@@ -36,8 +38,6 @@
 
 using namespace std;
 
-class MaxMesh; //forward declaration because we can't use Types.h because Winsock_2 is used in types (try it and see...)
-
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
 class MyDazExporter : public DzExporter {
@@ -59,10 +59,17 @@ protected:
 
 private:
 
-	MaxMesh	getMesh(DzObject* mesh);
-	map<string,string> getMaterialProperties(DzDefaultMaterial* material);
-	map<string,string> getMaterialProperties(DzMaterial* material);
+	MaxScene	scene;
 
+	void				resolveSelectedDzNode(DzNode* node);
+	MaxMesh				getSkinnedFigure(DzObject* node);
+	MaxMesh				getStaticMesh(DzObject* node);
+	MaxMesh				getMesh(DzObject* mesh);
+	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);
+
+	vector<DzNode*> processedNodes;
+
+	void		Reset();
 
 };
 

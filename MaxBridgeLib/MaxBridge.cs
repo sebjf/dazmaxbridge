@@ -14,7 +14,8 @@ namespace MaxBridgeLib
     {
         #region Local Members
 
-        MaxMesh myMesh;
+        MaxScene myScene;
+        int mesh = 0;
 
         public const int FLOATS_PER_VERTEX = 3;
         public const int INTS_PER_FACE = 4;
@@ -31,58 +32,72 @@ namespace MaxBridgeLib
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(fs);
 
-            MessagePackSerializer<MaxMesh> c = MessagePackSerializer.Create<MaxMesh>();
-            myMesh = c.Unpack(fs);
+            MessagePackSerializer<MaxScene> c = MessagePackSerializer.Create<MaxScene>();
+            myScene = c.Unpack(fs);
         }
+
+        #region Scene Navigation
+
+        public int GetNumItems()
+        {
+            return myScene.Items.Count;
+        }
+
+        public void SetMesh(int mesh)
+        {
+            this.mesh = mesh;
+        }
+
+        #endregion
 
         #region Mesh & Geometry
 
         public int GetNumVertices()
         {
-            return myMesh.NumVertices;
+            return myScene.Items[mesh].NumVertices;
         }
 
         public float[] GetVertices()
         {
-            return myMesh.Vertices.ToArray();
+            return myScene.Items[mesh].Vertices.ToArray();
         }
 
         public int GetNumTextureVertices()
         {
-            return myMesh.NumTextureCoordinates;
+            return myScene.Items[mesh].NumTextureCoordinates;
         }
 
         public float[] GetTextureVertices()
         {
-            return myMesh.TextureCoordinates.ToArray();
+            return myScene.Items[mesh].TextureCoordinates.ToArray();
         }
 
         public int GetNumFaces()
         {
-            return myMesh.NumFaces;
+            return myScene.Items[mesh].NumFaces;
         }
 
         public int GetNumTriangulatedFaces()
         {
-            if (myMesh.TriangulatedFaces == null)
+            if (myScene.Items[mesh].TriangulatedFaces == null)
             {
-                TriangulateFaces(myMesh);
+                TriangulateFaces(myScene.Items[mesh]);
             }
-            return myMesh.TriangulatedFaces.Length;
+            return myScene.Items[mesh].TriangulatedFaces.Length;
         }
 
         public int[] GetTriangulatedFaces()
         {
-            if (myMesh.TriangulatedFaces == null)
+            if (myScene.Items[mesh].TriangulatedFaces == null)
             {
-                TriangulateFaces(myMesh);
+                TriangulateFaces(myScene.Items[mesh]);
             }
-            return BlockCast(myMesh.TriangulatedFaces);
+            return BlockCast(myScene.Items[mesh].TriangulatedFaces);
         }
 
         public int[] GetFaces()
         {
-            return BlockCast<int>(myMesh.Faces);
+            return BlockCast<int>(myScene.Items[mesh].Faces);
         }
 
         #endregion
@@ -92,7 +107,8 @@ namespace MaxBridgeLib
         public int GetHighestMaterialSlot()
         {
             int max = 0;
-            foreach (Material m in myMesh.Materials){
+            foreach (Material m in myScene.Items[mesh].Materials)
+            {
                 if (m.MaterialIndex > max)
                     max = m.MaterialIndex;
             }
@@ -101,45 +117,45 @@ namespace MaxBridgeLib
 
         public int GetNumMaterials()
         {
-            return myMesh.Materials.Count;
+            return myScene.Items[mesh].Materials.Count;
         }
 
         public int GetMaterialSlot(int material)
         {
-            return myMesh.Materials[material].MaterialIndex;
+            return myScene.Items[mesh].Materials[material].MaterialIndex;
         }
 
         public string GetMaterialName(int material)
         {
-            return myMesh.Materials[material].MaterialName;
+            return myScene.Items[mesh].Materials[material].MaterialName;
         }
 
         public string GetMaterialType(int material)
         {
-            return myMesh.Materials[material].MaterialType;
+            return myScene.Items[mesh].Materials[material].MaterialType;
         }
 
         public string GetMaterialProperty(int material, string property)
         {
-            return myMesh.Materials[material].MaterialProperties[property];
+            return myScene.Items[mesh].Materials[material].MaterialProperties[property];
         }
 
         public string TryGetMaterialProperty(int material, string property)
         {
-            if (myMesh.Materials[material].MaterialProperties.ContainsKey(property))
-                return myMesh.Materials[material].MaterialProperties[property];
+            if (myScene.Items[mesh].Materials[material].MaterialProperties.ContainsKey(property))
+                return myScene.Items[mesh].Materials[material].MaterialProperties[property];
             else
                 return "";
         }
 
         public string[] GetMaterialProperties(int material)
         {
-            return myMesh.Materials[material].MaterialProperties.Keys.ToArray();
+            return myScene.Items[mesh].Materials[material].MaterialProperties.Keys.ToArray();
         }
 
         public string[] GetMaterialValues(int material)
         {
-            return myMesh.Materials[material].MaterialProperties.Values.ToArray();
+            return myScene.Items[mesh].Materials[material].MaterialProperties.Values.ToArray();
         }
 
         #endregion
@@ -219,23 +235,27 @@ namespace MaxBridgeLib
                 f1.PositionVertices[0] = fv1;
                 f1.PositionVertices[1] = fv2;
                 f1.PositionVertices[2] = fv3;
+                f1.PositionVertices[3] = -1;
                 f1.TextureVertices[0] = tv1;
                 f1.TextureVertices[1] = tv2;
                 f1.TextureVertices[2] = tv3;
+                f1.TextureVertices[3] = -1;
                 f1.MaterialId = fmaterial;
 
                 triangulatedFaces.Add(f1);
 
-                if (fv1 >= 0)
+                if (fv4 >= 0)
                 {
                     Face f2;
 
                     f2.PositionVertices[0] = fv1;
                     f2.PositionVertices[1] = fv3;
                     f2.PositionVertices[2] = fv4;
+                    f2.PositionVertices[3] = -1;
                     f2.TextureVertices[0] = tv1;
                     f2.TextureVertices[1] = tv3;
                     f2.TextureVertices[2] = tv4;
+                    f2.TextureVertices[3] = -1;
                     f2.MaterialId = fmaterial;
 
                     triangulatedFaces.Add(f2);

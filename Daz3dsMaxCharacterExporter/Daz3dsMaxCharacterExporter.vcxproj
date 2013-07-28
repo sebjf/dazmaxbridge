@@ -98,7 +98,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DAZ3DSMAXCHARACTEREXPORTER_EXPORTS;QT3_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DAZ3DSMAXCHARACTEREXPORTER_EXPORTS;_WINSOCKAPI_;QT3_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(DAZ_STUDIO_SDK)\include;$(ProjectDir)msgpack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

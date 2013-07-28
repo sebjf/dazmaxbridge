@@ -1,5 +1,4 @@
 #include "Daz3dsMaxCharacterExporter.h"
-#include "Types.h"
 #include <sstream>
 
 /*This method is responsible for turning a Daz material into a set of queryable properties 
@@ -9,7 +8,6 @@ can be iterated in .NET*/
 
 string PropertyToString(QString v)
 {
-	return v;
 	QByteArray b = v.toUtf8();
 	char* s_data = b.data();
 	string s = string(s_data);
@@ -87,12 +85,12 @@ string PropertyToString(DzProperty* v)
 	{
 		return PropertyToString( ((DzIntProperty*)v)->getRawValue() );
 	}
-	return (QString("Error: cannot resolve type ") + v->className() + QString(" to a string."));
+	return string((QString("Error: cannot resolve type ") + v->className() + QString(" to a string.")).toUtf8().data());
 }
 
-map<string,string> MyDazExporter::getMaterialProperties(DzMaterial* material)
+MATERIALPROPERTIES MyDazExporter::getMaterialProperties(DzMaterial* material)
 {
-	map<string,string> properties;
+	MATERIALPROPERTIES properties;
 
 	//first, collect the color (diffuse) map along with other properties that Daz treats as 
 	//special cases

@@ -84,4 +84,20 @@ namespace MaxBridgeLib
 
         public Face[] TriangulatedFaces = null;
     }
+
+    /*  
+    class MaxCollection
+    {
+    public:
+	    vector<MaxMesh>	Items;
+
+	    MSGPACK_DEFINE(Items);
+    };
+    */
+
+    public class MaxScene
+    {
+        [MessagePackMember(0)]
+        public List<MaxMesh> Items;
+    }
 }

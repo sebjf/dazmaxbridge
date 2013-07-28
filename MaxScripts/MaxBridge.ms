@@ -62,9 +62,15 @@ struct MaxBridge
 		disableSceneRedraw()
 		suspendEditing()
 		undo off(
-		
-		myMesh = MakeMesh()
-		mymesh.material = MakeMaterial()
+			
+			sceneItemCount = myBridge.GetNumItems()
+			
+			for i = 1 to sceneItemCount do
+			(
+				myBridge.SetMesh (i-1)
+				myMesh = MakeMesh()
+				mymesh.material = MakeMaterial()
+			)
 			
 		)
 		
