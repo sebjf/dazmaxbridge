@@ -23,6 +23,13 @@
 #include "dztexture.h"
 #include "dzmap.h"
 #include "dzproperty.h"
+#include "dzimageproperty.h"
+#include "dzfloatproperty.h"
+#include "dzcolorproperty.h"
+#include "dzstringproperty.h"
+#include "dzfileproperty.h"
+#include "dzboolproperty.h"
+#include "dzenumproperty.h"
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>
@@ -54,6 +61,7 @@ private:
 
 	MaxMesh	getMesh(DzObject* mesh);
 	map<string,string> getMaterialProperties(DzDefaultMaterial* material);
+	map<string,string> getMaterialProperties(DzMaterial* material);
 
 
 };

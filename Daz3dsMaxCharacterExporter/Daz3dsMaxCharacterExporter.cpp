@@ -94,39 +94,12 @@ MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 		{
 			printf("Unable to find material.");
 		}
-		
+
 		myMaterial.MaterialType = material->className();
 
-		if(material->inherits("DzDefaultMaterial"))
+		if(material->inherits("DzMaterial"))
 		{
-			//now store the material properties
-			myMaterial.MaterialProperties = getMaterialProperties((DzDefaultMaterial*)material);
-		}
-
-		int propertyCount = material->getNumProperties();
-
-		vector<QString> propertyNames;
-		vector<QString> propertyTypes;
-
-		for(int i = 0; i < propertyCount; i++)
-		{
-			DzProperty* prop = material->getProperty(i);
-
-			OutputDebugString(prop->getName());
-			OutputDebugString(prop->metaObject()->className());
-			OutputDebugString("\n\n");
-
-		}
-
-		if(material->inherits("DzShaderMaterial"))
-		{
-			const QMetaObject* mo = material->metaObject();
-			int mc = mo->methodCount();
-			vector<string> methodNames;
-			for(int i = mo->methodOffset(); i < mc; i++)
-			{
-				methodNames.push_back(string( mo->method(i).signature()));
-			}
+			myMaterial.MaterialProperties = getMaterialProperties((DzMaterial*)material);
 		}
 
 		myMesh.Materials.push_back(myMaterial);

@@ -7,14 +7,15 @@ struct	GeometryProcessor
 	
 	fn GetVertices
 	=(
-		vertexCount= myBridge.GetNumVertices()
-		vertexData	= myBridge.GetVertices()
+		local vertexCount= myBridge.GetNumVertices()
+		local vertexData	= myBridge.GetVertices()
 		
-		vertices = #()
+		local vertices = #()
+		vertices[vertexCount] = 0
 		
 		for i = 0 to (vertexCount-1) do
 		(
-			append vertices ( [ vertexData[(i * 3) + 1], vertexData[ (i * 3) + 2], vertexData[(i * 3) + 3] ] ) 
+			vertices[i+1] = ( [ vertexData[(i * 3) + 1], vertexData[ (i * 3) + 2], vertexData[(i * 3) + 3] ] ) 
 		)			
 		
 		return vertices
@@ -22,25 +23,26 @@ struct	GeometryProcessor
 	
 	fn GetTextureVertices
 	=(
-		vertexCount 	= myBridge.GetNumTextureVertices()
-		vertexData 	= myBridge.GetTextureVertices()
+		local vertexCount 	= myBridge.GetNumTextureVertices()
+		local vertexData 	= myBridge.GetTextureVertices()
 		
-		vertices = #()
+		local vertices = #()
+		vertices[vertexCount] = 0
 		
-		elementsPerVertex = vertexData.count / vertexCount;
+		local elementsPerVertex = vertexData.count / vertexCount;
 		
 		if(elementsPerVertex == 2)then
 		(
 			for i = 0 to (vertexCount-1) do
 			(
-				append vertices ( [ vertexData[(i * 2) + 1], vertexData[ (i * 2) + 2], 0.0 ] ) 
+				vertices[i+1] = ( [ vertexData[(i * 2) + 1], vertexData[ (i * 2) + 2], 0.0 ] ) 
 			)
 		)
 		if(elementsPerVertex == 3)then
 		(
 			for i = 0 to (vertexCount-1) do
 			(
-				append vertices ( [ vertexData[(i * 3) + 1], vertexData[ (i * 3) + 2], vertexData[(i * 3) + 3] ] ) 
+				vertices[i+1] = ( [ vertexData[(i * 3) + 1], vertexData[ (i * 3) + 2], vertexData[(i * 3) + 3] ] ) 
 			)
 		)
 		
@@ -52,13 +54,17 @@ struct	GeometryProcessor
 		local faceCount			= myBridge.GetNumTriangulatedFaces()
 		local faceData			= myBridge.GetTriangulatedFaces()
 		
-		faceVertexIndices = #()
-		faceTextureIndices = #()
-		faceMaterials 		= #()
+		local faceVertexIndices 	= #()
+		local faceTextureIndices 	= #()
+		local faceMaterials 			= #()
 		
 		progressUpdate 25.0
 		
 		local ptr = 1;
+		
+		faceVertexIndices[faceCount] 	= 0
+		faceTextureIndices[faceCount] 	= 0
+		faceMaterials[faceCount] 			= 0
 		
 		for i = 0 to ((faceCount-1)) do
 		(
@@ -74,9 +80,9 @@ struct	GeometryProcessor
 			
 			ptr = ptr + 9;
 			
-			append faceVertexIndices 		( [ fv1, fv2, fv3 ] )
-			append faceTextureIndices 	( [ ft1, ft2, ft3 ] )
-			append faceMaterials 			fmid
+			faceVertexIndices[i+1] 	=	( [ fv1, fv2, fv3 ] )
+			faceTextureIndices[i+1] 	=	( [ ft1, ft2, ft3 ] )
+			faceMaterials[i+1] 			= 	fmid
 		)			
 		
 		return #(faceVertexIndices, faceTextureIndices, faceMaterials)
@@ -88,22 +94,22 @@ struct	GeometryProcessor
 		progressStart "Creating mesh..."
 		progressUpdate 0.0
 		
-		myVertices = GetVertices()
+		local myVertices = GetVertices()
 		progressUpdate 10.0
 		
-		myUVVertices = GetTextureVertices()
+		local myUVVertices = GetTextureVertices()
 		progressUpdate 20.0
 		
-		faceData = GetFaceData()
+		local faceData = GetFaceData()
 		progressUpdate 30.0
 				
-		myMesh = mesh vertices:myVertices faces:faceData[1] materialIDs:faceData[3] tverts:myUVVertices
+		local myMesh = mesh vertices:myVertices faces:faceData[1] materialIDs:faceData[3] tverts:myUVVertices
 		progressUpdate 40.0
 				
 		buildTVFaces myMesh.mesh
 		progressUpdate 50.0
 		
-		faceTextureVertices = faceData[2]
+		local faceTextureVertices = faceData[2]
 		for i = 1 to myMesh.numFaces do
 		(
 			setTVFace myMesh.mesh i faceTextureVertices[i]

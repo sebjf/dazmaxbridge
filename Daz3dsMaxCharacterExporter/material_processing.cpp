@@ -53,57 +53,80 @@ string PropertyToString(bool v)
 		return "False";
 }
 
-map<string,string> MyDazExporter::getMaterialProperties(DzDefaultMaterial* material)
+string PropertyToString(DzProperty* v)
+{
+	if(v->isA("DzImageProperty"))
+	{
+		return PropertyToString( ((DzImageProperty*)v)->getValue() );
+	}
+	if(v->isA("DzFloatProperty"))
+	{
+		return PropertyToString( ((DzFloatProperty*)v)->getRawValue() );
+	}
+	if(v->isA("DzColorProperty"))
+	{
+		return PropertyToString( ((DzColorProperty*)v)->getRawColorValue() );
+	}
+	if(v->isA("DzBoolProperty"))
+	{
+		return PropertyToString( ((DzBoolProperty*)v)->getRawBoolValue() );
+	}
+	if(v->isA("DzEnumProperty"))
+	{
+		return PropertyToString( ((DzEnumProperty*)v)->getRawStringValue() );
+	}
+	if(v->isA("DzStringProperty"))
+	{
+		return PropertyToString( ((DzEnumProperty*)v)->getRawStringValue() );
+	}
+	if(v->isA("DzFileProperty"))
+	{
+		return PropertyToString( ((DzEnumProperty*)v)->getRawStringValue() );
+	}
+	if(v->isA("DzIntProperty"))
+	{
+		return PropertyToString( ((DzIntProperty*)v)->getRawValue() );
+	}
+	return (QString("Error: cannot resolve type ") + v->className() + QString(" to a string."));
+}
+
+map<string,string> MyDazExporter::getMaterialProperties(DzMaterial* material)
 {
 	map<string,string> properties;
 
-	properties["allowsAutoBake"] = PropertyToString( material->allowsAutoBake() );
-	properties["BaseOpacity"] = PropertyToString( material->getBaseOpacity() );
-	properties["ColorMap"] = PropertyToString( material->getColorMap() );
-	properties["DiffuseColor"] = PropertyToString( material->getDiffuseColor() );
-	properties["MaterialType"] = PropertyToString( material->getMaterialName() );
-	properties["NumGLMaps"] = PropertyToString( material->getNumGLMaps() );
-	properties["OpacityMap"] = PropertyToString( material->getOpacityMap() );
-	properties["isColorMappable"] = PropertyToString( material->isColorMappable() );
-	properties["isOpacityMappable"] = PropertyToString( material->isOpacityMappable() );
-	properties["isOpaque"] = PropertyToString( material->isOpaque() );
-	properties["AmbientColor"] = PropertyToString( material->getAmbientColor() );
-	properties["AmbientColorMap"] = PropertyToString( material->getAmbientColorMap() );
-	properties["AmbientStrength"] = PropertyToString( material->getAmbientStrength() );
-	properties["AmbientValueMap"] = PropertyToString( material->getAmbientValueMap() );
-	properties["BumpMap"] = PropertyToString( material->getBumpMap() );
-	properties["BumpMax"] = PropertyToString( material->getBumpMax() );
-	properties["BumpMin"] = PropertyToString( material->getBumpMin() );
-	properties["BumpStrength"] = PropertyToString( material->getBumpStrength() );
-	properties["DiffuseStrength"] = PropertyToString( material->getDiffuseStrength() );
-	properties["DiffuseValueMap"] = PropertyToString( material->getDiffuseValueMap() );
-	properties["DisplacementMap"] = PropertyToString( material->getDisplacementMap() );
-	properties["DisplacementMax"] = PropertyToString( material->getDisplacementMax() );
-	properties["DisplacementMin"] = PropertyToString( material->getDisplacementMin() );
-	properties["DisplacementStrength"] = PropertyToString( material->getDisplacementStrength() );
-	properties["GlossinessStrength"] = PropertyToString( material->getGlossinessStrength() );
-	properties["GlossinessValueMap"] = PropertyToString( material->getGlossinessValueMap() );
-	properties["HorizontalOffset"] = PropertyToString( material->getHorizontalOffset() );
-	properties["HorizontalTiles"] = PropertyToString( material->getHorizontalTiles() );
-	properties["IndexOfRefraction"] = PropertyToString( material->getIndexOfRefraction() );
-	properties["NormalValueMap"] = PropertyToString( material->getNormalValueMap() );
-	properties["ReflectionColor"] = PropertyToString( material->getReflectionColor() );
-	properties["ReflectionMap"] = PropertyToString( material->getReflectionMap() );
-	properties["ReflectionStrength"] = PropertyToString( material->getReflectionStrength() );
-	properties["ReflectionValueMap"] = PropertyToString( material->getReflectionValueMap() );
-	properties["RefractionColor"] = PropertyToString( material->getRefractionColor() );
-	properties["RefractionColorMap"] = PropertyToString( material->getRefractionColorMap() );
-	properties["RefractionStrength"] = PropertyToString( material->getRefractionStrength() );
-	properties["RefractionValueMap"] = PropertyToString( material->getRefractionValueMap() );
-	properties["SpecularColor"] = PropertyToString( material->getSpecularColor() );
-	properties["SpecularColorMap"] = PropertyToString( material->getSpecularColorMap() );
-	properties["SpecularStrength"] = PropertyToString( material->getSpecularStrength() );
-	properties["SpecularValueMap"] = PropertyToString( material->getSpecularValueMap() );
-	properties["SurfaceType"] = PropertyToString( material->getSurfaceType() );
-	properties["VerticalOffset"] = PropertyToString( material->getVerticalOffset() );
-	properties["VerticalTiles"] = PropertyToString( material->getVerticalTiles() );
-	properties["isMultThroughOpacity"] = PropertyToString( material->isMultThroughOpacity() );
+	//first, collect the color (diffuse) map along with other properties that Daz treats as 
+	//special cases
+
+	properties["Color Map"] = PropertyToString( material->getColorMap() );
+	properties["Diffuse Color"] = PropertyToString( material->getDiffuseColor() );
+	properties["Opacity Map"] = PropertyToString( material->getOpacityMap() );
+
+	//this is also where the smoothing is done for when we are ready...
+
+	/*	
+	DzBoolProperty*	getSmoothControl () const
+	virtual double 	getSmoothingAngle () const 
+	*/
+
+	//now, collect the arbitrary properties
+
+	for( int i = 0; i < material->getNumProperties(); i++)
+	{
+		DzProperty* myProperty = material->getProperty(i);
+		string propertyName = myProperty->getName().toUtf8().data();
+		string propertyValue = PropertyToString(myProperty);
+		properties[propertyName] = propertyValue;
+
+		if(myProperty->inherits("DzNumericProperty"))
+		{
+			DzNumericProperty* myNumericProperty = ((DzNumericProperty*)myProperty);
+			if(myNumericProperty->isMappable())
+			{
+				properties[ propertyName + " Map" ] = PropertyToString( myNumericProperty->getMapValue() );
+			}
+		}
+	}
 
 	return properties;
-}
 
+}

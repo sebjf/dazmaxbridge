@@ -24,6 +24,11 @@ struct MaxBridge
 				
 			myMaterialProcessor = MaterialProcessor myBridge:myBridge
 			myGeometryProcessor = GeometryProcessor myBridge:myBridge
+			
+			if(heapSize < 300000000)then
+			(
+				heapSize += 300000000
+			)
 	),
 	
 	fn Test
@@ -31,9 +36,9 @@ struct MaxBridge
 		myBridge.Test()
 	),
 	
-	fn Load
+	fn LoadFromFile
 	=(
-		myBridge.LoadFromFile("E:\Daz3D\Scripting\f2.characterkit")
+		myBridge.LoadFromFile("E:\Daz3D\Scripting\f.characterkit")
 	),
 	
 	fn MakeMesh
@@ -44,13 +49,30 @@ struct MaxBridge
 	fn MakeMaterial
 	=(
 		return myMaterialProcessor.CreateMultiMaterial()
+	),
+	
+	fn DoImport
+	=(
+		if(myBridge == undefined)then
+		(
+			LoadDependencies()
+		)
+		LoadFromFile()
+		
+		disableSceneRedraw()
+		suspendEditing()
+		undo off(
+		
+		myMesh = MakeMesh()
+		mymesh.material = MakeMaterial()
+			
+		)
+		
+		resumeEditing()
+		enableSceneRedraw()
 	)
 	
 )
 
 bridge = MaxBridge()
-bridge.LoadDependencies()
-bridge.Test()
-bridge.Load()
-m = bridge.MakeMesh()
-m.material = bridge.MakeMaterial()
+bridge.DoImport()
