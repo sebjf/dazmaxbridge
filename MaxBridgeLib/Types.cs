@@ -50,15 +50,15 @@ namespace MaxBridgeLib
 	    int NumVertices;
 	    vector<float>	Vertices;
 
-	    int NumTextureCoordinates;
-	    vector<float>	TextureCoordinates;
+	    int NumTextureVertices;
+	    vector<float>	TextureVertices;
 
 	    int		NumFaces;
 	    BYTES	Faces;
 
-	    vector<Material> Materials;
+	    map<int,Material> Materials;
 
-	    MSGPACK_DEFINE(NumVertices, Vertices, NumTextureCoordinates, TextureCoordinates, NumFaces, Faces, Materials);
+	    MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials);
     };
     */
 
@@ -80,7 +80,7 @@ namespace MaxBridgeLib
         public byte[] Faces;
 
         [MessagePackMember(6)]
-        public List<Material> Materials;
+        public Dictionary<int,Material> Materials;
 
         public Face[] TriangulatedFaces = null;
     }

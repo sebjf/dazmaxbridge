@@ -38,7 +38,7 @@ struct MaxBridge
 	
 	fn LoadFromFile
 	=(
-		myBridge.LoadFromFile("E:\Daz3D\Scripting\f.characterkit")
+		myBridge.LoadFromFile("E:\Daz3D\Scripting\selene.characterkit")
 	),
 	
 	fn MakeMesh

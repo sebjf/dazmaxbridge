@@ -2,10 +2,7 @@
 //
 #include "Daz3dsMaxCharacterExporter.h"
 
-#define		VERTEX_SIZE_IN_BYTES			(sizeof(DzPnt3))
-#define		FACE_SIZE_IN_BYTES				(sizeof(Face))
-#define		FACE_MATERIAL_ID_SIZE_IN_BYTES	(sizeof(int))
-#define		FLOATS_PER_VERTEX				3
+
 
 
 QString VecToString(DzVec3 v)
@@ -18,113 +15,103 @@ void    MyDazExporter::getDefaultOptions( DzFileIOSettings *options ) const
 	
 }
 
-MaxMesh	MyDazExporter::getMesh(DzObject* obj)
+void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& myMesh)
 {
-	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
-
-	MaxMesh myMesh;
-
-	// Collect the vertices into a float array - each vertex is three floats so its a simple copy
-
-	myMesh.NumVertices = mesh->getNumVertices();
-	myMesh.Vertices.assign( (float*)mesh->getVerticesPtr(), (float*)mesh->getVerticesPtr() + (myMesh.NumVertices * FLOATS_PER_VERTEX) );
-
-	DzMap* uvMap = mesh->getUVs();
-	myMesh.NumTextureVertices = uvMap->getNumValues();
-	switch(uvMap->getType())
+	for(int i = 0; i < myMesh._materialsToProcess.size(); i++)
 	{
-	case DzMap::FLOAT_MAP:
-		myMesh.TextureVertices.assign( uvMap->getFloatArrayPtr(), uvMap->getFloatArrayPtr() + myMesh.NumTextureVertices );
-		break;
-	case DzMap::FLOAT2_MAP:
-		myMesh.TextureVertices.assign( (float*)uvMap->getPnt2ArrayPtr(), (float*)uvMap->getPnt2ArrayPtr() + (myMesh.NumTextureVertices * 2) );
-		break;
-	case DzMap::FLOAT3_MAP:
-		myMesh.TextureVertices.assign( (float*)uvMap->getPnt3ArrayPtr(), (float*)uvMap->getPnt3ArrayPtr() + (myMesh.NumTextureVertices * 3) );
-		break;
-	}
+		pair<int,QString>& materialToProcess = myMesh._materialsToProcess[i];
 
-	// Collect the faces into an int array - each facet contains a number of properties such as material indices so split them out
-
-	myMesh.NumFaces = mesh->getNumFacets();
-	myMesh.Faces.size = myMesh.NumFaces * FACE_SIZE_IN_BYTES;
-	myMesh.Faces.ptr = (char*)malloc(myMesh.Faces.size);
-
-	vector<int> materialsToProcess;
-
-	Face* faces = (Face*)myMesh.Faces.ptr;
-
-	DzFacet* facets = mesh->getFacetsPtr();
-	for(int i = 0; i < myMesh.NumFaces; i++)
-	{
-		faces[i].PositionVertices[0] = facets[i].m_vertIdx[0];
-		faces[i].PositionVertices[1] = facets[i].m_vertIdx[1];
-		faces[i].PositionVertices[2] = facets[i].m_vertIdx[2];
-		faces[i].PositionVertices[3] = facets[i].m_vertIdx[3];
-
-		faces[i].TextureVertices[0] = facets[i].m_uvwIdx[0];
-		faces[i].TextureVertices[1] = facets[i].m_uvwIdx[1];
-		faces[i].TextureVertices[2] = facets[i].m_uvwIdx[2];
-		faces[i].TextureVertices[3] = facets[i].m_uvwIdx[3];
-
-		faces[i].MaterialId = facets[i].m_materialIdx;
-
-		if(std::find(materialsToProcess.begin(),materialsToProcess.end(),facets[i].m_materialIdx) == materialsToProcess.end())
-		{
-			materialsToProcess.push_back(facets[i].m_materialIdx);
-		}
-	}
-
-
-	DzShape* shape = obj->getCurrentShape();
-
-	for(int i = 0; i < materialsToProcess.size(); i++)
-	{
 		Material myMaterial;
 
-		myMaterial.MaterialIndex = materialsToProcess[i];
-		
-		DzMaterialFaceGroup* material_group = mesh->getMaterialGroup(myMaterial.MaterialIndex);
-		myMaterial.MaterialName = material_group->getName();
+		myMaterial.MaterialIndex = materialToProcess.first;
+		myMaterial.MaterialName  = materialToProcess.second;
 
-		DzMaterial* material = shape->findMaterial(material_group->getName());
+		DzMaterial* material = shape->findMaterial(materialToProcess.second);
+		
+		if(material == NULL)
+		{
+			/*geografted geometry may result in faces in one shape referencing a group where the materials are actually defined in another, so here we try to find them*/
+			for(DzShapeList::Iterator itr = shapes.begin(); itr != shapes.end(); itr++)
+			{
+				DzMaterial* material = (*itr)->findMaterial(materialToProcess.second);
+				if(material != NULL){
+					break;
+				}
+			}
+		}
 
 		if(material == NULL)
 		{
-			printf("Unable to find material.");
+			dzApp->statusLine(QString("MyDazExporter: Unable to find material ") + QString(myMaterial.MaterialName.c_str()));
+			hadErrors = true;
 		}
-
-		myMaterial.MaterialType = material->className();
-
-		if(material->inherits("DzMaterial"))
+		else
 		{
-			myMaterial.MaterialProperties = getMaterialProperties((DzMaterial*)material);
+			myMaterial.MaterialType = material->className();
+
+			if(material->inherits("DzMaterial"))
+			{
+				myMaterial.MaterialProperties = getMaterialProperties((DzMaterial*)material);
+			}
 		}
 
-		myMesh.Materials.push_back(myMaterial);
+		/*Even if we know the material is a dud, add it anyway and force max to deal with it, notifying the user that something has gone wrong, instead of failing silently*/
+		myMesh.Materials[myMaterial.MaterialIndex] = myMaterial;
 	}
+}
+
+MaxMesh MyDazExporter::getFigureMesh(DzObject* obj, DzFigure* figure)
+{
+	MaxMesh myMesh;
+
+	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
+	addGeometryData(mesh, myMesh);
+
+	DzShape* shape = obj->getCurrentShape();
+	addMaterialData(shape, getFigureShapes(getFigureFollowers(figure)), myMesh);
 
 	return myMesh;
 }
 
-DzSkeleton* findBoneSkeleton(DzNode* node)
+MaxMesh	MyDazExporter::getMesh(DzObject* obj)
 {
-	DzNode* theParent = node->getNodeParent();
-	if(theParent->inherits("DzSkeleton"))
+	MaxMesh myMesh;
+
+	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
+	addGeometryData(mesh, myMesh);
+
+	DzShape* shape = obj->getCurrentShape();
+	addMaterialData(shape, DzShapeList(), myMesh);
+
+	return myMesh;
+}
+
+void MyDazExporter::addSkinnedFigure(DzFigure* figure, DzObject* object)
+{
+	PreparedFigure figureInfo;
+
+	figureInfo.figure = figure;
+	figureInfo.object = object;
+
+	DzSkeleton* parentFigure = figure->getFollowTarget();
+	if(parentFigure != NULL)
 	{
-		return (DzSkeleton*)theParent;
+		return;
 	}
-	return findBoneSkeleton(theParent);
+
+	scene.Items.push_back( getFigureMesh(figureInfo.object, figureInfo.figure) ); //for now we dont do skinning so just export the figure
+
+	/*the main resolve method will not iterate over bones, so we do so here checking for things like props and hair (which we also want to be parented)*/
+	DzNodeList children = getSkeletonBoneChildren(figure);
+	for(int i = 0; i < children.size(); i++)
+	{
+		resolveSelectedDzNode(children[i]);
+	}
 }
 
-MaxMesh MyDazExporter::getSkinnedFigure(DzObject* node)
+void MyDazExporter::addStaticMesh(DzObject* object)
 {
-	return getMesh(node); //for now we dont do skinning so just export the figure
-}
-
-MaxMesh MyDazExporter::getStaticMesh(DzObject* node)
-{
-	return getMesh(node);
+	scene.Items.push_back( getMesh(object) );
 }
 
 void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
@@ -146,15 +133,16 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
 				return;
 			}
 
+			//note there might be a bug here when we traverse characters, to do with hair etc
 			processedNodes.push_back(node);
 
-			if(node->inherits("DzSkeleton"))
+			if(node->inherits("DzFigure"))
 			{
-				scene.Items.push_back( getSkinnedFigure(object) );
+				addSkinnedFigure((DzFigure*)node, object);
 			}
 			else
 			{
-				scene.Items.push_back( getStaticMesh(object) );
+				addStaticMesh(object);
 			}
 		}
 	}
@@ -174,6 +162,8 @@ void	MyDazExporter::Reset()
 
 	vector<DzNode*> newProcessedNodes;	
 	processedNodes = newProcessedNodes;
+
+	hadErrors = false;
 }
 
 DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *options )
@@ -195,6 +185,12 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 	myFile.write(sbuf.data(), sbuf.size());
 
 	myFile.close();
+
+	if(hadErrors)
+	{
+		dzApp->statusLine(QString("MyDazExporter: export completed with errors."));
+		return DZ_UNHANDLED_EXCEPTION_ERROR;
+	}
 		
 	return DZ_NO_ERROR;
 }

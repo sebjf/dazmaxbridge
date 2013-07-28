@@ -77,7 +77,8 @@ struct	MaterialProcessor
 		
 		if(myMaterialProperties.count <= 0)then
 		(
-			print "Warning: material " + myMaterialId + " of type " + (myBridge.GetMaterialType myMaterialId) + " came through with no properties."
+			print "Warning: material " + (myMaterialId as string) + " of type " + (myBridge.GetMaterialType myMaterialId) + " came through with no properties."
+			return myMaterial;
 		)
 				
 		for i = 1 to myMaterialProperties.count do

@@ -46,6 +46,12 @@
     <ClCompile Include="material_processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="geometry_processing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Daz3dsMaxCharacterExporter.h">

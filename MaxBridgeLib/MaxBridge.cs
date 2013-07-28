@@ -106,13 +106,7 @@ namespace MaxBridgeLib
 
         public int GetHighestMaterialSlot()
         {
-            int max = 0;
-            foreach (Material m in myScene.Items[mesh].Materials)
-            {
-                if (m.MaterialIndex > max)
-                    max = m.MaterialIndex;
-            }
-            return max;
+            return myScene.Items[mesh].Materials.Keys.Max();
         }
 
         public int GetNumMaterials()

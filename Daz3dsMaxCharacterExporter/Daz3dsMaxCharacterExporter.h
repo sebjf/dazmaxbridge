@@ -5,6 +5,7 @@
 
 #include "Types.h"
 
+#include "dzapp.h"
 #include <dzscene.h>
 #include "dzexporter.h"
 #include "dznode.h"
@@ -32,11 +33,22 @@
 #include "dzfileproperty.h"
 #include "dzboolproperty.h"
 #include "dzenumproperty.h"
+#include "dzmodifier.h"
+#include "dzfigure.h"
+#include "dzshape.h"
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>
 
 using namespace std;
+
+class PreparedFigure
+{
+public:
+	DzFigure*		figure;
+	DzObject*		object;
+	DzSkeletonList followers;
+};
 
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
@@ -62,12 +74,25 @@ private:
 	MaxScene	scene;
 
 	void				resolveSelectedDzNode(DzNode* node);
-	MaxMesh				getSkinnedFigure(DzObject* node);
-	MaxMesh				getStaticMesh(DzObject* node);
+	void				addSkinnedFigure(DzFigure* node, DzObject* object);
+	void				addStaticMesh(DzObject* object);
+
+	void				addGeometryData(DzFacetMesh* dazMesh, MaxMesh& maxMesh);
+	void				addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& maxMesh);
+
+	MaxMesh				getFigureMesh(DzObject* mesh, DzFigure* figure);
 	MaxMesh				getMesh(DzObject* mesh);
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);
 
+	/* Utilities */
+	DzSkeletonList		getFigureFollowers(DzFigure* figure);
+	DzShapeList			getFigureShapes(DzSkeletonList& figures);
+	DzNodeList			getSkeletonBoneChildren(DzSkeleton* skeleton);
+	DzSkeleton*			findBoneSkeleton(DzNode* node);
+
+	/* Management & Reporting */
 	vector<DzNode*> processedNodes;
+	bool			hadErrors;
 
 	void		Reset();
 

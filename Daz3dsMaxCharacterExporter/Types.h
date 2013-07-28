@@ -15,12 +15,18 @@
 
 #pragma warning(pop)
 
+#include <QtCore\qstring.h>
 
 using namespace msgpack;
 using namespace std;
 
 #define	BYTES				msgpack::type::raw_ref
 #define MATERIALPROPERTIES	map<string,string>
+
+#define		VERTEX_SIZE_IN_BYTES			(sizeof(DzPnt3))
+#define		FACE_SIZE_IN_BYTES				(sizeof(Face))
+#define		FACE_MATERIAL_ID_SIZE_IN_BYTES	(sizeof(int))
+#define		FLOATS_PER_VERTEX				3
 
 class Material
 {
@@ -55,9 +61,11 @@ public:
 	int		NumFaces;
 	BYTES	Faces;
 
-	vector<Material> Materials;
+	map<int,Material> Materials;
 
 	MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials);
+
+	vector<pair<int,QString>> _materialsToProcess;
 };
 
 class MaxScene

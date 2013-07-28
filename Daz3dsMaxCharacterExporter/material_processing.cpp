@@ -8,10 +8,7 @@ can be iterated in .NET*/
 
 string PropertyToString(QString v)
 {
-	QByteArray b = v.toUtf8();
-	char* s_data = b.data();
-	string s = string(s_data);
-	return s;
+	return string(v.toUtf8().data());
 }
 
 string PropertyToString(QColor& v)
