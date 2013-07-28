@@ -1,6 +1,6 @@
 #include "Daz3dsMaxCharacterExporter.h"
 
-DzSkeletonList MyDazExporter::getFigureFollowers(DzFigure* figure)
+DzSkeletonList MyDazExporter::getFigureFollowers(DzSkeleton* figure)
 {
 	DzSkeletonList followers;
 
@@ -60,6 +60,7 @@ DzNodeList MyDazExporter::getSkeletonBoneChildren(DzSkeleton* skeleton)
 
 }
 
+//There is a clear path to an exception here but Daz say Bones are not ever meant to be parented to a non bone/skeleton
 DzSkeleton* MyDazExporter::findBoneSkeleton(DzNode* node)
 {
 	DzNode* theParent = node->getNodeParent();
@@ -68,4 +69,13 @@ DzSkeleton* MyDazExporter::findBoneSkeleton(DzNode* node)
 		return (DzSkeleton*)theParent;
 	}
 	return findBoneSkeleton(theParent);
+}
+
+bool	MyDazExporter::IsAlreadyAddedNode(DzNode* node)
+{
+	if(find(addedNodes.begin(), addedNodes.end(), node) != addedNodes.end()){
+		return true;
+	}else{
+		return false;
+	}
 }

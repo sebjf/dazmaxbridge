@@ -125,3 +125,49 @@ MATERIALPROPERTIES MyDazExporter::getMaterialProperties(DzMaterial* material)
 	return properties;
 
 }
+
+void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& myMesh)
+{
+	for(int i = 0; i < myMesh._materialsToProcess.size(); i++)
+	{
+		pair<int,QString>& materialToProcess = myMesh._materialsToProcess[i];
+
+		Material myMaterial;
+
+		myMaterial.MaterialIndex = materialToProcess.first;
+		myMaterial.MaterialName  = materialToProcess.second;
+
+		DzMaterial* material = shape->findMaterial(materialToProcess.second);
+		
+		if(material == NULL)
+		{
+			/*geografted geometry may result in faces in one shape referencing a group where the materials are actually defined in another, so here we try to find them*/
+			for(DzShapeList::Iterator itr = shapes.begin(); itr != shapes.end(); itr++)
+			{
+				DzMaterial* material = (*itr)->findMaterial(materialToProcess.second);
+				if(material != NULL){
+					break;
+				}
+			}
+		}
+
+		if(material == NULL)
+		{
+			QString message = QString("MyDazExporter: Unable to find material ") + QString(myMaterial.MaterialName.c_str());
+			dzApp->statusLine(message);
+			log.push_back(message);
+		}
+		else
+		{
+			myMaterial.MaterialType = material->className();
+
+			if(material->inherits("DzMaterial"))
+			{
+				myMaterial.MaterialProperties = getMaterialProperties((DzMaterial*)material);
+			}
+		}
+
+		/*Even if we know the material is a dud, add it anyway and force max to deal with it, notifying the user that something has gone wrong, instead of failing silently*/
+		myMesh.Materials[myMaterial.MaterialIndex] = myMaterial;
+	}
+}

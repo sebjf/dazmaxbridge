@@ -3,8 +3,6 @@
 #include "Daz3dsMaxCharacterExporter.h"
 
 
-
-
 QString VecToString(DzVec3 v)
 {
 	return (QString::number(v.m_x) + QString(", ") + QString::number(v.m_y) + QString(", ") + QString::number(v.m_z) + QString(", ") + QString::number(v.m_w));
@@ -15,83 +13,9 @@ void    MyDazExporter::getDefaultOptions( DzFileIOSettings *options ) const
 	
 }
 
-void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& myMesh)
-{
-	for(int i = 0; i < myMesh._materialsToProcess.size(); i++)
-	{
-		pair<int,QString>& materialToProcess = myMesh._materialsToProcess[i];
-
-		Material myMaterial;
-
-		myMaterial.MaterialIndex = materialToProcess.first;
-		myMaterial.MaterialName  = materialToProcess.second;
-
-		DzMaterial* material = shape->findMaterial(materialToProcess.second);
-		
-		if(material == NULL)
-		{
-			/*geografted geometry may result in faces in one shape referencing a group where the materials are actually defined in another, so here we try to find them*/
-			for(DzShapeList::Iterator itr = shapes.begin(); itr != shapes.end(); itr++)
-			{
-				DzMaterial* material = (*itr)->findMaterial(materialToProcess.second);
-				if(material != NULL){
-					break;
-				}
-			}
-		}
-
-		if(material == NULL)
-		{
-			dzApp->statusLine(QString("MyDazExporter: Unable to find material ") + QString(myMaterial.MaterialName.c_str()));
-			hadErrors = true;
-		}
-		else
-		{
-			myMaterial.MaterialType = material->className();
-
-			if(material->inherits("DzMaterial"))
-			{
-				myMaterial.MaterialProperties = getMaterialProperties((DzMaterial*)material);
-			}
-		}
-
-		/*Even if we know the material is a dud, add it anyway and force max to deal with it, notifying the user that something has gone wrong, instead of failing silently*/
-		myMesh.Materials[myMaterial.MaterialIndex] = myMaterial;
-	}
-}
-
-MaxMesh MyDazExporter::getFigureMesh(DzObject* obj, DzFigure* figure)
-{
-	MaxMesh myMesh;
-
-	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
-	addGeometryData(mesh, myMesh);
-
-	DzShape* shape = obj->getCurrentShape();
-	addMaterialData(shape, getFigureShapes(getFigureFollowers(figure)), myMesh);
-
-	return myMesh;
-}
-
-MaxMesh	MyDazExporter::getMesh(DzObject* obj)
-{
-	MaxMesh myMesh;
-
-	DzFacetMesh* mesh = (DzFacetMesh*)obj->getCachedGeom();
-	addGeometryData(mesh, myMesh);
-
-	DzShape* shape = obj->getCurrentShape();
-	addMaterialData(shape, DzShapeList(), myMesh);
-
-	return myMesh;
-}
-
-void MyDazExporter::addSkinnedFigure(DzFigure* figure, DzObject* object)
+void MyDazExporter::addFigure(DzSkeleton* figure)
 {
 	PreparedFigure figureInfo;
-
-	figureInfo.figure = figure;
-	figureInfo.object = object;
 
 	DzSkeleton* parentFigure = figure->getFollowTarget();
 	if(parentFigure != NULL)
@@ -99,7 +23,10 @@ void MyDazExporter::addSkinnedFigure(DzFigure* figure, DzObject* object)
 		return;
 	}
 
-	scene.Items.push_back( getFigureMesh(figureInfo.object, figureInfo.figure) ); //for now we dont do skinning so just export the figure
+	MaxMesh myMesh;
+	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
+	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(getFigureFollowers(figure)), myMesh);
+	scene.Items.push_back( myMesh );
 
 	/*the main resolve method will not iterate over bones, so we do so here checking for things like props and hair (which we also want to be parented)*/
 	DzNodeList children = getSkeletonBoneChildren(figure);
@@ -109,9 +36,12 @@ void MyDazExporter::addSkinnedFigure(DzFigure* figure, DzObject* object)
 	}
 }
 
-void MyDazExporter::addStaticMesh(DzObject* object)
+void MyDazExporter::addNode(DzNode* node)
 {
-	scene.Items.push_back( getMesh(object) );
+	MaxMesh myMesh;
+	addGeometryData((DzFacetMesh*)(node->getObject()->getCachedGeom()), myMesh);
+	addMaterialData(node->getObject()->getCurrentShape(), DzShapeList(), myMesh);
+	scene.Items.push_back( myMesh );
 }
 
 void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
@@ -122,27 +52,23 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
 		node = findBoneSkeleton(node);
 	}
 
-	DzObject* object = node->getObject();
-	if(object != NULL)
+	if(IsAlreadyAddedNode(node)){
+		return;
+	}
+
+	if(node->getObject() != NULL)
 	{
-		//this node has geometry so its something we want to export
-		if(object->getCachedGeom()->inherits("DzFacetMesh"))
+		if(node->getObject()->getCachedGeom()->inherits("DzFacetMesh"))
 		{
-			if(find(processedNodes.begin(), processedNodes.end(), node) != processedNodes.end()){
-				//if we have already encountered this node (which we might have done if the user has selected multiple bones in same skeleton for example), abort.
-				return;
-			}
+			addedNodes.push_back(node);
 
-			//note there might be a bug here when we traverse characters, to do with hair etc
-			processedNodes.push_back(node);
-
-			if(node->inherits("DzFigure"))
+			if(node->inherits("DzSkeleton"))
 			{
-				addSkinnedFigure((DzFigure*)node, object);
+				addFigure((DzSkeleton*)node);
 			}
 			else
 			{
-				addStaticMesh(object);
+				addNode(node);
 			}
 		}
 	}
@@ -157,13 +83,9 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
 
 void	MyDazExporter::Reset()
 {
-	MaxScene newScene;
-	scene = newScene;
-
-	vector<DzNode*> newProcessedNodes;	
-	processedNodes = newProcessedNodes;
-
-	hadErrors = false;
+	scene = MaxScene();
+	addedNodes = vector<DzNode*>();
+	log = vector<QString>();
 }
 
 DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *options )
@@ -171,10 +93,8 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 	Reset();
 
 	DzNodeListIterator nodeIterator = dzScene->selectedNodeListIterator();
-	while(nodeIterator.hasNext())
-	{
-		DzNode* node = nodeIterator.next();
-		resolveSelectedDzNode(node);		
+	while(nodeIterator.hasNext()){
+		resolveSelectedDzNode(nodeIterator.next());		
 	}
 
 	QFile myFile(filename);
@@ -186,10 +106,15 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 
 	myFile.close();
 
-	if(hadErrors)
+	if(log.size() > 0)
 	{
-		dzApp->statusLine(QString("MyDazExporter: export completed with errors."));
-		return DZ_UNHANDLED_EXCEPTION_ERROR;
+		QMessageBox myMessageBox;
+		QString message = "Export completed but with problems:\n";
+		for(int i = 0; i < log.size(); i++){
+			message += (log[i] + "\n");
+		}
+		myMessageBox.setText(message);
+		myMessageBox.exec();	
 	}
 		
 	return DZ_NO_ERROR;

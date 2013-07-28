@@ -39,6 +39,7 @@
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>
+#include <QtCore\qcoreapplication.h>
 
 using namespace std;
 
@@ -74,25 +75,25 @@ private:
 	MaxScene	scene;
 
 	void				resolveSelectedDzNode(DzNode* node);
-	void				addSkinnedFigure(DzFigure* node, DzObject* object);
-	void				addStaticMesh(DzObject* object);
+	void				addFigure(DzSkeleton* skeleton);
+	void				addNode(DzNode* node);
 
 	void				addGeometryData(DzFacetMesh* dazMesh, MaxMesh& maxMesh);
 	void				addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& maxMesh);
 
-	MaxMesh				getFigureMesh(DzObject* mesh, DzFigure* figure);
-	MaxMesh				getMesh(DzObject* mesh);
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);
 
 	/* Utilities */
-	DzSkeletonList		getFigureFollowers(DzFigure* figure);
+	DzSkeletonList		getFigureFollowers(DzSkeleton* figure);
 	DzShapeList			getFigureShapes(DzSkeletonList& figures);
 	DzNodeList			getSkeletonBoneChildren(DzSkeleton* skeleton);
 	DzSkeleton*			findBoneSkeleton(DzNode* node);
 
 	/* Management & Reporting */
-	vector<DzNode*> processedNodes;
-	bool			hadErrors;
+	vector<DzNode*> addedNodes;
+	bool			IsAlreadyAddedNode(DzNode* node);
+	
+	vector<QString> log;
 
 	void		Reset();
 
