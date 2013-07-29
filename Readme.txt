@@ -1,13 +1,17 @@
 
-Welcome to the Daz-to-3DSMax Pipeline
+Welcome to the Daz-to-3DSMax Bridge
 
 What is the purpose of this project?
 
 To enable the use of Daz assets in 3DS Max quickly and easily.
 
+Why is it needed?
+
+Interchange formats are limited, by their design (OBJ - no skinning data) or implementation (FBX - buggy) making the transfer of assets time consuming and frustrating.
+
 How does it do it?
 
-By providing bespoke plugins for both tools that are highly coupled for maximum efficiency and robustness, both to eachother and their host applications.
+By providing bespoke plugins for both tools that are highly coupled for maximum efficiency and robustness, both to eachother and their host applications, enabling the quick transfer of data between the two.
 
 What does it consist of?
 
@@ -29,14 +33,51 @@ Recreate a rig from scratch (i.e. the managed library can't be used in Blender f
 
 What is it not?
 
-An interchange or storage format - the files are single use only and no guarantees are made about them. Neither will material maps be copied, Max will continue to reference the originals.
+An interchange or storage format - the files generated are for single use only and no guarantees are made about them. Neither will material maps be copied; Max will continue to reference the originals.
 
-Whats next?
+Known Limitations & Bugs
 
-A C++ (Max 2011 and below) or .NET (Max 2012 and above) port of the MaxScript for speed
+Materials of geografted geometry are missing
+
+Roadmap
+
+Automatically transfer clothing of a character
+Improved base rig in Max
+Transfer joint deformers
+Export to shared memory
+Re-import single components (e.g. just vertex positions for when a morph changes)
+
+Other possible improvements
+
+A C++ (Max 2011 and below) or .NET (Max 2012 and above) port of the MaxScript script for speed
 
 
-The purpose of this project is to provide a clean pipeline between Daz and Max, enabling Daz's rich figure creation tools and content library to be utilised in powerful 3D modeller and renderer that is Max.
+Building
+
+Before building make sure the following steps are complete:
+
+1. Install the Daz SDK (The Daz 4.5 SDK is the latest one and works with Daz 4.6)
+2. Create a SYSTEM ENVIRONMENT VARIABLE called DazInstallDirectory and set its value to the installation directory of Daz Studio (e.g. C:\Program Files\DAZ 3D\DAZStudio4)
+3. Select a location for the MaxScript scripts and copy the contents of the MaxScript folder to it
+4. Update the Post-build Event Command Line in the MaxBridgeLib project with the location selected in (3)
+
+Installing
+
+When the project builds it should copy all the required files to their correct locations and to use the bridge outside the development environment, start Daz and Max as normal and transfer exactly as you would if debugging.
+
+
+Development Guidelines
+
+Where possible try to avoid large dependencies like Boost; when using third party libraries prefer those which can be entered into source control and statically linked (like MessagePack). This makes it easier for other developers to get started and reduces the likelihood of installation issues.
+
+MaxScript performance can vary wildly depending on how things are coded so keep an eye on its performance. It doesn't have a great debugger so make liberal use of brackets and decorators, if only to document your intentions for others.
+
+The managed library is a service to MaxScript and nothing else. Functionality should be kept in MaxScript where possible as this allows more people (i.e. non developers) the opportunity to edit the scripts and tune the bridge to their liking. The managed library is not intended as a bridge to other applications such as Blender, for these a dedicated importer using an implementation of MessagePack should be developed.
+
+The managed library should be used to speed up operations that MaxScript could do, like triangulation, but, like the triangulation example, nothing in the original structres should be hidden from MaxScript as a result of their presence, allowing others to go back to the original source if they have another way of doing things.
+
+Daz has alot of functionality in its Geometry pipeline and provides methods to get at the mesh data at various stages - don't reinvent the wheel! - take the cached/world space transforms where possible and work backwards if needs be, rather than get the primitives and recreate. Daz has already implemented and tested their pipeline with full visibility of the rest of the codebase.
+
 
 Overview
 
@@ -72,10 +113,3 @@ MaxScript is by far the slowest stage of the pipeline. It could be replaced with
 1. It is compatiable with all versions of 3DS Max (plugins must be recompiled)
 2. It allows each user to edit how the data is used (e.g. new material types or skinning techniques) without needing the plugin source
 
-
-To Do List
-
-1. Complete Standard Properties Mapping in MaxScript
-2. Use QMetaObject to process DzShaderMaterials
-3. Add Proper Error Checking
-4. Manually Increase MaxScript Heap Size to improve performance of first run
