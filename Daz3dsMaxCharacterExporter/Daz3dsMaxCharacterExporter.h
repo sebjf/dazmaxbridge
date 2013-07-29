@@ -80,6 +80,7 @@ private:
 
 	void				addGeometryData(DzFacetMesh* dazMesh, MaxMesh& maxMesh);
 	void				addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& maxMesh);
+	int					addSkeletonData(DzSkeleton* skeleton);
 
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);
 

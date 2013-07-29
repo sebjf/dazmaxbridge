@@ -63,17 +63,55 @@ public:
 
 	map<int,Material> Materials;
 
-	MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials);
+	int		SkeletonIndex;
+
+	MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
 
 	vector<pair<int,QString>> _materialsToProcess;
+
+	MaxMesh()
+	{
+		SkeletonIndex = -1;
+	}
+};
+
+class MaxBone
+{
+public:
+	string	Name;
+
+	float	OriginX;
+	float	OriginY;
+	float	OriginZ;
+
+	float	Qx;
+	float	Qy;
+	float	Qz;
+	float	Qw;
+
+	MSGPACK_DEFINE(Name,OriginX,OriginY,OriginZ,Qx,Qy,Qz,Qw);
+};
+
+class DzSkeleton; //forward declaration for the cache helper member below
+
+class MaxSkeleton
+{
+public:
+	vector<MaxBone>	Bones;
+
+	MSGPACK_DEFINE(Bones);
+
+	DzSkeleton* _sourceSkeleton;
+
 };
 
 class MaxScene
 {
 public:
-	vector<MaxMesh>	Items;
+	vector<MaxMesh>		Items;
+	vector<MaxSkeleton>	Skeletons;
 
-	MSGPACK_DEFINE(Items);
+	MSGPACK_DEFINE(Items, Skeletons);
 };
 
 #endif //MAXTYPES

@@ -178,6 +178,7 @@
     <ClCompile Include="geometry_processing.cpp" />
     <ClCompile Include="material_processing.cpp" />
     <ClCompile Include="moc\Daz3dsMaxCharacterExporter_moc.cpp" />
+    <ClCompile Include="skinning_data_processing.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

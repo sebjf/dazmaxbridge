@@ -4,6 +4,7 @@ struct MaxBridge
 	myBridge = undefined,
 	myMaterialProcessor = undefined,
 	myGeometryProcessor = undefined,
+	mySkeletonProcessor = undefined,
 	
 	fn LoadDependencies
 	=(
@@ -21,9 +22,11 @@ struct MaxBridge
 			
 			local MaterialProcessor = fileIn (thisScriptPath + "MaterialProcessor.ms")
 			local GeometryProcessor = fileIn (thisScriptPath + "GeometryProcessor.ms")	
+			local SkeletonProcessor = fileIn (thisScriptPath + "SkeletonProcessor.ms")	
 				
 			myMaterialProcessor = MaterialProcessor myBridge:myBridge
 			myGeometryProcessor = GeometryProcessor myBridge:myBridge
+			mySkeletonProcessor = SkeletonProcessor myBridge:myBridge
 			
 			if(heapSize < 300000000)then
 			(
@@ -69,6 +72,13 @@ struct MaxBridge
 			(
 				myBridge.SetMesh (i-1)
 				myMesh = MakeMesh()
+				
+				if(myBridge.GetSkeletonIndex() >= 0)then
+				(
+					-- do skeleton
+					mySkeletonProcessor.DoTestSkeleton	(myBridge.GetSkeletonIndex())
+				)
+				
 				mymesh.material = MakeMaterial()
 			)
 			

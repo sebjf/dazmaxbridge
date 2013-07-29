@@ -26,6 +26,9 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	MaxMesh myMesh;
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(getFigureFollowers(figure)), myMesh);
+
+	myMesh.SkeletonIndex = addSkeletonData(figure);
+
 	scene.Items.push_back( myMesh );
 
 	/*the main resolve method will not iterate over bones, so we do so here checking for things like props and hair (which we also want to be parented)*/

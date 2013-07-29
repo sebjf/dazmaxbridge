@@ -50,6 +50,38 @@ namespace MaxBridgeLib
 
         #endregion
 
+        #region Skinning
+
+        public int GetSkeletonIndex()
+        {
+            return myScene.Items[mesh].SkeletonIndex;
+        }
+
+        public int GetNumBones(int skeleton)
+        {
+            return myScene.Skeletons[skeleton].Bones.Count;
+        }
+
+        public string GetBoneName(int skeleton, int bone)
+        {
+            return myScene.Skeletons[skeleton].Bones[bone].Name;
+        }
+
+        public float[] GetBoneTransform(int skeleton, int bone)
+        {
+            float[] boneTransform = new float[7];
+            boneTransform[0] = myScene.Skeletons[skeleton].Bones[bone].OriginX;
+            boneTransform[1] = myScene.Skeletons[skeleton].Bones[bone].OriginY;
+            boneTransform[2] = myScene.Skeletons[skeleton].Bones[bone].OriginZ;
+            boneTransform[3] = myScene.Skeletons[skeleton].Bones[bone].Qx;
+            boneTransform[4] = myScene.Skeletons[skeleton].Bones[bone].Qy;
+            boneTransform[5] = myScene.Skeletons[skeleton].Bones[bone].Qz;
+            boneTransform[6] = myScene.Skeletons[skeleton].Bones[bone].Qw;
+            return boneTransform; 
+        }
+
+        #endregion
+
         #region Mesh & Geometry
 
         public int GetNumVertices()
