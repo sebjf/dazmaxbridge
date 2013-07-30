@@ -35,15 +35,15 @@ void MyDazExporter::addGeometryData(DzFacetMesh* mesh, MaxMesh& myMesh)
 	DzFacet* facets = mesh->getFacetsPtr();
 	for(int i = 0; i < myMesh.NumFaces; i++)
 	{
-		faces[i].PositionVertices[0] = facets[i].m_vertIdx[0];
-		faces[i].PositionVertices[1] = facets[i].m_vertIdx[1];
-		faces[i].PositionVertices[2] = facets[i].m_vertIdx[2];
-		faces[i].PositionVertices[3] = facets[i].m_vertIdx[3];
+		faces[i].PositionVertex1 = facets[i].m_vertIdx[0];
+		faces[i].PositionVertex2 = facets[i].m_vertIdx[1];
+		faces[i].PositionVertex3 = facets[i].m_vertIdx[2];
+		faces[i].PositionVertex4 = facets[i].m_vertIdx[3];
 
-		faces[i].TextureVertices[0] = facets[i].m_uvwIdx[0];
-		faces[i].TextureVertices[1] = facets[i].m_uvwIdx[1];
-		faces[i].TextureVertices[2] = facets[i].m_uvwIdx[2];
-		faces[i].TextureVertices[3] = facets[i].m_uvwIdx[3];
+		faces[i].TextureVertex1 = facets[i].m_uvwIdx[0];
+		faces[i].TextureVertex2 = facets[i].m_uvwIdx[1];
+		faces[i].TextureVertex3 = facets[i].m_uvwIdx[2];
+		faces[i].TextureVertex4 = facets[i].m_uvwIdx[3];
 
 		faces[i].MaterialId = facets[i].m_materialIdx;
 

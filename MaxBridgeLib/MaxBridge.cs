@@ -190,14 +190,14 @@ namespace MaxBridgeLib
 
         #region Utilities
 
-        private T[] BlockCast<T>(byte[] source)
+        public static T[] BlockCast<T>(byte[] source)
         {
             var array = new T[source.Length / Marshal.SizeOf(typeof(T))];
             Buffer.BlockCopy(source, 0, array, 0, source.Length);
             return array;
         }
 
-        private Face[] BlockCast(byte[] source)
+        public static Face[] BlockCast(byte[] source)
         {
             int elements = source.Length / Marshal.SizeOf(typeof(Face));
             Face[] dst = new Face[elements];
@@ -215,7 +215,7 @@ namespace MaxBridgeLib
             return dst;
         }
 
-        private int[] BlockCast(Face[] faces)
+        private static int[] BlockCast(Face[] faces)
         {
             int dstElements = (Marshal.SizeOf(typeof(Face)) / Marshal.SizeOf(typeof(int))) * faces.Length;
             int[] dst = new int[dstElements];
@@ -237,59 +237,42 @@ namespace MaxBridgeLib
 
         #region Mesh Processing
 
-        unsafe private void TriangulateFaces(MaxMesh myMesh)
+        unsafe public static void TriangulateFaces(MaxMesh myMesh)
         {
             Face[] quadFaces = BlockCast(myMesh.Faces);
 
             List<Face> triangulatedFaces = new List<Face>();
             foreach (Face f in quadFaces)
             {
-                Face localFace = f;
-
-                int fv1 = localFace.PositionVertices[0];
-                int fv2 = localFace.PositionVertices[1];
-                int fv3 = localFace.PositionVertices[2];
-                int fv4 = localFace.PositionVertices[3];
-
-                int tv1 = localFace.TextureVertices[0];
-                int tv2 = localFace.TextureVertices[1];
-                int tv3 = localFace.TextureVertices[2];
-                int tv4 = localFace.TextureVertices[3];
-
-                int fmaterial = localFace.MaterialId;
-
                 Face f1;
-
-                f1.PositionVertices[0] = fv1;
-                f1.PositionVertices[1] = fv2;
-                f1.PositionVertices[2] = fv3;
-                f1.PositionVertices[3] = -1;
-                f1.TextureVertices[0] = tv1;
-                f1.TextureVertices[1] = tv2;
-                f1.TextureVertices[2] = tv3;
-                f1.TextureVertices[3] = -1;
-                f1.MaterialId = fmaterial;
+                f1.PositionVertex1 = f.PositionVertex1;
+                f1.PositionVertex2 = f.PositionVertex2;
+                f1.PositionVertex3 = f.PositionVertex3;
+                f1.PositionVertex4 = -1;
+                f1.TextureVertex1 = f.TextureVertex1;
+                f1.TextureVertex2 = f.TextureVertex2;
+                f1.TextureVertex3 = f.TextureVertex3;
+                f1.TextureVertex4 = -1;
+                f1.MaterialId = f.MaterialId;
 
                 triangulatedFaces.Add(f1);
 
-                if (fv4 >= 0)
+                if (f.PositionVertex4 >= 0)
                 {
                     Face f2;
-
-                    f2.PositionVertices[0] = fv1;
-                    f2.PositionVertices[1] = fv3;
-                    f2.PositionVertices[2] = fv4;
-                    f2.PositionVertices[3] = -1;
-                    f2.TextureVertices[0] = tv1;
-                    f2.TextureVertices[1] = tv3;
-                    f2.TextureVertices[2] = tv4;
-                    f2.TextureVertices[3] = -1;
-                    f2.MaterialId = fmaterial;
+                    f2.PositionVertex1 = f.PositionVertex1;
+                    f2.PositionVertex2 = f.PositionVertex3;
+                    f2.PositionVertex3 = f.PositionVertex4;
+                    f2.PositionVertex4 = -1;
+                    f2.TextureVertex1 = f.TextureVertex1;
+                    f2.TextureVertex2 = f.TextureVertex3;
+                    f2.TextureVertex3 = f.TextureVertex4;
+                    f2.TextureVertex4 = -1;
+                    f2.MaterialId = f.MaterialId;
 
                     triangulatedFaces.Add(f2);
                 }
             }
-
 
             myMesh.TriangulatedFaces = triangulatedFaces.ToArray();
         }

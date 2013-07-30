@@ -24,23 +24,46 @@ namespace MaxBridgeLib
     struct Face
     {
     public:
-	    int		PositionVertices[4];
-	    int		TextureVertices[4];
+	    int		PositionVertex1;
+	    int		PositionVertex2;
+	    int		PositionVertex3;
+	    int		PositionVertex4;
+
+	    int		TextureVerticex1;
+	    int		TextureVerticex2;
+	    int		TextureVerticex3;
+	    int		TextureVerticex4;
+
 	    int		MaterialId;
+
+	    /*Note this is not a messagepack capable object - these are packed into a raw array
     };
-     */
+    */
 
     /* Remember this comes from MessagePack in a raw byte array */
     [StructLayout(LayoutKind.Explicit)]
     unsafe public struct Face
     {
-        [FieldOffset(0)]
-        public fixed int PositionVertices[4];
+        [FieldOffset(sizeof(int) * 0)]
+        public int PositionVertex1;
+        [FieldOffset(sizeof(int) * 1)]
+        public int PositionVertex2;
+        [FieldOffset(sizeof(int) * 2)]
+        public int PositionVertex3;
+        [FieldOffset(sizeof(int) * 3)]
+        public int PositionVertex4;
+
         [FieldOffset(sizeof(int) * 4)]
-        public fixed int TextureVertices[4];
+        public int TextureVertex1;
+        [FieldOffset(sizeof(int) * 5)]
+        public int TextureVertex2;
+        [FieldOffset(sizeof(int) * 6)]
+        public int TextureVertex3;
+        [FieldOffset(sizeof(int) * 7)]
+        public int TextureVertex4;
+
         [FieldOffset(sizeof(int) * 8)]
         public int MaterialId;
-
     }
 
     /*

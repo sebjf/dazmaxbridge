@@ -8,12 +8,12 @@ using Autodesk.Max.Plugins;
 
 namespace MaxBridgePlugin
 {
-    public partial class MaxBridgePlugin
+    public partial class MaxBridgeImporterPlugin
     {
         internal IGlobal global;
         internal Descriptor descriptor;
 
-        public MaxBridgePlugin(IGlobal global, Descriptor descriptor)
+        public MaxBridgeImporterPlugin(IGlobal global, Descriptor descriptor)
         {
             this.global = global;
             this.descriptor = descriptor;
@@ -31,7 +31,7 @@ namespace MaxBridgePlugin
                 this.global = global;
 
                 // The two numbers used for class id have to be unique/random
-                classID = global.Class_ID.Create(6458464, 9184590);
+                classID = global.Class_ID.Create(118920184, 157352180);
             }
 
             public override string Category
@@ -46,12 +46,12 @@ namespace MaxBridgePlugin
 
             public override string ClassName
             {
-                get { return "Create"; }
+                get { return "MaxBridgeImporterPlugin"; }
             }
 
             public override object Create(bool loading)
             {
-                return new MaxBridgePlugin(global, this);
+                return new MaxBridgeImporterPlugin(global, this);
             }
 
             public override bool IsPublic
@@ -62,7 +62,7 @@ namespace MaxBridgePlugin
 
             public override SClass_ID SuperClassID
             {
-                get { return SClass_ID.Geomobject; }
+                get { return SClass_ID.SceneImport; }
             }
         }
     }

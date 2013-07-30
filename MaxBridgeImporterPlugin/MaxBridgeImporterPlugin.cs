@@ -9,36 +9,47 @@ using Autodesk.Max.Plugins;
 
 namespace MaxBridgePlugin
 {
-    public partial class MaxBridgePlugin : Autodesk.Max.Plugins.SceneImport
+    public partial class MaxBridgeImporterPlugin : Autodesk.Max.Plugins.SceneImport
     {
         public override string AuthorName
         {
-            get { throw new NotImplementedException(); }
+            get { return "Daz Max Bridge Author"; }
         }
 
         public override string CopyrightMessage
         {
-            get { throw new NotImplementedException(); }
+            get { return "Daz Max Bridge Copyright Message"; }
         }
+
+        IImpInterface importer;
+        IInterface ginteface;
 
         public override int DoImport(string name, IImpInterface ii, IInterface i, bool suppressPrompts)
         {
-            throw new NotImplementedException();
+            importer = ii;
+            ginteface = i;
+
+            MaxBridge bridge = new MaxBridge();
+            bridge.LoadFromFile(name);
+
+            Create(bridge.myScene);
+
+            return 1;
         }
 
         public override string Ext(int n)
         {
-            throw new NotImplementedException();
+            return "characterkit";
         }
 
         public override int ExtCount
         {
-            get { throw new NotImplementedException(); }
+            get { return 1; }
         }
 
         public override string LongDesc
         {
-            get { throw new NotImplementedException(); }
+            get { return "Importer for DazMaxBridge bytestreams."; }
         }
 
         public override string OtherMessage1()
@@ -53,7 +64,7 @@ namespace MaxBridgePlugin
 
         public override string ShortDesc
         {
-            get { throw new NotImplementedException(); }
+            get { return "DazMaxBridge Bytestream"; }
         }
 
         public override void ShowAbout(IntPtr hWnd)
@@ -63,17 +74,16 @@ namespace MaxBridgePlugin
 
         public override uint Version
         {
-            get { throw new NotImplementedException(); }
+            get { return 0; }
         }
 
         public override int ZoomExtents
         {
-            get { throw new NotImplementedException(); }
+            get { return 0; }
         }
 
         public override void Dispose()
         {
-            throw new NotImplementedException();
         }
 
     }

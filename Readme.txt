@@ -32,6 +32,7 @@ Allow editing of morphs or pose once in Daz
 Transfer advanced hair and cloth systems
 Transfer joint deformation controllers
 Transfer rigging
+Transfer smoothing parameters
 
 What is it not?
 

@@ -42,8 +42,16 @@ public:
 struct Face
 {
 public:
-	int		PositionVertices[4];
-	int		TextureVertices[4];
+	int		PositionVertex1;
+	int		PositionVertex2;
+	int		PositionVertex3;
+	int		PositionVertex4;
+
+	int		TextureVertex1;
+	int		TextureVertex2;
+	int		TextureVertex3;
+	int		TextureVertex4;
+
 	int		MaterialId;
 
 	/*Note this is not a messagepack capable object - these are packed into a raw array*/
