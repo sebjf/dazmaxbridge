@@ -14,7 +14,7 @@ namespace MaxBridgeLib
     {
         #region Local Members
 
-        MaxScene myScene;
+        public MaxScene myScene;
         int mesh = 0;
 
         public const int FLOATS_PER_VERTEX = 3;
@@ -34,6 +34,8 @@ namespace MaxBridgeLib
 
             MessagePackSerializer<MaxScene> c = MessagePackSerializer.Create<MaxScene>();
             myScene = c.Unpack(fs);
+
+            reader.Close();
         }
 
         #region Scene Navigation

@@ -51,6 +51,15 @@ public:
 	DzSkeletonList followers;
 };
 
+class SceneFigureInformation
+{
+public:
+	vector<DzFigure*>				Figures;
+	vector<DzSkeleton*>				GeograftList;
+	map<DzSkeleton*,DzSkeletonList> Geografts;
+	map<DzSkeleton*,DzSkeletonList>	Followers;
+};
+
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
 class MyDazExporter : public DzExporter {
@@ -90,7 +99,10 @@ private:
 	DzNodeList			getSkeletonBoneChildren(DzSkeleton* skeleton);
 	DzSkeleton*			findBoneSkeleton(DzNode* node);
 
+	void				populateSceneFigureInformation();
+
 	/* Management & Reporting */
+	SceneFigureInformation sceneFigures;
 	vector<DzNode*> addedNodes;
 	bool			IsAlreadyAddedNode(DzNode* node);
 	

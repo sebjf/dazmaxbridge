@@ -15,17 +15,13 @@ void    MyDazExporter::getDefaultOptions( DzFileIOSettings *options ) const
 
 void MyDazExporter::addFigure(DzSkeleton* figure)
 {
-	PreparedFigure figureInfo;
-
-	DzSkeleton* parentFigure = figure->getFollowTarget();
-	if(parentFigure != NULL)
-	{
+	if(find(sceneFigures.GeograftList.begin(), sceneFigures.GeograftList.end(), figure) != sceneFigures.GeograftList.end()){	//we dont export geografts so if its identified as one return
 		return;
 	}
 
 	MaxMesh myMesh;
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
-	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(getFigureFollowers(figure)), myMesh);
+	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneFigures.Geografts[figure]), myMesh);
 
 	myMesh.SkeletonIndex = addSkeletonData(figure);
 
@@ -36,6 +32,13 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	for(int i = 0; i < children.size(); i++)
 	{
 		resolveSelectedDzNode(children[i]);
+	}
+
+	/*Get the clothes (geografts will be filtered out by the statement at the top)*/
+	DzSkeletonList followers = sceneFigures.Followers[figure];
+	for(int i = 0; i < followers.size(); i++)
+	{
+		resolveSelectedDzNode(followers[i]);
 	}
 }
 
@@ -89,11 +92,13 @@ void	MyDazExporter::Reset()
 	scene = MaxScene();
 	addedNodes = vector<DzNode*>();
 	log = vector<QString>();
+	sceneFigures = SceneFigureInformation();
 }
 
 DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *options )
 {
 	Reset();
+	populateSceneFigureInformation();
 
 	DzNodeListIterator nodeIterator = dzScene->selectedNodeListIterator();
 	while(nodeIterator.hasNext()){

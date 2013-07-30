@@ -1,5 +1,7 @@
 
-Welcome to the Daz-to-3DSMax Bridge
+Welcome to the Daz-Max-Bridge
+
+-----------------------Page 1-----------------------
 
 What is the purpose of this project?
 
@@ -7,7 +9,11 @@ To enable the use of Daz assets in 3DS Max quickly and easily.
 
 Why is it needed?
 
-Interchange formats are limited, by their design (OBJ - no skinning data) or implementation (FBX - buggy) making the transfer of assets time consuming and frustrating.
+Interchange formats are limited, by their design (e.g. OBJ - no skinning data) or implementation (e.g. FBX - buggy) making the transfer of assets time consuming and frustrating.
+
+What does it do?
+
+Take a set of props or figures from Daz, and create counterparts in Max, complete with all world transforms, morphs, skinning data and materials which operate in Max just how they did in Daz.
 
 How does it do it?
 
@@ -18,18 +24,14 @@ What does it consist of?
 * A plugin for Daz
 * A MaxScript for Max
 * A .NET tool library for the MaxScript for Max
-
-What can it do?
-
-Take a set of props or figures from Daz, and create counterparts in Max, complete with all world transforms, morphs, skinning data and materials which operate in Max just how they did in Daz.
+* A .NET plugin for Max
 
 What can't it do?
 
-Allow editing of morphs once in Daz
-Transfer poses and animations (without baking)
+Allow editing of morphs or pose once in Daz
 Transfer advanced hair and cloth systems
 Transfer joint deformation controllers
-Recreate a rig from scratch (i.e. the managed library can't be used in Blender for example without extra information contained in the Max CAT rig)
+Transfer rigging
 
 What is it not?
 
@@ -42,15 +44,13 @@ Materials of geografted geometry are missing
 Roadmap
 
 Automatically transfer clothing of a character
-Improved base rig in Max
+Transfer basic rigging
 Transfer joint deformers
 Export to shared memory
 Re-import single components (e.g. just vertex positions for when a morph changes)
 
-Other possible improvements
 
-A C++ (Max 2011 and below) or .NET (Max 2012 and above) port of the MaxScript script for speed
-
+-----------------------Page 2-----------------------
 
 Building
 
@@ -66,18 +66,25 @@ Installing
 When the project builds it should copy all the required files to their correct locations and to use the bridge outside the development environment, start Daz and Max as normal and transfer exactly as you would if debugging.
 
 
-Development Guidelines
+-----------------------Page 3-----------------------
 
-Where possible try to avoid large dependencies like Boost; when using third party libraries prefer those which can be entered into source control and statically linked (like MessagePack). This makes it easier for other developers to get started and reduces the likelihood of installation issues.
+Shortcuts in Daz
 
-MaxScript performance can vary wildly depending on how things are coded so keep an eye on its performance. It doesn't have a great debugger so make liberal use of brackets and decorators, if only to document your intentions for others.
+The exporter can be executed from DazScript in a couple of lines, and this script bound to a shortcut or menu item, to allow quick execution.
 
-The managed library is a service to MaxScript and nothing else. Functionality should be kept in MaxScript where possible as this allows more people (i.e. non developers) the opportunity to edit the scripts and tune the bridge to their liking. The managed library is not intended as a bridge to other applications such as Blender, for these a dedicated importer using an implementation of MessagePack should be developed.
+1. Create a script with the following content in the Daz Scripting IDE:
 
-The managed library should be used to speed up operations that MaxScript could do, like triangulation, but, like the triangulation example, nothing in the original structres should be hidden from MaxScript as a result of their presence, allowing others to go back to the original source if they have another way of doing things.
+var oExporter = App.getExportMgr().findExporterByClassName( "MyDazExporter" );
+var oSettings = new DzFileIOSettings();
+oExporter.writeFile( "E:\\Daz3D\\Scripting\\Scratch.characterkit", oSettings );
 
-Daz has alot of functionality in its Geometry pipeline and provides methods to get at the mesh data at various stages - don't reinvent the wheel! - take the cached/world space transforms where possible and work backwards if needs be, rather than get the primitives and recreate. Daz has already implemented and tested their pipeline with full visibility of the rest of the codebase.
+2. Save it in the [Daz Content]\Scripts folder.
 
+3. Navigate to the script in the Content Library in Daz, right-click and select 'Create Custom Action'. A new menu item under the 'Scripts' menu will be created on the main toolbar bar.
+
+(4.) To bind this to a shortcut, go to Window -> Workspace -> Customize..., and under 'Custom' the first entry, in the left pane, right click the action and select 'Change Keyboard Shortcut'. Press the appropriate key combination and then 'Accept'.
+
+-----------------------Page 4-----------------------
 
 Overview
 

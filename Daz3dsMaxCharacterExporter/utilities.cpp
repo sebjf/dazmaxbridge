@@ -79,3 +79,32 @@ bool	MyDazExporter::IsAlreadyAddedNode(DzNode* node)
 		return false;
 	}
 }
+
+void	MyDazExporter::populateSceneFigureInformation()
+{
+	DzSkeletonListIterator skeletonIterator = dzScene->skeletonListIterator();
+	while(skeletonIterator.hasNext())
+	{
+		DzSkeleton* skeleton = skeletonIterator.next();
+
+		DzSkeleton* followTarget = skeleton->getFollowTarget();
+		if(followTarget != NULL){
+			sceneFigures.Followers[followTarget].push_back(skeleton);
+		}
+
+		if(skeleton->inherits("DzFigure"))
+		{
+			DzFigure* figure = (DzFigure*)skeleton;
+
+			sceneFigures.Figures.push_back(figure);
+
+			DzWeakFigureListIterator geograftIterator = figure->graftFigureIterator();
+			while(geograftIterator.hasNext()){
+				DzFigure* geograft = geograftIterator.next();
+				sceneFigures.GeograftList.push_back(geograft);
+				sceneFigures.Geografts[figure].push_back(geograft);
+			}
+
+		}
+	}
+}

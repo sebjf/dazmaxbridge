@@ -10,6 +10,8 @@ int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 		}
 	}
 
+	//if the skeleton exists then return the exact index. if it doesn't, create & add it and then return the index.
+
 	DzBoneList bones;
 	skeleton->getAllBones(bones);
 
