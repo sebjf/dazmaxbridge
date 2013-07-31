@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MaxBridgeLib;
+using MaxManagedBridge;
 using Autodesk.Max;
 using Autodesk.Max.Plugins;
 
 
-namespace MaxBridgePlugin
+namespace MaxManagedBridge
 {
     public partial class MaxBridgeImporterPlugin : Autodesk.Max.Plugins.SceneImport
     {
@@ -29,11 +29,12 @@ namespace MaxBridgePlugin
             importer = ii;
             ginteface = i;
 
-            MaxBridge bridge = new MaxBridge();
-            bridge.LoadFromFile(name);
+            MaxBridgePlugin myBridge = new MaxBridgePlugin();
 
-            Create(bridge.myScene);
+            myBridge.LoadFromFile(name);
 
+            ImportUsingHeadlessPlugin(myBridge);
+           
             return 1;
         }
 

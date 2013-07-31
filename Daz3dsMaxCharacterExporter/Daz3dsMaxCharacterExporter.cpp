@@ -23,7 +23,7 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneFigures.Geografts[figure]), myMesh);
 
-	myMesh.SkeletonIndex = addSkeletonData(figure);
+	myMesh.SkeletonIndex = addSkeletonData(figure); //CLOTHES NEED TO FOLLOW THEIR PARENT!
 
 	scene.Items.push_back( myMesh );
 

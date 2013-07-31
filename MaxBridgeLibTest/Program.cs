@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-
-using MaxBridgeLib;
+using MaxManagedBridge;
 
 namespace MaxBridgeLibTest
 {
@@ -12,10 +11,9 @@ namespace MaxBridgeLibTest
     {
         static void Main(string[] args)
         {
-            MaxBridge bridge = new MaxBridge();
-            bridge.LoadFromFile(@"E:\Daz3D\Scripting\selene.characterkit");
-            int[] f = bridge.GetTriangulatedFaces();
-            int i = bridge.GetHighestMaterialSlot();
+            MaxBridgePlugin p = new MaxBridgePlugin();
+            p.LoadFromFile(@"E:\Daz3D\Scripting\Scratch.characterkit");
+
         }
 
 

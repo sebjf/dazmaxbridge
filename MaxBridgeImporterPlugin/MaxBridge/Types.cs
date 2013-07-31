@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using MsgPack;
 using MsgPack.Serialization;
 
-namespace MaxBridgeLib
+namespace MaxManagedBridge
 {
     public class Material
     {

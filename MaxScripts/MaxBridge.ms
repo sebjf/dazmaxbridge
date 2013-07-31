@@ -9,15 +9,11 @@ struct MaxBridge
 	fn LoadDependencies
 	=(
 			local thisScriptPath = getFilenamePath (getThisScriptFilename())
-			local	maxlib_dll = thisScriptPath + "MaxBridgeLib.dll"			
-			local maxlib_assembly = dotnet.loadassembly maxlib_dll
-			local maxlib_class = dotNetClass "MaxBridgeLib.MaxBridge"
 			
-			myBridge = dotNetObject maxlib_class
-		
+			myBridge = dotNetObject "MaxManagedBridge.MaxBridgeLegacy"
 			if(myBridge == undefined)then
 			(
-				MessageBox ("Could not load " + maxlib_dll)
+				MessageBox ("Could not load .NET library. Things to check: Autodesk.Max.Dll is installed, the library is targetting .NET Framework 3.5 Client.")
 			)
 			
 			local MaterialProcessor = fileIn (thisScriptPath + "MaterialProcessor.ms")
@@ -41,7 +37,7 @@ struct MaxBridge
 	
 	fn LoadFromFile
 	=(
-		myBridge.LoadFromFile("E:\Daz3D\Scripting\selene.characterkit")
+		myBridge.LoadFromFile("E:\Daz3D\Scripting\Scratch.characterkit")
 	),
 	
 	fn MakeMesh
@@ -76,7 +72,7 @@ struct MaxBridge
 				if(myBridge.GetSkeletonIndex() >= 0)then
 				(
 					-- do skeleton
-					mySkeletonProcessor.DoTestSkeleton	(myBridge.GetSkeletonIndex())
+					--mySkeletonProcessor.DoTestSkeleton	(myBridge.GetSkeletonIndex())
 				)
 				
 				mymesh.material = MakeMaterial()
@@ -91,4 +87,5 @@ struct MaxBridge
 )
 
 bridge = MaxBridge()
-bridge.DoImport()
+bridge.LoadDependencies()
+--bridge.DoImport()
