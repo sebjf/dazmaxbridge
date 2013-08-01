@@ -5,7 +5,7 @@ struct	StdMaterialProcessor
 	
 	myBridge = undefined,
 	
-	bumpAmountScalar = 1000,
+	bumpAmountScalar = 500,
 		
 	fn toColour		str
 	=(
@@ -93,6 +93,15 @@ struct	StdMaterialProcessor
 		)
 					
 		stdMaterial.bumpMapAmount = (findBumpMapAmount myMaterial)
+		
+		local U_Tiling = (myMaterial.MaterialProperties.SafeGet "Horizontal Tiles" "1") as float
+		local V_Tiling = (myMaterial.MaterialProperties.SafeGet "Vertical Tiles" "1") as float
+		
+		local maps = (GetClassInstances bitmapTexture target:stdMaterial)
+		for map in maps do(
+			map.coords.u_tiling = U_Tiling;
+			map.coords.v_tiling = V_Tiling;
+		)
 				
 		return stdMaterial
 	),

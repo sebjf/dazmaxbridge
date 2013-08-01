@@ -81,11 +81,9 @@ namespace MaxManagedBridge
                 maxMesh.Faces[i].SetVerts(myFace.PositionVertex1, myFace.PositionVertex2, myFace.PositionVertex3);
                 maxMesh.TvFace[i].SetTVerts(myFace.TextureVertex1, myFace.TextureVertex2, myFace.TextureVertex3);
                 maxMesh.Faces[i].MatID = (ushort)myFace.MaterialId;
+                maxMesh.Faces[i].SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
             }
 
-            //NEED TO MAKE EDGES
-
-      //      maxMesh.BuildStripsAndEdges();
             maxMesh.BuildNormals();
             maxMesh.EnableEdgeList(1);
 
