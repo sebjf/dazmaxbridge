@@ -9,7 +9,7 @@ using MsgPack.Serialization;
 
 namespace MaxManagedBridge
 {
-    public class MaxBridge
+    public partial class MaxBridge
     {
         public MyScene Scene { get; private set; }
 
@@ -31,7 +31,6 @@ namespace MaxManagedBridge
                 }
             }
         }
-
 
         #region Utilities
 

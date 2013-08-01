@@ -15,7 +15,7 @@ namespace MaxManagedBridge
             foreach (MyMesh mesh in headlessPlugin.Scene.Items)
             {
                 ITriObject m = global.TriObject.Create();
-                headlessPlugin.PopulateMesh(m.Mesh, mesh);
+                headlessPlugin.AddMeshData(m.Mesh, mesh);
             }
         }
 

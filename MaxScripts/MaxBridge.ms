@@ -2,9 +2,8 @@
 struct MaxBridge
 (	
 	myBridge = undefined,
-	myMaterialProcessor = undefined,
-	myGeometryProcessor = undefined,
-	mySkeletonProcessor = undefined,
+	myMaterialProcessor 	= undefined,
+	mySkeletonProcessor 	= undefined,
 	
 	fn LoadDependencies
 	=(
@@ -16,13 +15,11 @@ struct MaxBridge
 				MessageBox ("Could not load .NET library. Things to check: Autodesk.Max.Dll is installed, the library is targetting .NET Framework 3.5 Client.")
 			)
 			
-			local MaterialProcessor = fileIn (thisScriptPath + "MaterialProcessor.ms")
-			local GeometryProcessor = fileIn (thisScriptPath + "GeometryProcessor.ms")	
-			local SkeletonProcessor = fileIn (thisScriptPath + "SkeletonProcessor.ms")	
+			local StdMaterialProcessor 	= fileIn (thisScriptPath + "StdMaterialProcessor.ms")
+			local SkeletonProcessor 	= fileIn (thisScriptPath + "SkeletonProcessor.ms")	
 				
-			myMaterialProcessor = MaterialProcessor myBridge:myBridge
-			myGeometryProcessor = GeometryProcessor myBridge:myBridge
-			mySkeletonProcessor = SkeletonProcessor myBridge:myBridge
+			myMaterialProcessor = StdMaterialProcessor 	myBridge:myBridge
+			mySkeletonProcessor = SkeletonProcessor 	myBridge:myBridge
 			
 			if(heapSize < 300000000)then
 			(
@@ -35,14 +32,16 @@ struct MaxBridge
 		myBridge.LoadFromFile "E:\Daz3D\Scripting\Scratch.characterkit" true
 	),
 	
-	fn MakeMesh
+	fn MakeMesh	myMesh
 	=(
-		return myGeometryProcessor.MakeMesh()
+		maxMesh = mesh()
+		myBridge.AddMeshData	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+		return maxMesh
 	),
 
-	fn MakeMaterial
+	fn MakeMaterial	myMesh
 	=(
-		return myMaterialProcessor.CreateMultiMaterial()
+		return myMaterialProcessor.CreateMultiMaterial		myMesh
 	),
 	
 	fn DoImport
@@ -62,8 +61,8 @@ struct MaxBridge
 			(
 				myMesh = myMeshItems[i]
 				
-				maxMesh = mesh()
-				myBridge.PopulateMesh	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+				maxMesh = MakeMesh myMesh
+				maxMesh.material = MakeMaterial myMesh 
 				
 				--myBridge.MakeNode 	myMesh
 				
@@ -72,8 +71,7 @@ struct MaxBridge
 					-- do skeleton
 					--mySkeletonProcessor.DoTestSkeleton	(myBridge.GetSkeletonIndex())
 				)
-				
-			--	mymesh.material = MakeMaterial()
+			
 			)
 			
 		)

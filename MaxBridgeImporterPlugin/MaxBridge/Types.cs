@@ -8,6 +8,50 @@ using MsgPack.Serialization;
 
 namespace MaxManagedBridge
 {
+    /* The methods here allow the Dictionary to be used in Max (since MaxScript cannot invoke the operator overloads) */
+    public class MaxDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+    {
+        public TValue Get(TKey key)
+        {
+            return this[key];
+        }
+
+        public TValue SafeGet(TKey key, TValue fallback)
+        {
+            if (this.ContainsKey(key))
+            {
+                return this[key];
+            }
+            else
+            {
+                return fallback;
+            }
+        }
+
+        public TKey[] KeysArray
+        {
+            get { return this.Keys.ToArray(); }
+        }
+
+        public TValue[] ValuesArray
+        {
+            get { return this.Values.ToArray(); }
+        }
+    }
+
+    /*
+    class Material
+    {
+    public:
+	    string				MaterialName;
+	    int					MaterialIndex;		//index as known by the mesh (i.e. the material slot)
+	    string				MaterialType;
+	    MATERIALPROPERTIES	MaterialProperties;
+
+	    MSGPACK_DEFINE(MaterialName, MaterialIndex, MaterialType, MaterialProperties);
+    };
+     */
+
     public class Material
     {
         [MessagePackMember(0)]
@@ -17,7 +61,8 @@ namespace MaxManagedBridge
         [MessagePackMember(2)]
         public string MaterialType;
         [MessagePackMember(3)]
-        public Dictionary<string, string> MaterialProperties;
+        public MaxDictionary<string, string> MaterialProperties;
+
     }
 
     /*
@@ -112,12 +157,20 @@ namespace MaxManagedBridge
         public byte[] Faces;
 
         [MessagePackMember(6)]
-        public Dictionary<int, Material> Materials;
+        public List<Material> Materials;
 
         [MessagePackMember(7)]
         public int SkeletonIndex;
 
+        /* The following properties are .NET only */
+
         public Face[] TriangulatedFaces = null;
+
+        public int NumberOfMaterialSlots
+        {
+            get { return Materials.Max(Material => Material.MaterialIndex) + 1; }
+        }
+
     }
 
     /*

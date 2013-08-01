@@ -30,7 +30,7 @@ namespace MaxManagedBridge
             return (System.Int64)Autodesk.Max.GlobalInterface.Instance.Animatable.GetHandleByAnim(obj);
         }
 
-        public IINode MakeNode(MyMesh myMesh)
+        public IINode MakeMeshNode(MyMesh myMesh)
         {
             IINode myEntity = GlobalInterface.Instance.COREInterface.CreateObjectNode(MakeMesh(myMesh));
             return myEntity;
@@ -39,11 +39,11 @@ namespace MaxManagedBridge
         public ITriObject MakeMesh(MyMesh myMesh)
         {
             ITriObject obj = GlobalInterface.Instance.CreateNewTriObject;
-            PopulateMesh(obj.Mesh, myMesh);
+            AddMeshData(obj.Mesh, myMesh);
             return obj;
         }
 
-        public void PopulateMesh(IMesh maxMesh, MyMesh myMesh)
+        public void AddMeshData(IMesh maxMesh, MyMesh myMesh)
         {
             maxMesh.SetNumVerts(myMesh.NumVertices, false, false);
             for (int i = 0; i < myMesh.NumVertices; i++)

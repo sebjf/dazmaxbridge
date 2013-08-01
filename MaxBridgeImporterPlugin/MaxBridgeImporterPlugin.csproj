@@ -48,12 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MaxBridge\Helpers.cs" />
     <Compile Include="MaxImporterPlugin\Descriptor.cs" />
     <Compile Include="MaxImporterPlugin\Importer.cs" />
     <Compile Include="MaxImporterPlugin\MaxBridgeImporterPlugin.cs" />
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
-    <Compile Include="MaxLegacy\MaxBridgeLegacyMethods.cs" />
     <Compile Include="MaxPlugin\MaxBridgePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

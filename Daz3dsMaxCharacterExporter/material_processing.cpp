@@ -168,6 +168,6 @@ void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& 
 		}
 
 		/*Even if we know the material is a dud, add it anyway and force max to deal with it, notifying the user that something has gone wrong, instead of failing silently*/
-		myMesh.Materials[myMaterial.MaterialIndex] = myMaterial;
+		myMesh.Materials.push_back(myMaterial);
 	}
 }

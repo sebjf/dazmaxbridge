@@ -69,7 +69,7 @@ public:
 	int		NumFaces;
 	BYTES	Faces;
 
-	map<int,Material> Materials;
+	vector<Material> Materials;
 
 	int		SkeletonIndex;
 
