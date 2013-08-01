@@ -20,10 +20,22 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	}
 
 	MyMesh myMesh;
+
+	myMesh.Name = figure->getLabel();
+	if(myMesh.Name.size() <= 0){
+		myMesh.Name = "Unnamed Figure";
+	}
+
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneFigures.Geografts[figure]), myMesh);
 
-	myMesh.SkeletonIndex = addSkeletonData(figure); //CLOTHES NEED TO FOLLOW THEIR PARENT! AND INCLUDE NAME
+	DzSkeleton* parentSkeleton = figure->getFollowTarget();
+	if(parentSkeleton == NULL)
+	{
+		parentSkeleton = figure;
+	}
+
+	myMesh.SkeletonIndex = addSkeletonData(parentSkeleton);
 
 	scene.Items.push_back( myMesh );
 
@@ -45,6 +57,12 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 void MyDazExporter::addNode(DzNode* node)
 {
 	MyMesh myMesh;
+
+	myMesh.Name = node->getLabel();
+	if(myMesh.Name.size() <= 0){
+		myMesh.Name = "Unnamed Node";
+	}
+
 	addGeometryData((DzFacetMesh*)(node->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(node->getObject()->getCurrentShape(), DzShapeList(), myMesh);
 	scene.Items.push_back( myMesh );
@@ -110,9 +128,14 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 
 	msgpack::sbuffer sbuf;
 	msgpack::pack(sbuf, scene);
-	myFile.write(sbuf.data(), sbuf.size());
+	int written = myFile.write(sbuf.data(), sbuf.size());
 
 	myFile.close();
+
+	if(written != sbuf.size())
+	{
+		log.push_back("Unable to write file (reason unknown but not all bytes were written)");
+	}
 
 	if(log.size() > 0)
 	{

@@ -60,10 +60,12 @@ public:
 class MyMesh
 {
 public:	
-	int NumVertices;
+	string	Name;
+
+	int		NumVertices;
 	vector<float>	Vertices;
 
-	int NumTextureVertices;
+	int		NumTextureVertices;
 	vector<float>	TextureVertices;
 
 	int		NumFaces;
@@ -73,7 +75,7 @@ public:
 
 	int		SkeletonIndex;
 
-	MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
+	MSGPACK_DEFINE(Name, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
 
 	vector<pair<int,QString>> _materialsToProcess;
 

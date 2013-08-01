@@ -85,12 +85,14 @@ namespace MaxManagedBridge
 
             //NEED TO MAKE EDGES
 
-            maxMesh.BuildStripsAndEdges();
+      //      maxMesh.BuildStripsAndEdges();
+            maxMesh.BuildNormals();
+            maxMesh.EnableEdgeList(1);
 
-            maxMesh.InvalidateEdgeList();
-            maxMesh.InvalidateStrips();
             maxMesh.InvalidateGeomCache();
             maxMesh.InvalidateTopologyCache();
+
+
         }
 
         //protected IMultiMtl MakeMultiMaterial(MaxMesh mesh)

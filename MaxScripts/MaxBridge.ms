@@ -34,8 +34,11 @@ struct MaxBridge
 	
 	fn MakeMesh	myMesh
 	=(
-		maxMesh = mesh()
+		maxMesh = mesh name:(myMesh.Name)
+		
 		myBridge.AddMeshData	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+		addmodifier maxMesh (smooth autoSmooth:true)
+		
 		return maxMesh
 	),
 

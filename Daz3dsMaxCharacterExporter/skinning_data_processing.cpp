@@ -37,6 +37,8 @@ int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 		mySkeleton.Bones.push_back(myBone);
 	}
 
+	mySkeleton._sourceSkeleton = skeleton;
+
 	scene.Skeletons.push_back(mySkeleton);
 
 	return index;

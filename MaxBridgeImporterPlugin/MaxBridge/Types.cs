@@ -115,6 +115,8 @@ namespace MaxManagedBridge
     class MyMesh
     {
     public:	
+	    string Name;
+
 	    int NumVertices;
 	    vector<float>	Vertices;
 
@@ -124,15 +126,15 @@ namespace MaxManagedBridge
 	    int		NumFaces;
 	    BYTES	Faces;
 
-	    map<int,Material> Materials;
+	    vector<Material> Materials;
 
 	    int		SkeletonIndex;
 
-	    MSGPACK_DEFINE(NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
+	    MSGPACK_DEFINE(Name, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
 
 	    vector<pair<int,QString>> _materialsToProcess;
 
-	    MaxMesh()
+	    MyMesh()
 	    {
 		    SkeletonIndex = -1;
 	    }
@@ -142,24 +144,27 @@ namespace MaxManagedBridge
     public class MyMesh
     {
         [MessagePackMember(0)]
-        public int NumVertices;
+        public string Name;
+
         [MessagePackMember(1)]
+        public int NumVertices;
+        [MessagePackMember(2)]
         public List<float> Vertices;
 
-        [MessagePackMember(2)]
-        public int NumTextureCoordinates;
         [MessagePackMember(3)]
+        public int NumTextureCoordinates;
+        [MessagePackMember(4)]
         public List<float> TextureCoordinates;
 
-        [MessagePackMember(4)]
-        public int NumFaces;
         [MessagePackMember(5)]
+        public int NumFaces;
+        [MessagePackMember(6)]
         public byte[] Faces;
 
-        [MessagePackMember(6)]
+        [MessagePackMember(7)]
         public List<Material> Materials;
 
-        [MessagePackMember(7)]
+        [MessagePackMember(8)]
         public int SkeletonIndex;
 
         /* The following properties are .NET only */

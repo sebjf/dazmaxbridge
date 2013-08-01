@@ -77,7 +77,7 @@ struct	StdMaterialProcessor
 		
 		if(myMaterialProperties.Count <= 0)then
 		(
-			print "Warning: material " + myMaterial.MaterialName + " of type " + myMaterial.MaterialType + " came through with no properties."
+			print ("Warning: material " + myMaterial.MaterialName + " of type " + myMaterial.MaterialType + " came through with no properties.")
 			return stdMaterial;
 		)
 				
