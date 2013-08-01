@@ -11,17 +11,25 @@ namespace MaxManagedBridge
 {
     public class MaxBridge
     {
-        public MaxScene Scene { get; private set; }
+        public MyScene Scene { get; private set; }
 
-        public void LoadFromFile(string filename)
+        public void LoadFromFile(string filename, bool triangulate = true)
         {
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
             BinaryReader reader = new BinaryReader(fs);
 
-            MessagePackSerializer<MaxScene> c = MessagePackSerializer.Create<MaxScene>();
+            MessagePackSerializer<MyScene> c = MessagePackSerializer.Create<MyScene>();
             Scene = c.Unpack(fs);
 
             reader.Close();
+
+            if (triangulate)
+            {
+                foreach (MyMesh m in Scene.Items)
+                {
+                    TriangulateFaces(m);
+                }
+            }
         }
 
 
@@ -74,8 +82,12 @@ namespace MaxManagedBridge
 
         #region Mesh Processing
 
-        unsafe public void TriangulateFaces(MaxMesh myMesh)
+        unsafe public void TriangulateFaces(MyMesh myMesh)
         {
+            if (myMesh.TriangulatedFaces != null){
+                return;
+            }
+
             Face[] quadFaces = BlockCast(myMesh.Faces);
 
             List<Face> triangulatedFaces = new List<Face>();

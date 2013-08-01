@@ -10,7 +10,7 @@ struct MaxBridge
 	=(
 			local thisScriptPath = getFilenamePath (getThisScriptFilename())
 			
-			myBridge = dotNetObject "MaxManagedBridge.MaxBridgeLegacy"
+			myBridge = DotNetObject "MaxManagedBridge.MaxPlugin"
 			if(myBridge == undefined)then
 			(
 				MessageBox ("Could not load .NET library. Things to check: Autodesk.Max.Dll is installed, the library is targetting .NET Framework 3.5 Client.")
@@ -30,14 +30,9 @@ struct MaxBridge
 			)
 	),
 	
-	fn Test
-	=(
-		myBridge.Test()
-	),
-	
 	fn LoadFromFile
 	=(
-		myBridge.LoadFromFile("E:\Daz3D\Scripting\Scratch.characterkit")
+		myBridge.LoadFromFile "E:\Daz3D\Scripting\Scratch.characterkit" true
 	),
 	
 	fn MakeMesh
@@ -62,20 +57,23 @@ struct MaxBridge
 		suspendEditing()
 		undo off(
 			
-			sceneItemCount = myBridge.GetNumItems()
-			
-			for i = 1 to sceneItemCount do
+			myMeshItems = myBridge.Scene.Items.ToArray()
+			for i = 1 to myMeshItems.Count do
 			(
-				myBridge.SetMesh (i-1)
-				myMesh = MakeMesh()
+				myMesh = myMeshItems[i]
 				
-				if(myBridge.GetSkeletonIndex() >= 0)then
+				maxMesh = mesh()
+				myBridge.PopulateMesh	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+				
+				--myBridge.MakeNode 	myMesh
+				
+				if(myMesh.SkeletonIndex >= 0)then
 				(
 					-- do skeleton
 					--mySkeletonProcessor.DoTestSkeleton	(myBridge.GetSkeletonIndex())
 				)
 				
-				mymesh.material = MakeMaterial()
+			--	mymesh.material = MakeMaterial()
 			)
 			
 		)
@@ -88,4 +86,4 @@ struct MaxBridge
 
 bridge = MaxBridge()
 bridge.LoadDependencies()
---bridge.DoImport()
+bridge.DoImport()

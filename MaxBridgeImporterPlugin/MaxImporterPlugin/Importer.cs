@@ -8,11 +8,11 @@ using Autodesk.Max.Plugins;
 
 namespace MaxManagedBridge
 {
-    public partial class MaxBridgeImporterPlugin
+    public partial class MaxImporter
     {
-        protected void ImportUsingHeadlessPlugin(MaxBridgePlugin headlessPlugin)
+        protected void ImportUsingHeadlessPlugin(MaxPlugin headlessPlugin)
         {
-            foreach (MaxMesh mesh in headlessPlugin.Scene.Items)
+            foreach (MyMesh mesh in headlessPlugin.Scene.Items)
             {
                 ITriObject m = global.TriObject.Create();
                 headlessPlugin.PopulateMesh(m.Mesh, mesh);

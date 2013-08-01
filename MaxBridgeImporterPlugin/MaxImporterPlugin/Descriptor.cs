@@ -8,12 +8,12 @@ using Autodesk.Max.Plugins;
 
 namespace MaxManagedBridge
 {
-    public partial class MaxBridgeImporterPlugin
+    public partial class MaxImporter
     {
         internal IGlobal global;
         internal Descriptor descriptor;
 
-        public MaxBridgeImporterPlugin(IGlobal global, Descriptor descriptor)
+        public MaxImporter(IGlobal global, Descriptor descriptor)
         {
             this.global = global;
             this.descriptor = descriptor;
@@ -51,7 +51,7 @@ namespace MaxManagedBridge
 
             public override object Create(bool loading)
             {
-                return new MaxBridgeImporterPlugin(global, this);
+                return new MaxImporter(global, this);
             }
 
             public override bool IsPublic

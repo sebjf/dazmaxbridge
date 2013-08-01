@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MaxManagedBridge
 {
-    public class MaxBridgeLegacy : MaxBridge
+    public class MaxLegacy : MaxBridge
     {
         #region Scene Navigation
 

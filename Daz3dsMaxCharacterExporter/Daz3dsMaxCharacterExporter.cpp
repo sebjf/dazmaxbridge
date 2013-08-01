@@ -19,11 +19,11 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 		return;
 	}
 
-	MaxMesh myMesh;
+	MyMesh myMesh;
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneFigures.Geografts[figure]), myMesh);
 
-	myMesh.SkeletonIndex = addSkeletonData(figure); //CLOTHES NEED TO FOLLOW THEIR PARENT!
+	myMesh.SkeletonIndex = addSkeletonData(figure); //CLOTHES NEED TO FOLLOW THEIR PARENT! AND INCLUDE NAME
 
 	scene.Items.push_back( myMesh );
 
@@ -44,7 +44,7 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 
 void MyDazExporter::addNode(DzNode* node)
 {
-	MaxMesh myMesh;
+	MyMesh myMesh;
 	addGeometryData((DzFacetMesh*)(node->getObject()->getCachedGeom()), myMesh);
 	addMaterialData(node->getObject()->getCurrentShape(), DzShapeList(), myMesh);
 	scene.Items.push_back( myMesh );
@@ -89,7 +89,7 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
 
 void	MyDazExporter::Reset()
 {
-	scene = MaxScene();
+	scene = MyScene();
 	addedNodes = vector<DzNode*>();
 	log = vector<QString>();
 	sceneFigures = SceneFigureInformation();

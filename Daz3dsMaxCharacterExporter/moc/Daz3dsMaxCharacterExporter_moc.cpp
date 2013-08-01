@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Daz3dsMaxCharacterExporter.h'
 **
-** Created: Tue 30. Jul 21:55:25 2013
+** Created: Wed 31. Jul 23:32:20 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!

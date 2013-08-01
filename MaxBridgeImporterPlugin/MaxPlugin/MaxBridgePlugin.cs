@@ -6,77 +6,91 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
-    public class MaxBridgePlugin : MaxBridge
+    public class MaxPlugin : MaxBridge
     {
         public string PrintName(System.Int64 handle)
         {
-            var node = ObjectFromHandle<IAnimatable>(handle);
+            var node = Convert(handle);
             return (node.NodeName + " of type " + node.ClassName);
         }
 
-        public T ObjectFromHandle<T>(System.Int64 handle) where T : IAnimatable
+        public string PrintObject(object obj)
         {
-            IAnimatable anim = Autodesk.Max.GlobalInterface.Instance.Animatable.GetAnimByHandle((UIntPtr)handle);
-            if (anim is T){
-                return (T)anim;
-            }
-            else{
-                throw new ArgumentException("Handle is of the type " + anim.GetType().Name + " not " + typeof(T).Name);
-            }
+            return obj.GetType().GetType().Name;
         }
 
-        public System.Int64 HandleFromObject(IAnimatable obj)
+        public IAnimatable Convert(System.Int64 handle)
+        {
+            IAnimatable anim = Autodesk.Max.GlobalInterface.Instance.Animatable.GetAnimByHandle((UIntPtr)handle);
+            return anim;
+        }
+
+        public System.Int64 Convert(IAnimatable obj)
         {
             return (System.Int64)Autodesk.Max.GlobalInterface.Instance.Animatable.GetHandleByAnim(obj);
         }
 
-        public void PopulateMesh(Int64 handle, int meshId)
+        public IINode MakeNode(MyMesh myMesh)
         {
-      //      PopulateMesh(ObjectFromHandle<IMesh>(handle), Scene.Items[meshId]);
+            IINode myEntity = GlobalInterface.Instance.COREInterface.CreateObjectNode(MakeMesh(myMesh));
+            return myEntity;
         }
 
-        public void PopulateMesh(IMesh myMesh, MaxMesh mesh)
+        public ITriObject MakeMesh(MyMesh myMesh)
         {
-            myMesh.SetNumVerts(mesh.NumVertices, false, false);
-            for (int i = 0; i < mesh.NumVertices; i++)
+            ITriObject obj = GlobalInterface.Instance.CreateNewTriObject;
+            PopulateMesh(obj.Mesh, myMesh);
+            return obj;
+        }
+
+        public void PopulateMesh(IMesh maxMesh, MyMesh myMesh)
+        {
+            maxMesh.SetNumVerts(myMesh.NumVertices, false, false);
+            for (int i = 0; i < myMesh.NumVertices; i++)
             {
-                myMesh.SetVert(i, mesh.Vertices[(i * 3) + 0], mesh.Vertices[(i * 3) + 1], mesh.Vertices[(i * 3) + 2]);
+                maxMesh.SetVert(i, myMesh.Vertices[(i * 3) + 0], myMesh.Vertices[(i * 3) + 1], myMesh.Vertices[(i * 3) + 2]);
             }
 
-            myMesh.SetNumTVerts(mesh.NumTextureCoordinates, false);
-            int elementsPerVertex = mesh.TextureCoordinates.Count / mesh.NumTextureCoordinates;
+            maxMesh.SetNumTVerts(myMesh.NumTextureCoordinates, false);
+            int elementsPerVertex = myMesh.TextureCoordinates.Count / myMesh.NumTextureCoordinates;
             switch (elementsPerVertex)
             {
                 case 2:
-                    for (int i = 0; i < mesh.NumTextureCoordinates; i++)
+                    for (int i = 0; i < myMesh.NumTextureCoordinates; i++)
                     {
-                        myMesh.SetTVert(i, mesh.TextureCoordinates[(i * 2) + 0], mesh.TextureCoordinates[(i * 2) + 1], 0.0f);
+                        maxMesh.SetTVert(i, myMesh.TextureCoordinates[(i * 2) + 0], myMesh.TextureCoordinates[(i * 2) + 1], 0.0f);
                     }
                     break;
                 case 3:
-                    for (int i = 0; i < mesh.NumTextureCoordinates; i++)
+                    for (int i = 0; i < myMesh.NumTextureCoordinates; i++)
                     {
-                        myMesh.SetTVert(i, mesh.TextureCoordinates[(i * 3) + 0], mesh.TextureCoordinates[(i * 3) + 1], mesh.TextureCoordinates[(i * 3) + 2]);
+                        maxMesh.SetTVert(i, myMesh.TextureCoordinates[(i * 3) + 0], myMesh.TextureCoordinates[(i * 3) + 1], myMesh.TextureCoordinates[(i * 3) + 2]);
                     }
                     break;
                 default:
                     throw new NotImplementedException(("Unable to handle texture coordinates with " + elementsPerVertex + " coordinates."));
             }
 
-            TriangulateFaces(mesh);
+            TriangulateFaces(myMesh);
 
-            myMesh.SetNumFaces(mesh.TriangulatedFaces.Length, false, false);
-            myMesh.SetNumTVFaces(mesh.TriangulatedFaces.Length, false, 0);
-            for (int i = 0; i < mesh.TriangulatedFaces.Length; i++)
+            maxMesh.SetNumFaces(myMesh.TriangulatedFaces.Length, false, false);
+            maxMesh.SetNumTVFaces(myMesh.TriangulatedFaces.Length, false, 0);
+            for (int i = 0; i < myMesh.TriangulatedFaces.Length; i++)
             {
-                Face myFace = mesh.TriangulatedFaces[i];
-                myMesh.Faces[i].SetVerts(myFace.PositionVertex1, myFace.PositionVertex2, myFace.PositionVertex3);
-                myMesh.TvFace[i].SetTVerts(myFace.TextureVertex1, myFace.TextureVertex2, myFace.TextureVertex3);
-                myMesh.Faces[i].MatID = (ushort)myFace.MaterialId;
+                Face myFace = myMesh.TriangulatedFaces[i];
+                maxMesh.Faces[i].SetVerts(myFace.PositionVertex1, myFace.PositionVertex2, myFace.PositionVertex3);
+                maxMesh.TvFace[i].SetTVerts(myFace.TextureVertex1, myFace.TextureVertex2, myFace.TextureVertex3);
+                maxMesh.Faces[i].MatID = (ushort)myFace.MaterialId;
             }
 
-            myMesh.InvalidateGeomCache();
-            myMesh.InvalidateTopologyCache();
+            //NEED TO MAKE EDGES
+
+            maxMesh.BuildStripsAndEdges();
+
+            maxMesh.InvalidateEdgeList();
+            maxMesh.InvalidateStrips();
+            maxMesh.InvalidateGeomCache();
+            maxMesh.InvalidateTopologyCache();
         }
 
         //protected IMultiMtl MakeMultiMaterial(MaxMesh mesh)

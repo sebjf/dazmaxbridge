@@ -9,7 +9,7 @@ using Autodesk.Max.Plugins;
 
 namespace MaxManagedBridge
 {
-    public partial class MaxBridgeImporterPlugin : Autodesk.Max.Plugins.SceneImport
+    public partial class MaxImporter : Autodesk.Max.Plugins.SceneImport
     {
         public override string AuthorName
         {
@@ -29,7 +29,7 @@ namespace MaxManagedBridge
             importer = ii;
             ginteface = i;
 
-            MaxBridgePlugin myBridge = new MaxBridgePlugin();
+            MaxPlugin myBridge = new MaxPlugin();
 
             myBridge.LoadFromFile(name);
 

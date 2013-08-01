@@ -126,7 +126,7 @@ MATERIALPROPERTIES MyDazExporter::getMaterialProperties(DzMaterial* material)
 
 }
 
-void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& myMesh)
+void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& myMesh)
 {
 	for(int i = 0; i < myMesh._materialsToProcess.size(); i++)
 	{

@@ -67,7 +67,7 @@ namespace MaxManagedBridge
     }
 
     /*
-    class MaxMesh
+    class MyMesh
     {
     public:	
 	    int NumVertices;
@@ -94,7 +94,7 @@ namespace MaxManagedBridge
     };
     */
 
-    public class MaxMesh
+    public class MyMesh
     {
         [MessagePackMember(0)]
         public int NumVertices;
@@ -121,7 +121,7 @@ namespace MaxManagedBridge
     }
 
     /*
-    class MaxBone
+    class MyBone
     {
     public:
 	    string	Name;
@@ -143,7 +143,7 @@ namespace MaxManagedBridge
     };
      */
 
-    public class MaxBone
+    public class MyBone
     {
         [MessagePackMember(0)]
         public string Name;
@@ -166,7 +166,7 @@ namespace MaxManagedBridge
     }
 
     /*
-    class MaxSkeleton
+    class MySkeleton
     {
     public:
 	    vector<MaxBone>	Bones;
@@ -178,14 +178,14 @@ namespace MaxManagedBridge
     };
      */
 
-    public class MaxSkeleton
+    public class MySkeleton
     {
         [MessagePackMember(0)]
-        public List<MaxBone> Bones;
+        public List<MyBone> Bones;
     }
 
     /*  
-    class MaxScene
+    class MyScene
     {
     public:
 	    vector<MaxMesh>		Items;
@@ -195,12 +195,12 @@ namespace MaxManagedBridge
     };
     */
 
-    public class MaxScene
+    public class MyScene
     {
         [MessagePackMember(0)]
-        public List<MaxMesh> Items;
+        public List<MyMesh> Items;
         [MessagePackMember(1)]
-        public List<MaxSkeleton> Skeletons;
+        public List<MySkeleton> Skeletons;
 
     }
 

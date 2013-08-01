@@ -15,11 +15,11 @@ int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 	DzBoneList bones;
 	skeleton->getAllBones(bones);
 
-	MaxSkeleton mySkeleton;
+	MySkeleton mySkeleton;
 
 	for(int i = 0; i < bones.size(); i++)
 	{
-		MaxBone myBone;
+		MyBone myBone;
 
 		DzBone*  bone = bones[i];
 

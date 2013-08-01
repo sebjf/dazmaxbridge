@@ -57,7 +57,7 @@ public:
 	/*Note this is not a messagepack capable object - these are packed into a raw array*/
 };
 
-class MaxMesh
+class MyMesh
 {
 public:	
 	int NumVertices;
@@ -77,13 +77,13 @@ public:
 
 	vector<pair<int,QString>> _materialsToProcess;
 
-	MaxMesh()
+	MyMesh()
 	{
 		SkeletonIndex = -1;
 	}
 };
 
-class MaxBone
+class MyBone
 {
 public:
 	string	Name;
@@ -102,10 +102,10 @@ public:
 
 class DzSkeleton; //forward declaration for the cache helper member below
 
-class MaxSkeleton
+class MySkeleton
 {
 public:
-	vector<MaxBone>	Bones;
+	vector<MyBone>	Bones;
 
 	MSGPACK_DEFINE(Bones);
 
@@ -113,11 +113,11 @@ public:
 
 };
 
-class MaxScene
+class MyScene
 {
 public:
-	vector<MaxMesh>		Items;
-	vector<MaxSkeleton>	Skeletons;
+	vector<MyMesh>		Items;
+	vector<MySkeleton>	Skeletons;
 
 	MSGPACK_DEFINE(Items, Skeletons);
 };

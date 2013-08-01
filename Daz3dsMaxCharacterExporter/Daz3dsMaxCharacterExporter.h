@@ -81,14 +81,14 @@ protected:
 
 private:
 
-	MaxScene	scene;
+	MyScene	scene;
 
 	void				resolveSelectedDzNode(DzNode* node);
 	void				addFigure(DzSkeleton* skeleton);
 	void				addNode(DzNode* node);
 
-	void				addGeometryData(DzFacetMesh* dazMesh, MaxMesh& maxMesh);
-	void				addMaterialData(DzShape* shape, DzShapeList shapes, MaxMesh& maxMesh);
+	void				addGeometryData(DzFacetMesh* dazMesh, MyMesh& MyMesh);
+	void				addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& MyMesh);
 	int					addSkeletonData(DzSkeleton* skeleton);
 
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);

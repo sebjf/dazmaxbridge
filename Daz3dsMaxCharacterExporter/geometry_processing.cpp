@@ -1,6 +1,6 @@
 #include "Daz3dsMaxCharacterExporter.h"
 
-void MyDazExporter::addGeometryData(DzFacetMesh* mesh, MaxMesh& myMesh)
+void MyDazExporter::addGeometryData(DzFacetMesh* mesh, MyMesh& myMesh)
 {
 	// Collect the vertices into a float array - each vertex is three floats so its a simple copy
 
