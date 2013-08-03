@@ -1,4 +1,4 @@
-#include "Daz3dsMaxCharacterExporter.h"
+#include "DazMaxExporter.h"
 
 int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 {

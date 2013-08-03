@@ -1,4 +1,4 @@
-#include "Daz3dsMaxCharacterExporter.h"
+#include "DazMaxExporter.h"
 #include <sstream>
 
 /*This method is responsible for turning a Daz material into a set of queryable properties 

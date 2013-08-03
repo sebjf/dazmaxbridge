@@ -1,4 +1,4 @@
-#include "Daz3dsMaxCharacterExporter.h"
+#include "DazMaxExporter.h"
 
 void MyDazExporter::addGeometryData(DzFacetMesh* mesh, MyMesh& myMesh)
 {

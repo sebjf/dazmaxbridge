@@ -1,6 +1,6 @@
 // Daz3dsMaxCharacterExporter.cpp : Defines the exported functions for the DLL application.
 //
-#include "Daz3dsMaxCharacterExporter.h"
+#include "DazMaxExporter.h"
 
 
 QString VecToString(DzVec3 v)

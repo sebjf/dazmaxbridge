@@ -24,7 +24,7 @@
 #include "dzapp.h"
 
 #include "version.h"
-#include "Daz3dsMaxCharacterExporter.h"
+#include "DazMaxExporter.h"
 
 /*****************************
    Plugin Definition

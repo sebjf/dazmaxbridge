@@ -150,7 +150,7 @@
     <None Include="DazMaxExporter.def" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Daz3dsMaxCharacterExporter.h">
+    <CustomBuild Include="DazMaxExporter.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(DAZ_STUDIO_SDK)\bin\$(Platform)\moc" "%(FullPath)" -o .\moc\%(Filename)_moc.cpp</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mocing "%(Filename)"...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\moc\%(Filename)_moc.cpp</Outputs>
@@ -160,7 +160,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Daz3dsMaxCharacterExporter.cpp" />
+    <ClCompile Include="DazMaxExporter.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
@@ -177,7 +177,7 @@
     </ClCompile>
     <ClCompile Include="geometry_processing.cpp" />
     <ClCompile Include="material_processing.cpp" />
-    <ClCompile Include="moc\Daz3dsMaxCharacterExporter_moc.cpp" />
+    <ClCompile Include="moc\DazMaxExporter_moc.cpp" />
     <ClCompile Include="skinning_data_processing.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>

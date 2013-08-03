@@ -29,14 +29,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Daz3dsMaxCharacterExporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="moc\Daz3dsMaxCharacterExporter_moc.cpp">
-      <Filter>moc</Filter>
     </ClCompile>
     <ClCompile Include="material_processing.cpp">
       <Filter>Source Files</Filter>
@@ -50,15 +44,21 @@
     <ClCompile Include="skinning_data_processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="Daz3dsMaxCharacterExporter.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
+    <ClCompile Include="DazMaxExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="moc\DazMaxExporter_moc.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DazMaxExporter.def">
       <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="DazMaxExporter.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
