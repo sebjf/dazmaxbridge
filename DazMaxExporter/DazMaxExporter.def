@@ -1,4 +1,4 @@
-LIBRARY Daz3dsMaxCharacterExporter
+LIBRARY DazMaxExporter
 EXPORTS
 	getSDKVersion			@1
 	getPluginDefinition		@2

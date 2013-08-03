@@ -104,7 +104,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>Daz3dsMaxCharacterExporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration)\;$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;msgpack.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -141,13 +141,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>Daz3dsMaxCharacterExporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Daz3dsMaxCharacterExporter.def" />
+    <None Include="DazMaxExporter.def" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Daz3dsMaxCharacterExporter.h">
