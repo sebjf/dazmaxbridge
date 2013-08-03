@@ -1,13 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DazExporterPlugin", "DazMaxExporter\Daz3dsMaxCharacterExporter.vcxproj", "{370A9679-A3A7-4C7C-9DE0-DE4BE3BE5947}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DazExporterPlugin", "DazMaxExporter\DazMaxExporter.vcxproj", "{370A9679-A3A7-4C7C-9DE0-DE4BE3BE5947}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaxBridgeLibTest", "MaxBridgeLibTest\MaxBridgeLibTest.csproj", "{813E9711-6A05-4EB6-AC48-9A54363BF20D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1C362C44-A854-41A9-90DE-8670AD79366F}"
 	ProjectSection(SolutionItems) = preProject
 		Readme.txt = Readme.txt
+		ToDoList.txt = ToDoList.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaxBridgeImporterPlugin", "MaxBridgeImporterPlugin\MaxBridgeImporterPlugin.csproj", "{645EC39A-1BBA-45DA-BC41-38C04EE66D3B}"

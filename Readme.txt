@@ -59,8 +59,9 @@ Before building make sure the following steps are complete:
 
 1. Install the Daz SDK (The Daz 4.5 SDK is the latest one and works with Daz 4.6)
 2. Create a SYSTEM ENVIRONMENT VARIABLE called DazInstallDirectory and set its value to the installation directory of Daz Studio (e.g. C:\Program Files\DAZ 3D\DAZStudio4)
-3. Select a location for the MaxScript scripts and copy the contents of the MaxScript folder to it
-4. Update the Post-build Event Command Line in the MaxBridgeLib project with the location selected in (3)
+3. Set the Debugger property of the project options as this is stored in the user file which is not included in source control
+4. Select a location for the MaxScript scripts and copy the contents of the MaxScript folder to it
+5. Update the Post-build Event Command Line in the MaxBridgeLib project with the location selected in (3)
 
 Installing
 
