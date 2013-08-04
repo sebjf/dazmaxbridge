@@ -1,2 +1,0 @@
-
-1. On import Apply XFORM, rotate and centre, then collapse. This should be more robust than swapping vertices.

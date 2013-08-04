@@ -40,7 +40,7 @@ namespace MaxManagedBridge
 
         public override string Ext(int n)
         {
-            return "characterkit";
+            return "dazmaxbridge";
         }
 
         public override int ExtCount

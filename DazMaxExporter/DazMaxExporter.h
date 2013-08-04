@@ -67,12 +67,12 @@ class MyDazExporter : public DzExporter {
 public:
 
 	/** Constructor **/
-	MyDazExporter() : DzExporter(QString("characterkit")) { }
+	MyDazExporter() : DzExporter(QString("dazmaxbridge")) { }
 
 public slots:
 
 	virtual void    getDefaultOptions( DzFileIOSettings *options ) const;
-	virtual QString getDescription() const { return QString("3DS Max Character Unwrapper"); };
+	virtual QString getDescription() const { return QString("3DS Max Bridge Unwrapper"); };
 	virtual bool	isFileExporter() const { return true; };
 
 protected:

@@ -34,7 +34,7 @@
 	This macro creates the plugin definition, and the functions that are needed
 	for DAZ Studio to load our plugin.
 **/
-DZ_PLUGIN_DEFINITION( "An exporter to transfer character geometry and rigging information." );
+DZ_PLUGIN_DEFINITION( "An exporter to transfer character and scene geometry and rigging information to 3DS Max." );
 
 /**
 	This macro sets the author string for the plugin

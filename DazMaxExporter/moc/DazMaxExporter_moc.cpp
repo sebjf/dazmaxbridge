@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'DazMaxExporter.h'
 **
-** Created: Sat 3. Aug 20:52:46 2013
+** Created: Sun 4. Aug 14:09:40 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!

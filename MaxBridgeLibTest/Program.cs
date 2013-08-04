@@ -12,7 +12,7 @@ namespace MaxBridgeLibTest
         static void Main(string[] args)
         {
             MaxPlugin p = new MaxPlugin();
-            p.LoadFromFile(@"E:\Daz3D\Scripting\Scratch.characterkit");
+            p.LoadFromFile(@"E:\Daz3D\Scripting\Scratch.dazmaxbridge");
 
         }
 

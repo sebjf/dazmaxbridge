@@ -1,4 +1,4 @@
-// Daz3dsMaxCharacterExporter.cpp : Defines the exported functions for the DLL application.
+// DazMaxExporter.cpp : Defines the exported functions for the DLL application.
 //
 #include "DazMaxExporter.h"
 

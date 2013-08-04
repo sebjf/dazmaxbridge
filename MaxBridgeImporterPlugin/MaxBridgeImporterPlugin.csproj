@@ -48,7 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MaxBridge\Helpers.cs" />
     <Compile Include="MaxImporterPlugin\Descriptor.cs" />
     <Compile Include="MaxImporterPlugin\Importer.cs" />
     <Compile Include="MaxImporterPlugin\MaxBridgeImporterPlugin.cs" />
@@ -59,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -66,8 +66,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "D:\Program Files\Autodesk\3ds Max 2011\Plugins\"
-copy "$(TargetDir)MsgPack.*" "D:\Program Files\Autodesk\3ds Max 2011\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "%25_3DSMaxInstallDirectory%25Plugins\"
+copy "$(TargetDir)MsgPack.*" "%25_3DSMaxInstallDirectory%25Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
