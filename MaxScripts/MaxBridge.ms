@@ -37,10 +37,11 @@ struct MaxBridge
 	
 	fn MakeMesh	myMesh
 	=(
-		maxMesh = mesh name:(myMesh.Name)
+		--maxMesh = mesh name:(myMesh.Name)
 		
 		-- Get the node created above in '.net space', and send its 'mesh' member to the AddMeshData method for initialisation
-		myBridge.AddMeshData	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+		--myBridge.AddMeshData	(myBridge.Convert (GetHandleByAnim maxMesh)).ObjectRef.Mesh_ myMesh
+		maxMesh = (GetAnimByHandle  (myBridge.Convert (myBridge.MakeMeshNode	myMesh)))
 		addmodifier maxMesh (smooth autoSmooth:true)
 		
 		-- Swap the Z&Y axis by rotating the mesh by 90 deg. around X
@@ -48,6 +49,8 @@ struct MaxBridge
 		addmodifier maxMesh myXForm
 		myXForm.center = [0,0,0]
 		myXForm.gizmo.rotation = ((eulerangles -90 0 0) as quat)
+		
+		maxOps.CollapseNode maxMesh true
 			
 		return maxMesh
 	),

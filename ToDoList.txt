@@ -1,0 +1,23 @@
+
+1. Not selecting anything transfers entire scene
+
+2. MaxScript sets diffuse to 0 on import
+
+3. do proper opacity map adjustment
+
+4. add colour conversion
+
+
+Roadmap
+
+1. Nodes created in managed lib
+2. Daz plugin converted to utility
+3. Implement communication between managed lib and daz plugin
+4. Have managed plugin pull selected daz objects directly
+5. Have managed plugin present daz scene to user
+6. Have managed plugin update specific items instead of creating new ones (from scratch - i.e. same node new geom)
+7. Update specific geom components
+8. Link this to changed event in daz
+
+
+Basic skinning for pose adjustments

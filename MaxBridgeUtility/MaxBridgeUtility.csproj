@@ -1,22 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Autodesk\3ds Max 2011\3dsmax.exe</StartProgram>
-  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{645EC39A-1BBA-45DA-BC41-38C04EE66D3B}</ProjectGuid>
+    <ProjectGuid>{D143B9D7-1DCD-46A4-AFE3-C21DC3F8F606}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MaxBridgePlugin</RootNamespace>
-    <AssemblyName>MaxBridgePlugin</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>MaxBridgeUtility</RootNamespace>
+    <AssemblyName>MaxBridgeUtility</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +22,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,39 +33,41 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autodesk.Max">
-      <HintPath>D:\Program Files\Autodesk\3ds Max 2011\Autodesk.Max.dll</HintPath>
+      <HintPath>D:\Program Files\Autodesk\3ds Max 2014\Autodesk.Max.dll</HintPath>
     </Reference>
-    <Reference Include="MsgPack, Version=0.3.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
-      <HintPath>..\packages\MsgPack.Cli.0.3.2\lib\net35-client\MsgPack.dll</HintPath>
+    <Reference Include="ManagedServices">
+      <HintPath>D:\Program Files\Autodesk\3ds Max 2014\ManagedServices.dll</HintPath>
+    </Reference>
+    <Reference Include="MsgPack">
+      <HintPath>..\packages\MsgPack.Cli.0.3.2\lib\net40-client\MsgPack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MaxImporterPlugin\Descriptor.cs" />
-    <Compile Include="MaxImporterPlugin\Importer.cs" />
-    <Compile Include="MaxImporterPlugin\MaxBridgeImporterPlugin.cs" />
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
+    <Compile Include="MaxImporterUtility\Descriptor.cs" />
+    <Compile Include="MaxImporterUtility\Utility.cs" />
+    <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
+    <Compile Include="MaxPlugin\Materials.cs" />
+    <Compile Include="MaxPlugin\Geometry.cs" />
     <Compile Include="MaxPlugin\MaxBridgePlugin.cs" />
+    <Compile Include="MaxPlugin\MaxScriptInterop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Readme.txt" />
-    <Content Include="License.txt" />
-  </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "%25_3DSMaxInstallDirectory%25Plugins\"
-copy "$(TargetDir)MsgPack.*" "%25_3DSMaxInstallDirectory%25Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "D:\Program Files\Autodesk\3ds Max 2014\bin\assemblies\"
+copy "$(TargetDir)MsgPack.*" "D:\Program Files\Autodesk\3ds Max 2014\bin\assemblies\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

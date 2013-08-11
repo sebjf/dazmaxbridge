@@ -123,6 +123,8 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 		resolveSelectedDzNode(nodeIterator.next());		
 	}
 
+	//todo get all scene items if none are selcected
+
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
 

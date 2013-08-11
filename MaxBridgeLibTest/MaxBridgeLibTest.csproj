@@ -49,9 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MaxBridgeImporterPlugin\MaxBridgeImporterPlugin.csproj">
-      <Project>{645EC39A-1BBA-45DA-BC41-38C04EE66D3B}</Project>
-      <Name>MaxBridgeImporterPlugin</Name>
+    <ProjectReference Include="..\MaxBridgeUtility\MaxBridgeUtility.csproj">
+      <Project>{D143B9D7-1DCD-46A4-AFE3-C21DC3F8F606}</Project>
+      <Name>MaxBridgeUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
