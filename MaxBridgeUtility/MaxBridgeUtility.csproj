@@ -34,15 +34,26 @@
   <ItemGroup>
     <Reference Include="Autodesk.Max">
       <HintPath>D:\Program Files\Autodesk\3ds Max 2014\Autodesk.Max.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Autodesk.Max.Wrappers">
+      <HintPath>D:\Program Files\Autodesk\3ds Max 2014\bin\assemblies\Autodesk.Max.Wrappers.dll</HintPath>
     </Reference>
     <Reference Include="ManagedServices">
       <HintPath>D:\Program Files\Autodesk\3ds Max 2014\ManagedServices.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MaxCustomControls">
+      <HintPath>D:\Program Files\Autodesk\3ds Max 2014\MaxCustomControls.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MsgPack">
       <HintPath>..\packages\MsgPack.Cli.0.3.2\lib\net40-client\MsgPack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,8 +64,15 @@
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
     <Compile Include="MaxImporterUtility\Descriptor.cs" />
+    <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.Designer.cs">
+      <DependentUpon>UtilityMainForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MaxImporterUtility\Utility.cs" />
     <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
+    <Compile Include="MaxPlugin\MaxSceneExploration.cs" />
     <Compile Include="MaxPlugin\Materials.cs" />
     <Compile Include="MaxPlugin\Geometry.cs" />
     <Compile Include="MaxPlugin\MaxBridgePlugin.cs" />
@@ -63,6 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MaxImporterUtility\GUI\UtilityMainForm.resx">
+      <DependentUpon>UtilityMainForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

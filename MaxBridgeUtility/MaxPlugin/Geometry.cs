@@ -8,15 +8,34 @@ namespace MaxManagedBridge
 {
     public partial class MaxPlugin : MaxBridge
     {
-        public void AddMeshData(IMesh maxMesh, MyMesh myMesh)
+        public bool SetPositionVertices(IMesh maxMesh, MyMesh myMesh)
         {
-            maxMesh.SetNumVerts(myMesh.NumVertices, false, false);
+            bool countChanged = false;
+
+            if (maxMesh.NumVerts != myMesh.NumVertices)
+            {
+                maxMesh.SetNumVerts(myMesh.NumVertices, false, false);
+                countChanged = true;
+            }
+
             for (int i = 0; i < myMesh.NumVertices; i++)
             {
                 maxMesh.SetVert(i, myMesh.Vertices[(i * 3) + 0], myMesh.Vertices[(i * 3) + 1], myMesh.Vertices[(i * 3) + 2]);
             }
 
-            maxMesh.SetNumTVerts(myMesh.NumTextureCoordinates, false);
+            return countChanged;
+        }
+
+        public bool SetTextureVertices(IMesh maxMesh, MyMesh myMesh)
+        {
+            bool countChanged = false;
+
+            if (maxMesh.NumTVerts != myMesh.NumTextureCoordinates)
+            {
+                maxMesh.SetNumTVerts(myMesh.NumTextureCoordinates, false);
+                countChanged = true;
+            }
+
             int elementsPerVertex = myMesh.TextureCoordinates.Count / myMesh.NumTextureCoordinates;
             switch (elementsPerVertex)
             {
@@ -36,10 +55,22 @@ namespace MaxManagedBridge
                     throw new NotImplementedException(("Unable to handle texture coordinates with " + elementsPerVertex + " coordinates."));
             }
 
+            return countChanged;
+        }
+
+        public bool SetFaces(IMesh maxMesh, MyMesh myMesh)
+        {
+            bool countChanged = false;
+
             TriangulateFaces(myMesh);
 
-            maxMesh.SetNumFaces(myMesh.TriangulatedFaces.Length, false, false);
-            maxMesh.SetNumTVFaces(myMesh.TriangulatedFaces.Length, false, 0);
+            if (maxMesh.NumFaces != myMesh.TriangulatedFaces.Length)
+            {
+                maxMesh.SetNumFaces(myMesh.TriangulatedFaces.Length, false, false);
+                maxMesh.SetNumTVFaces(myMesh.TriangulatedFaces.Length, false, 0);
+                countChanged = true;
+            }
+
             for (int i = 0; i < myMesh.TriangulatedFaces.Length; i++)
             {
                 Face myFace = myMesh.TriangulatedFaces[i];
@@ -49,13 +80,32 @@ namespace MaxManagedBridge
                 maxMesh.Faces[i].SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
             }
 
-            maxMesh.BuildNormals();
-            maxMesh.EnableEdgeList(1);
+            return countChanged;
+        }
+
+        public void SmoothMesh(IMesh maxMesh, MyMesh myMesh)
+        {
+            //todo: get angle from material for smoothing
+            maxMesh.AutoSmooth((float)DegreeToRadian(30.0), false, true);
+        }
+
+        public void UpdateMesh(IMesh maxMesh, MyMesh myMesh)
+        {
+            bool countChanged = false;
+
+            countChanged = SetPositionVertices(maxMesh, myMesh); //if the mesh is new or has been significantly altered, recreate the whole topology
+            if (countChanged)
+            {
+                SetTextureVertices(maxMesh, myMesh);
+                SetFaces(maxMesh, myMesh);
+
+                maxMesh.EnableEdgeList(1);
+                maxMesh.InvalidateTopologyCache();
+            }
+
+            SmoothMesh(maxMesh, myMesh);
 
             maxMesh.InvalidateGeomCache();
-            maxMesh.InvalidateTopologyCache();
-
-
         }
         
     }

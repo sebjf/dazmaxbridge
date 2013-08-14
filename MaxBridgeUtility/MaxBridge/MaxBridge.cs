@@ -77,6 +77,11 @@ namespace MaxManagedBridge
             return dst;
         }
 
+        public double DegreeToRadian(double angle)
+        {
+            return ((Math.PI * angle) / 180.0);
+        }
+
         #endregion
 
         #region Mesh Processing

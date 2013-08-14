@@ -28,11 +28,17 @@ namespace MaxManagedBridge
         public MaxBridgeUtility()
         {
             Global = Autodesk.Max.GlobalInterface.Instance;
+            Bridge = new MaxPlugin();
+            GUI = new UtilityMainForm(this);
+            GUI.ShowModeless();
         }
 
         protected IInterface Interface;
         protected IIUtil UtilityInterface;
         protected IGlobal Global;
+
+        protected UtilityMainForm GUI;
+        public    MaxPlugin Bridge; 
 
         public override void BeginEditParams(IInterface ip, IIUtil iu)
         {

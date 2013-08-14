@@ -8,6 +8,28 @@ namespace MaxManagedBridge
 {
     public partial class MaxPlugin : MaxBridge
     {
+        public void SetMeshMaterial(MyMesh myMesh, System.Int64 handle)
+        {
+            IAnimatable anim = Autodesk.Max.GlobalInterface.Instance.Animatable.GetAnimByHandle((UIntPtr)handle);
+
+            if (anim is IMtl)
+            {
+                foreach (var m in GetMappedNodes(myMesh))
+                {
+                    m.Mtl = (anim as IMtl);
+                }
+            }
+        }
+
+        public IEnumerable<IINode> GetMappedNodesWithoutMaterials(MyMesh source)
+        {
+            return GetMappedNodes(source).Where(n => n.Mtl == null);
+        }
+
+        public bool NeedsMaterialUpdate(MyMesh source)
+        {
+            return GetMappedNodesWithoutMaterials(source).Any();
+        }
 
         //protected IMultiMtl MakeMultiMaterial(MaxMesh mesh)
         //{
