@@ -72,6 +72,7 @@
     </Compile>
     <Compile Include="MaxImporterUtility\Utility.cs" />
     <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
+    <Compile Include="MaxPlugin\PropertyAccessors.cs" />
     <Compile Include="MaxPlugin\MaxSceneExploration.cs" />
     <Compile Include="MaxPlugin\Materials.cs" />
     <Compile Include="MaxPlugin\Geometry.cs" />

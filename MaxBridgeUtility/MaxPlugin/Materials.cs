@@ -31,61 +31,66 @@ namespace MaxManagedBridge
             return GetMappedNodesWithoutMaterials(source).Any();
         }
 
-        //protected IMultiMtl MakeMultiMaterial(MaxMesh mesh)
-        //{
-        //    IMultiMtl myMaterial = global.NewDefaultMultiMtl;
 
-        //    myMaterial.SetNumSubMtls(mesh.Materials.Keys.ToArray().Max() + 1);
-
-        //    foreach (int i in mesh.Materials.Keys.ToArray())
-        //    {
-        //        myMaterial.SetSubMtl(i, MakeStandardMaterial(mesh.Materials[i]));
-        //    }
-
-        //    return myMaterial;
-        //}
-
-        //protected IMtl MakeStandardMaterial(Material material)
-        //{
-        //    IStdMat2 myMaterial = global.NewDefaultStdMat;
-
-        //    myMaterial.Name = material.MaterialName;
-        //    myMaterial.TwoSided = true;
-        //    myMaterial.LockAmbDiffTex(false);
-
-
-
-        //    return myMaterial;
-        //}
-
-        protected void UpdateMaterial(IStdMat2 mat, string property, string value)
+        public IMultiMtl CreateMaterial(MyMesh myMesh)
         {
-            switch (property)
+            IMultiMtl maxMaterial = GlobalInterface.Instance.NewDefaultMultiMtl;
+            maxMaterial.SetNumSubMtls(myMesh.NumberOfMaterialSlots);
+
+            foreach (var myMat in myMesh.Materials)
             {
-                /*
-                case    "Ambient Color"     : mat.SetAmbient(toColor(value), 0); break;
-                case	"Ambient Color Map"	: myMaterial.ambientMap					= toMap myValue
-                case	"Ambient Strength"	: myMaterial.ambientMapAmount 		= toPercent myValue
-                case	"Bump Strength Map"	: myMaterial.bumpMap 						= toMap myValue
-                case	"Color Map"			: (getDiffuseMap myMaterial).map1 	= toMap myValue
-                case	"Diffuse Color"		: (getDiffuseMap myMaterial).color2 	= toColour myValue
-                case	"Diffuse Strength"	: myMaterial.diffuseMapAmount 			= toPercent myValue
-                case	"Opacity Map"		: myMaterial.opacityMap 					= toMap myValue
-                case	"Opacity Strength"	: myMaterial.opacityMapAmount			= toPercent myValue
-                case	"Specular Color"	: myMaterial.specular 						= toColour myValue
-                case	"Specular Color Map": myMaterial.specularMap					= toMap myValue
-                case	"Specular Strength"	: myMaterial.specularLevel 				= toPercent myValue
-                case	"Glossiness"	    :
-                */
+                maxMaterial.SetSubMtlAndName(myMat.MaterialIndex, CreateStandardMaterial(myMat), ref myMat.MaterialName);
             }
+
+            return maxMaterial;
         }
 
-        
-        //IColor toColor(string value)
-        //{
-        //    var components = value.Split(' ');
-        //    return global.Color.Create(float.Parse(components[1]), float.Parse(components[2]), float.Parse(components[3]));
-        //}
-        
+        public IMtl CreateStandardMaterial(Material myMaterial)
+        {
+            IStdMat2 material = GlobalInterface.Instance.NewDefaultStdMat;
+
+            List<string> names = new List<string>();
+            foreach (var p in EnumerateReferences(material))
+            {
+                names.Add(p.Name);
+            }
+
+            FindParameter("twoSided", material).SetValue(true);
+            FindParameter("showInViewport", material).SetValue(true);
+            FindParameter("adTextureLock", material).SetValue(false);
+            FindParameter("adLock", material).SetValue(false);
+            FindParameter("dsLock", material).SetValue(false);
+
+           
+
+
+            return material;
+        }
+
+        public void DoMtl()
+        {
+            
+            IBitmapTex bitmapTexture = (IBitmapTex)GlobalInterface.Instance.COREInterface12.CreateInstance(SClass_ID.Texmap, GlobalInterface.Instance.Class_ID.Create(ClassIDs.BitmapTexture_A, 0));
+
+            ITexmap rgb_mult = (ITexmap)GlobalInterface.Instance.COREInterface12.CreateInstance(SClass_ID.Texmap, GlobalInterface.Instance.Class_ID.Create(ClassIDs.RGB_Multiply_A, 0));
+
+            IStdMat2 stdmtl = (IStdMat2)GlobalInterface.Instance.COREInterface12.CreateInstance(SClass_ID.Material, GlobalInterface.Instance.Class_ID.Create(ClassIDs.StandardMaterial_A, 0));
+
+            IMultiMtl multimtl = (IMultiMtl)GlobalInterface.Instance.COREInterface12.CreateInstance(SClass_ID.Material, GlobalInterface.Instance.Class_ID.Create(ClassIDs.MultiMaterial, 0));
+
+            IOSModifier m = (IOSModifier)GlobalInterface.Instance.COREInterface12.CreateInstance(SClass_ID.Osm, GlobalInterface.Instance.Class_ID.Create(ClassIDs.XFORM_A, 0));
+
+            IList<Parameter> parameters = EnumerateReferences(stdmtl).ToList();
+
+            IList<Parameter> parameters2 = EnumerateReferences(rgb_mult).ToList();
+
+            IList<Parameter> parameters3 = EnumerateReferences(m).ToList();
+
+        }
+
+
+
+
     }
+
 }

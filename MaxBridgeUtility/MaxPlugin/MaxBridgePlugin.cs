@@ -20,7 +20,10 @@ namespace MaxManagedBridge
     public static class ClassIDs
     {
         public const uint XFORM_A = 622942244;
-        public const uint XFORM_B = 0;
+        public const uint BitmapTexture_A = 576;
+        public const uint RGB_Multiply_A = 656;
+        public const uint StandardMaterial_A = 2;
+        public const uint MultiMaterial = 512;
     }
 
     public partial class MaxPlugin : MaxBridge
@@ -49,23 +52,28 @@ namespace MaxManagedBridge
 
         public bool UpdateMesh(MyMesh myMesh)
         {
-            IList<IMesh> mappedMeshes = GetMappedMeshes(myMesh).ToList();
+            IList<IINode> mappedNodes = GetMappedNodes(myMesh).ToList();
 
             //No mesh nodes exist with that name yet, so initialise a new node for the object
-            if (mappedMeshes.Count < 1)
+            if (mappedNodes.Count < 1)
             {
-                mappedMeshes.Add(CreateMeshNode(myMesh.Name));
+                mappedNodes.Add(CreateMeshNode(myMesh.Name));
             }
 
-            foreach (var m in mappedMeshes)
+            foreach (var m in mappedNodes)
             {
-                UpdateMesh(m, myMesh);
+                UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
+
+                if (m.Mtl == null)
+                {
+                    m.Mtl = CreateMaterial(myMesh);
+                }
             }
 
             return true;
         }
 
-        public IMesh CreateMeshNode(string name)
+        public IINode CreateMeshNode(string name)
         {
             ITriObject meshObject = GlobalInterface.Instance.CreateNewTriObject();
             IINode myNode = GlobalInterface.Instance.COREInterface.CreateObjectNode(meshObject);
@@ -78,7 +86,7 @@ namespace MaxManagedBridge
                 (int)PivotMode.PIV_OBJECT_ONLY, 
                 true);
 
-            return meshObject.Mesh;
+            return myNode;
         }
 
     }
