@@ -9,16 +9,119 @@ namespace MaxManagedBridge
 {
     public partial class MaxPlugin : MaxBridge
     {
+        #region Property Finding and Setting 
+
         public Parameter FindParameter(string Name, IReferenceMaker Object)
         {
-            return EnumerateReferences(Object).FirstOrDefault(r => r.Name == Name);
+            return EnumerateReferences(Object).FirstOrDefault(r => (r.Name == Name) || (r.InternalName == Name));
         }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, bool Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;            
+        }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, float Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;    
+        }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, ITexmap Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;    
+        }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, IAColor Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;    
+        }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, IColor Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;
+        }
+
+        public bool SetParameter(IReferenceMaker Object, string Name, string Value)
+        {
+            Parameter p = FindParameter(Name, Object);
+            if (p == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to find parameter " + Name);
+                return false;
+            }
+            if (!p.SetValue(Value))
+            {
+                System.Windows.Forms.MessageBox.Show("Setting parameter " + p.Name + " of type " + p.Type + " failed.");
+                return false;
+            }
+            return true;    
+        }
+
+        #endregion
+
+        #region Parameter Type
 
         public class Parameter
         {
             public IIParamBlock2 ParamBlock;
 
             public string Name;
+            public string InternalName;
 
             public short Id;
             public int TableId;
@@ -28,6 +131,7 @@ namespace MaxManagedBridge
             {
                 this.ParamBlock = blck;
                 this.Name = blck.GetLocalName(idx, tabid);
+                this.InternalName = blck.GetParamDef(idx).IntName;
 
                 this.Id = idx;
                 this.TableId = tabid;
@@ -39,36 +143,48 @@ namespace MaxManagedBridge
             {
                 this.ParamBlock = blck;
                 this.Name = alias.Alias;
+                //Internal names are not added for aliases
 
                 this.Id = alias.Id;
                 this.TableId = alias.TabIndex;
                 this.Type = blck.GetParameterType(alias.Id);
             }
 
-            public void SetValue(bool value)
+            public bool SetValue(bool value)
             {
-                ParamBlock.SetValue(Id, 0, value ? 1 : 0, TableId);
+               return ParamBlock.SetValue(Id, 0, value ? 1 : 0, TableId);
             }
-            public void SetValue(float value)
+            public bool SetValue(float value)
             {
-                ParamBlock.SetValue(Id, 0, value, TableId);
+                return ParamBlock.SetValue(Id, 0, value, TableId);
             }
-            public void SetValue(ITexmap value)
+            public bool SetValue(ITexmap value)
             {
-                ParamBlock.SetValue(Id, 0, value, TableId);
+                return ParamBlock.SetValue(Id, 0, value, TableId);
+            }           
+            public bool SetValue(IAColor value)
+            {
+                return ParamBlock.SetValue(Id, 0, value, TableId);
+            }
+            public bool SetValue(IColor value)
+            {
+                return ParamBlock.SetValue(Id, 0, value, TableId);
+            }
+            public bool SetValue(string value)
+            {
+                return ParamBlock.SetValue(Id, 0, value, TableId);
             }
             
         }
+
+        #endregion
+
+        #region Parameter Enumeration
 
         /* Based on http://forums.cgsociety.org/archive/index.php/t-1041239.html */
 
         public IEnumerable<Parameter> EnumerateParamBlock(IIParamBlock2 block)
         {
-            for (short i = 0; i < block.Desc.Count; i++)
-            {
-                IParamDef definition = block.Desc.GetParamDef(i);
-            }
-
             for (short i = 0; i < block.NumParams; i++)
             {
                 int tableLength = 1;
@@ -90,6 +206,7 @@ namespace MaxManagedBridge
             }
         }
 
+
         public IEnumerable<Parameter> EnumerateReferences(IReferenceMaker obj)
         {
             for (int i = 0; i < obj.NumRefs; i++)
@@ -98,7 +215,11 @@ namespace MaxManagedBridge
 
                 if (iref is IIParamBlock)
                 {
-                    //         EnumerateParamBlock((IIParamBlock)iref);
+                    //Until we can identify IParamBlock member names there is no point in adding them to the list
+                    //foreach (var v in EnumerateParamBlock((IIParamBlock)iref))
+                    //{
+                    //    yield return v;
+                    //}
                     continue;
                 }
                 if (iref is IIParamBlock2)
@@ -109,7 +230,7 @@ namespace MaxManagedBridge
                     }
                     continue;
                 }
-                if (iref is ITexmap)
+                if (iref is IReferenceMaker)
                 {
                     foreach (var v in EnumerateReferences(iref))
                     {
@@ -117,26 +238,11 @@ namespace MaxManagedBridge
                     }
                     continue;
                 }
-                if (iref is IShader)
-                {
-                    foreach (var v in EnumerateReferences(iref))
-                    {
-                        yield return v;
-                    }
-                    continue;
-                }
-                if (iref is ISampler)
-                {
-                    foreach (var v in EnumerateReferences(iref))
-                    {
-                        yield return v;
-                    }
-                    continue;
-                }
-
-                //Unknown type
             }
+
         }
+
+        #endregion
 
     }
 }

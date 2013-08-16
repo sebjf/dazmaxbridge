@@ -21,17 +21,6 @@ namespace MaxManagedBridge
             }
         }
 
-        public IEnumerable<IINode> GetMappedNodesWithoutMaterials(MyMesh source)
-        {
-            return GetMappedNodes(source).Where(n => n.Mtl == null);
-        }
-
-        public bool NeedsMaterialUpdate(MyMesh source)
-        {
-            return GetMappedNodesWithoutMaterials(source).Any();
-        }
-
-
         public IMultiMtl CreateMaterial(MyMesh myMesh)
         {
             IMultiMtl maxMaterial = GlobalInterface.Instance.NewDefaultMultiMtl;
@@ -49,22 +38,65 @@ namespace MaxManagedBridge
         {
             IStdMat2 material = GlobalInterface.Instance.NewDefaultStdMat;
 
-            List<string> names = new List<string>();
-            foreach (var p in EnumerateReferences(material))
+            SetParameter(material, "twoSided", true);
+    //        SetParameter(material, "showInViewport", true);
+            SetParameter(material, "adTextureLock", false);
+            SetParameter(material, "adLock", false);
+            SetParameter(material, "dsLock", false);
+
+            for (int i = 0; i < myMaterial.MaterialProperties.Count; i++)
             {
-                names.Add(p.Name);
+                DoMaterialUpdate(material, myMaterial, myMaterial.MaterialProperties.KeysArray[i], myMaterial.MaterialProperties.ValuesArray[i]);
             }
 
-            FindParameter("twoSided", material).SetValue(true);
-            FindParameter("showInViewport", material).SetValue(true);
-            FindParameter("adTextureLock", material).SetValue(false);
-            FindParameter("adLock", material).SetValue(false);
-            FindParameter("dsLock", material).SetValue(false);
-
-           
-
-
             return material;
+        }
+
+        public void DoMaterialUpdate(IMtl maxMaterial, Material myMaterial, string property, string value)
+        {
+            if (value.Length <= 0)
+            {
+                return;
+            }
+
+            switch (property)
+            {
+                case "Ambient Color": SetParameter(maxMaterial, "ambient", ToIColor(value)); break;
+                case "Ambient Color Map": SetParameter(maxMaterial, "ambientMap", ToMap(value)); break;
+                case "Ambient Strength": SetParameter(maxMaterial, "ambientMapAmount", ToFloat(value)); break;
+                case "Bump Strength Map": SetParameter(maxMaterial, "bumpMap", ToMap(value)); break;
+                //"Color Map"					: (getDiffuseMap stdMaterial).map1 	= toMap myValue
+                //"Diffuse Color"				: (getDiffuseMap stdMaterial).color2 	= toColour myValue
+                case "Color Map"					: SetParameter(maxMaterial, "diffuseMap", ToMap(value)); break;
+              //  case "Diffuse Color"					: SetParameter(maxMaterial, "diffuseMap", ToMap(value)); break;
+                case "Diffuse Strength": SetParameter(maxMaterial, "diffuseMapAmount", ToFloat(value)); break;
+                case "Opacity Map": SetParameter(maxMaterial, "opacityMap", ToMap(value)); break;
+                case "Opacity Strength": SetParameter(maxMaterial, "opacityMapAmount", ToFloat(value)); break;
+                case "Specular Color": SetParameter(maxMaterial, "specular", ToIColor(value)); break;
+                case "Specular Color Map": SetParameter(maxMaterial, "specularMap", ToMap(value)); break;
+                case "Specular Strength": SetParameter(maxMaterial, "specularLevel", ToFloat(value)); break;
+                case "Glossiness": SetParameter(maxMaterial, "glossiness", ToFloat(value)); break;
+            }
+
+        }
+
+        public IColor ToIColor(string str)
+        {
+           var components = str.Split(' ');
+           return GlobalInterface.Instance.Color.Create(float.Parse(components[1]), float.Parse(components[2]), float.Parse(components[3]));
+        }
+
+        public ITexmap ToMap(string str)
+        {
+            IBitmapTex bitmap = GlobalInterface.Instance.NewDefaultBitmapTex;
+            bitmap.SetMapName(str, false);
+            bitmap.LoadMapFiles(0);
+            return bitmap;
+        }
+
+        public float ToFloat(string str)
+        {
+            return float.Parse(str);
         }
 
         public void DoMtl()

@@ -55,12 +55,6 @@ struct MaxBridge
 		(
 			--create all the meshes
 			myBridge.UpdateAllMeshes()
-			
-			--and update the materials
-			myMeshItems = myBridge.Scene.Items.ToArray()
-			for m in myMeshItems do(
-				myBridge.SetMeshMaterial	m	((GetHandleByAnim (MakeMaterial m)) as integer)
-			)
 						
 		)
 		resumeEditing()
