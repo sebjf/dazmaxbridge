@@ -28,6 +28,18 @@ namespace MaxManagedBridge
             }
         }
 
+        public TValue SafeGet(TKey key)
+        {
+            if (this.ContainsKey(key))
+            {
+                return this[key];
+            }
+            else
+            {
+                return default(TValue);
+            }
+        }
+
         public TKey[] KeysArray
         {
             get { return this.Keys.ToArray(); }
@@ -63,6 +75,17 @@ namespace MaxManagedBridge
         [MessagePackMember(3)]
         public MaxDictionary<string, string> MaterialProperties;
 
+        public string this[string key]
+        {
+            get
+            {
+                if(MaterialProperties.ContainsKey(key))
+                {
+                    return MaterialProperties[key];
+                }
+                return "";
+            }
+        }
     }
 
     /*

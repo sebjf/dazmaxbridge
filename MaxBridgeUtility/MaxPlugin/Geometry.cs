@@ -100,12 +100,12 @@ namespace MaxManagedBridge
                 SetFaces(maxMesh, myMesh);
 
                 maxMesh.EnableEdgeList(1);
-                maxMesh.InvalidateTopologyCache();
+
+                SmoothMesh(maxMesh, myMesh);
             }
 
-            SmoothMesh(maxMesh, myMesh);
-
             maxMesh.InvalidateGeomCache();
+            maxMesh.InvalidateTopologyCache();
         }
         
     }

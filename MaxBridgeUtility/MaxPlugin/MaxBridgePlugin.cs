@@ -52,23 +52,37 @@ namespace MaxManagedBridge
 
         public bool UpdateMesh(MyMesh myMesh)
         {
+            //Autodesk.Max.IInterface.DisableSceneRedraw()
+            GlobalInterface.Instance.COREInterface.DisableSceneRedraw();
+            GlobalInterface.Instance.COREInterface.EnableUndo(false);
+
+            UpdateProgress(0.0f, "Getting mapped items...");
+
             IList<IINode> mappedNodes = GetMappedNodes(myMesh).ToList();
 
             //No mesh nodes exist with that name yet, so initialise a new node for the object
             if (mappedNodes.Count < 1)
             {
+                UpdateProgress(0.1f, "Creating object...");
                 mappedNodes.Add(CreateMeshNode(myMesh.Name));
             }
 
             foreach (var m in mappedNodes)
             {
+                UpdateProgress(0.2f, "Updating geometry...");
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
 
                 if (m.Mtl == null)
                 {
+                    UpdateProgress(0.6f, "Updating materials...");
                     m.Mtl = CreateMaterial(myMesh);
                 }
             }
+
+            UpdateProgress(1.0f, "Done.");
+
+            GlobalInterface.Instance.COREInterface.EnableUndo(true);
+            GlobalInterface.Instance.COREInterface.EnableSceneRedraw();
 
             return true;
         }
@@ -89,5 +103,15 @@ namespace MaxManagedBridge
             return myNode;
         }
 
+        public void UpdateProgress(float progress, string message)
+        {
+            if (ProgressChanged != null)
+            {
+                ProgressChanged(progress, message);
+            }
+        }
+
+        public delegate void ProgressUpdateHandler(float progress, string message);
+        public event ProgressUpdateHandler ProgressChanged;
     }
 }
