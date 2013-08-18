@@ -53,66 +53,131 @@ namespace MaxManagedBridge
             return ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(command);
         }
 
-        public static string ToMapCommand(string value)
-        {
-            if (value == null || value.Length <= 0)
-            {
-                return "";
-            }
-            return string.Format("(bitmapTexture filename:\"{0}\")",value);
-        }
-
-        public static string ToColourCommand(string value)
-        {
-            if (value == null || value.Length <= 0)
-            {
-                return "";
-            }
-            string[] components = value.Split(' ');
-            return string.Format("(color ({0} as float * 255) ({1} as float * 255) ({2} as float * 255) ({3} as float * 255) )", components[1], components[2], components[3], components[0]);
-        }
-
-        public static string ToColourCommand(Color value)
-        {
-            return string.Format("(color (0} {1} {2} {3})", value.R, value.G, value.B, value.A);
-        }
-
-        public static string ToPercentCommand(string value)
-        {
-            if (value == null || value.Length <= 0)
-            {
-                return "";
-            }
-            return string.Format("({0} as float * 100)", value);
-
-        }
-
     }
 
-    public class MaxScriptObjectBuilder
+    public class MaxScriptStandardMaterial
     {
-        public MaxScriptObjectBuilder(string name)
-        {
-            this.Name = name;
-        }
+        public string name = "standardMaxScriptMaterial";
 
-        public string Name;
+        public Nullable<Color> Ambient { set { if (value != null) ambient = value.Value; } }
+        public string AmbientMap { set { if (value != null) ambientMap = value; } }
+        public Nullable<float> AmbientMapAmount { set { if (value != null) ambientMapAmount = value.Value; } }
+        public string BumpMap { set { if (value != null) bumpMap = value; } }
+        public Nullable<float> BumpMapAmount { set { if (value != null) bumpMapAmount = value.Value; } }
+        public Nullable<Color> Diffuse { set { if (value != null) diffuse = value.Value; } }
+        public string DiffuseMap { set { if (value != null) diffuseMap = value; } }
+        public Nullable<float> DiffuseMapAmount { set { if (value != null) diffuseMapAmount = value.Value; } }
+        public string OpacityMap { set { if (value != null) opacityMap = value; } }
+        public Nullable<float> OpacityMapAmount { set { if (value != null) opacityMapAmount = value.Value; } }
+        public Nullable<Color> Specular { set { if (value != null) specular = value.Value; } }
+        public string SpecularMap { set { if (value != null) specularMap = value; } }
+        public Nullable<float> SpecularLevel { set { if (value != null) specularLevel = value.Value; } }
+        public Nullable<float> Glossiness { set { if (value != null) glossiness = value.Value; } }
+        public Nullable<float> U_tiling { set { if (value != null) u_tiling = value.Value; } }
+        public Nullable<float> V_tiling { set { if (value != null) v_tiling = value.Value; } }
 
-        public string this[string key]
+        public bool twoSided = true;
+        public bool showInViewport = true;
+        public bool adTextureLock = true;
+        public bool adLock = true;
+        public bool dsLock = true;
+
+        public Color ambient = Color.Black;
+        public string ambientMap = null;
+        public float ambientMapAmount = 100.0f;
+
+        public string bumpMap = null;
+        public float bumpMapAmount = 100.0f;
+
+        public Color diffuse = Color.FromArgb(127, 127, 127);
+        public string diffuseMap = null;
+        public float diffuseMapAmount = 100.0f;
+
+        public string opacityMap = null;
+        public float opacityMapAmount = 100.0f;
+
+        public Color specular = Color.FromArgb(230, 230, 230);
+        public string specularMap = null;
+        public float specularLevel = 0.0f;
+        public float glossiness = 10.0f;
+
+        public float u_tiling = 1;
+        public float v_tiling = 1;
+
+        public string MakeScript()
         {
-            set
+            List<String> Commands = new List<string>();
+
+            Commands.Add(string.Format("stdmaterial = StandardMaterial name:(\"{0}\")", name));
+
+            Commands.Add(string.Format("stdmaterial.twoSided = {0}", twoSided));
+            Commands.Add(string.Format("stdmaterial.showInViewport = {0}", showInViewport));
+            Commands.Add(string.Format("stdmaterial.adTextureLock = {0}", adTextureLock));
+            Commands.Add(string.Format("stdmaterial.adLock = {0}", adLock));
+            Commands.Add(string.Format("stdmaterial.dsLock = {0}", dsLock));
+
+            if (ambientMap != null)
             {
-                if (value.Length <= 0)
-                {
-                    return;
-                }
-
-                Commands.Add(string.Format("{0}.{1} = {2}", Name, key, value));
+                Commands.Add(string.Format("stdmaterial.ambientMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", ambientMap, ambient.R, ambient.G, ambient.B));
+                Commands.Add(string.Format("stdmaterial.ambientMapAmount = {0}", ambientMapAmount));
+                Commands.Add(string.Format("stdmaterial.ambientMap.map1.coords.u_tiling = {0}; stdmaterial.ambientMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
             }
+            else
+            {
+                Commands.Add(string.Format("stdmaterial.ambient = color {0} {1} {2}", ambient.R, ambient.G, ambient.B));
+            }
+
+            if (bumpMap != null)
+            {
+                Commands.Add(string.Format("stdmaterial.bumpMap = (bitmapTexture filename:\"{0}\")", bumpMap));
+                Commands.Add(string.Format("stdmaterial.bumpMapAmount = {0}", bumpMapAmount));
+                Commands.Add(string.Format("stdmaterial.bumpMap.coords.u_tiling = {0}; stdmaterial.bumpMap.coords.v_tiling = {1};", u_tiling, v_tiling));
+            }
+
+            if (diffuseMap != null)
+            {
+                Commands.Add(string.Format("stdmaterial.diffuseMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", diffuseMap, diffuse.R, diffuse.G, diffuse.B));
+                Commands.Add(string.Format("stdmaterial.diffuseMapAmount = {0}", diffuseMapAmount));
+                Commands.Add(string.Format("stdmaterial.diffuseMap.map1.coords.u_tiling = {0}; stdmaterial.diffuseMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+            }
+            else
+            {
+                Commands.Add(string.Format("stdmaterial.diffuse = color {0} {1} {2}", diffuse.R, diffuse.G, diffuse.B));
+            }
+
+            if (opacityMap != null)
+            {
+                Commands.Add(string.Format("stdmaterial.opacityMap = (bitmapTexture filename:\"{0}\")", opacityMap));
+                Commands.Add(string.Format("stdmaterial.opacityMapAmount = {0}", opacityMapAmount));
+                Commands.Add(string.Format("stdmaterial.opacityMap.coords.u_tiling = {0}; stdmaterial.opacityMap.coords.v_tiling = {1};", u_tiling, v_tiling));
+            }
+            else
+            {
+                Commands.Add(string.Format("stdmaterial.opacity = {0}", opacityMapAmount));
+            }
+
+            if (specularMap != null)
+            {
+                Commands.Add(string.Format("stdmaterial.specularMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
+                Commands.Add(string.Format("stdmaterial.specularMap.map1.coords.u_tiling = {0}; stdmaterial.specularMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+            }
+            else
+            {
+                Commands.Add(string.Format("stdmaterial.specular = (color {0} {1} {2})", specular.R, specular.G, specular.B));
+            }
+
+            Commands.Add(string.Format("stdmaterial.specularLevel = {0}", specularLevel));
+            Commands.Add(string.Format("stdmaterial.glossiness = {0}", glossiness));
+
+            Commands.Add("(getHandleByAnim stdmaterial) as String");
+
+            string script = "";
+            foreach (var c in Commands)
+            {
+                script += (c + "; ");
+            }
+            return "(" + script + ")"; //Note, remove these brackets to have max print the results of each command in the set when debugging.
+
         }
-
-        public List<string> Commands = new List<string>();
-
     }
-
 }

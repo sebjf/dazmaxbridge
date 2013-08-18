@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using MsgPack;
 using MsgPack.Serialization;
+using System.Drawing;
 
 namespace MaxManagedBridge
 {
@@ -75,16 +76,40 @@ namespace MaxManagedBridge
         [MessagePackMember(3)]
         public MaxDictionary<string, string> MaterialProperties;
 
-        public string this[string key]
+        public Nullable<Color> GetColor(string key)
         {
-            get
-            {
-                if(MaterialProperties.ContainsKey(key))
-                {
-                    return MaterialProperties[key];
-                }
-                return "";
-            }
+            if (!MaterialProperties.ContainsKey(key))
+                return null;
+
+            string[] components = MaterialProperties[key].Split(' ');
+            float a = float.Parse(components[0]);
+            float r = float.Parse(components[1]);
+            float g = float.Parse(components[2]);
+            float b = float.Parse(components[3]);
+            return Color.FromArgb((int)(a * 255f), (int)(r * 255f), (int)(g * 255f), (int)(b * 255f));
+        }
+
+        public Nullable<float> GetFloat(string key)
+        {
+            if (!MaterialProperties.ContainsKey(key))
+                return null;
+
+            return float.Parse(MaterialProperties[key]);
+        }
+
+        public string GetString(string key)
+        {
+            if (!MaterialProperties.ContainsKey(key))
+                return null;
+
+            return MaterialProperties[key];
+        }
+
+        public float GetFloatSafe(string key, float fallback)
+        {
+            if(!MaterialProperties.ContainsKey(key))
+                return fallback;
+            return float.Parse(MaterialProperties[key]);
         }
     }
 

@@ -104,75 +104,34 @@ namespace MaxManagedBridge
         /// <returns></returns>
         public IMtl CreateStandardMaterialMaxScript(Material material)
         {
-            //CreateStandardMaterialMaxScript - because the only thing worse than code generation is using Max's SDK
-            MaxScriptObjectBuilder mxsMaterial = new MaxScriptObjectBuilder("stdMaterial");
+            MaxScriptStandardMaterial maxMaterial = new MaxScriptStandardMaterial();
 
-            //The Commands property is just a list, we can add any arbitrary thing to it
-            mxsMaterial.Commands.Add("fn getDiffuseMap stdMaterial =( if(stdMaterial.diffuseMap == undefined) then (stdMaterial.diffuseMap = RGB_Multiply()) return stdMaterial.diffuseMap)");
+            maxMaterial.Ambient = material.GetColor("Ambient Color");
+            maxMaterial.AmbientMap = material.GetString("Ambient Color Map");
+            maxMaterial.AmbientMapAmount = material.GetFloat("Ambient Strength") * 100;
+            maxMaterial.BumpMap = material.GetString("Bump Strength Map");
+            maxMaterial.DiffuseMap = material.GetString("Color Map");
+            maxMaterial.Diffuse = material.GetColor("Diffuse Color");
+            maxMaterial.DiffuseMapAmount = material.GetFloat("Diffuse Strength") * 100;
+            maxMaterial.OpacityMap = material.GetString("Opacity Map");
+            maxMaterial.OpacityMapAmount = material.GetFloat("Opacity Strength") * 100;
+            maxMaterial.Specular = material.GetColor("Specular Color");
+            maxMaterial.SpecularMap = material.GetString("Specular Color Map");
+            maxMaterial.SpecularLevel = material.GetFloat("Specular Strength") * 100;
+            maxMaterial.Glossiness = material.GetFloat("Glossiness") * 100;
+            maxMaterial.U_tiling = material.GetFloat("Horizontal Tiles");
+            maxMaterial.V_tiling = material.GetFloat("Vertical Tiles");
 
-            mxsMaterial.Commands.Add(string.Format("stdMaterial = StandardMaterial name:(\"{0}\")", material.MaterialName));
+            maxMaterial.BumpMapAmount = (material.GetFloatSafe("Positive Bump", 0) - material.GetFloatSafe("Negative Bump", 0)) * material.GetFloatSafe("Bump Strength", 0.03f) * BumpScalar;
 
-            mxsMaterial["twoSided"]         = "true";
-            mxsMaterial["showInViewport"]   = "true";
-            mxsMaterial["adTextureLock"]    = "false";
-            mxsMaterial["adLock"]           = "false";
-            mxsMaterial["dsLock"]           = "false";
-
-            mxsMaterial["ambient"]      = ToColourCommand(material["Ambient Color"]);
-            mxsMaterial["ambientMap"]   = ToMapCommand(material["Ambient Color Map"]);
-            mxsMaterial["ambientMapAmount"] = ToPercentCommand(material["Ambient Strength"]);
-            mxsMaterial["bumpMap"]      = ToMapCommand(material["Bump Strength Map"]);
-
-            if (material.MaterialProperties.ContainsKey("Color Map"))
-            {
-                mxsMaterial.Commands.Add("(getDiffuseMap stdMaterial).map1 = " + ToMapCommand(material["Color Map"]));
-            }
-
-            if (material.MaterialProperties.ContainsKey("Diffuse Color"))
-            {
-                mxsMaterial.Commands.Add("(getDiffuseMap stdMaterial).color2 = " + ToColourCommand(material["Diffuse Color"]));
-            }
-
-            mxsMaterial["diffuseMapAmount"]     = ToPercentCommand(material["Diffuse Strength"]);
-
-
-            if (material["Opacity Map"].Length > 0)
-            {
-                mxsMaterial["opacityMap"]       = ToMapCommand(material["Opacity Map"]);
-                mxsMaterial["opacityMapAmount"] = ToPercentCommand(material["Opacity Strength"]);
-            }
-            else
-            {
-                mxsMaterial["opacity"]  = ToPercentCommand(material["Opacity Strength"]);
-            }
-
-            mxsMaterial["specular"]     = ToColourCommand(material["Specular Color"]);
-            mxsMaterial["specularMap"]  = ToMapCommand(material["Specular Color Map"]);
-            mxsMaterial["specularLevel"] = ToPercentCommand(material["Specular Strength"]);
-            mxsMaterial["glossiness"]   = ToPercentCommand(material["Glossiness"]);
-
-            float bumpAmount = (float.Parse(material.MaterialProperties.SafeGet("Positive Bump", "0")) - float.Parse(material.MaterialProperties.SafeGet("Negative Bump", "0"))) * float.Parse(material.MaterialProperties.SafeGet("Bump Strength", "0.03")) * BumpScalar;
-            mxsMaterial.Commands.Add(string.Format("stdMaterial.bumpMapAmount = {0}", (bumpAmount * 100)));
-
-            string u_tiling = material.MaterialProperties.SafeGet( "Horizontal Tiles", "1");
-            string v_tiling = material.MaterialProperties.SafeGet( "Vertical Tiles", "1");
-
-            mxsMaterial.Commands.Add("maps = (GetClassInstances bitmapTexture target:stdMaterial)");
-            mxsMaterial.Commands.Add(string.Format("for map in maps do( map.coords.u_tiling = {0}; map.coords.v_tiling = {1}; )", u_tiling, v_tiling));
-
-            List<string> log = new List<string>();
-            foreach (var s in mxsMaterial.Commands)
-            {
-                var r = ManagedServices.MaxscriptSDK.ExecuteBooleanMaxscriptQuery(s);
-                log.Add(string.Format("{0} -> {1}", s, r));
-            }
-
-            string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery("(getHandleByAnim stdMaterial) as String");
+            string script = maxMaterial.MakeScript();
+         
+            string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(script);
             handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
             System.Int64 handle = System.Int64.Parse(handle_string);
             if (handle < 0)
             {
-                throw new Exception("MaxScript could not return a valid handle. There is an error in the script");
+                throw new Exception(string.Format("MaxScript could not return a valid handle. There is an error in the script: \n\n{0}\n\n",script));
             }
 
             return (Convert(handle) as IMtl);
