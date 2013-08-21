@@ -4,38 +4,51 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.Windows.Forms;
 using MsgPack.Serialization;
 using MsgPack;
-using System.IO.MemoryMappedFiles;
+
 
 namespace MaxManagedBridge
 {
     public class SceneClient
     {
-        public void Connect()
-        {
-            Socket = new TcpClient("localhost", 12121);
-            Socket.ReceiveBufferSize = 100000000; //nasty nasty
+        protected const string sharedMemoryName = "Local\\DazMaxBridgeSharedMemory";
 
-            Stream s = Socket.GetStream();
-            Reader = new StreamReader(s);
-            Writer = new StreamWriter(s);
-            Writer.AutoFlush = true;
+        public bool Connect()
+        {
+            if (sharedMemory != null)
+            {
+                return true;
+            }
+
+            try
+            {
+                sharedMemory = MemoryMappedFile.OpenExisting(sharedMemoryName, MemoryMappedFileRights.ReadWrite, HandleInheritability.None);
+            }
+            catch (FileNotFoundException nfe)
+            {
+                MessageBox.Show("Unable to find a Daz instance to connect to!");
+                return false;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Unknown error has occured.");
+                return false;
+            }  
+
+            return true;
         }
 
-        private TcpClient Socket;
-
-        private StreamReader Reader;
-        private StreamWriter Writer;
+        protected MemoryMappedFile sharedMemory;
 
         public MyScene GetScene()
         {
-            MemoryMappedFile f; ///MAX SUPPORTS .NET 4 yayayy
-            
-
-            Writer.WriteLine("getScene");
+            MemoryMappedViewStream accessor = sharedMemory.CreateViewStream();
+            accessor.Position = 0;
             MessagePackSerializer<MyScene> c = MessagePackSerializer.Create<MyScene>();
-            MyScene Scene = c.Unpack(Reader.BaseStream);
+            MyScene Scene = c.Unpack(accessor);
             return Scene;
         }
     }

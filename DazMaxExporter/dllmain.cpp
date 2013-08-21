@@ -25,6 +25,7 @@
 
 #include "version.h"
 #include "DazMaxExporter.h"
+#include "SceneServer.h"
 
 /*****************************
    Plugin Definition
@@ -64,4 +65,4 @@ DZ_PLUGIN_DESCRIPTION( QString(
 	information.
 **/
 //DZ_PLUGIN_CLASS_GUID( MyDazExporter, 6D5BC89D-014C-4213-8761-3A47279F5D0A );
-DZ_PLUGIN_CLASS_GUID( MyDazUtility, 6D5BC89D-014C-4213-8761-3A47279F5D0C );
+DZ_PLUGIN_CLASS_GUID( MySceneServer, 6D5BC89D-014C-4213-8761-3A47279F5D0C );

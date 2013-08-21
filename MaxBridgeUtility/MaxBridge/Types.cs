@@ -309,9 +309,9 @@ namespace MaxManagedBridge
     public class MyScene
     {
         [MessagePackMember(0)]
-        public List<MyMesh> Items;
+        public List<MyMesh> Items = new List<MyMesh>();
         [MessagePackMember(1)]
-        public List<MySkeleton> Skeletons;
+        public List<MySkeleton> Skeletons = new List<MySkeleton>();
 
     }
 

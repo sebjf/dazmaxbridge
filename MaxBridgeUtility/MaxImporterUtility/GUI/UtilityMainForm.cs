@@ -31,7 +31,8 @@ namespace MaxManagedBridge
 
         private void connect_button_Click(object sender, EventArgs e)
         {
-            Bridge.LoadFromFile(@"E:\Daz3D\Scripting\Scratch.dazmaxbridge");
+            //Bridge.LoadFromFile(@"E:\Daz3D\Scripting\Scratch.dazmaxbridge");
+            Bridge.LoadFromDaz();
 
             scene_explorer_listbox.Items.Clear();
             for (int i = 0; i < Bridge.Scene.Items.Count; i++ )

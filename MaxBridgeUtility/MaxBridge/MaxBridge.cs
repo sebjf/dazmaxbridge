@@ -17,8 +17,11 @@ namespace MaxManagedBridge
 
         public void LoadFromDaz()
         {
-            DazClient.Connect();
-            Scene = DazClient.GetScene();
+            Scene = new MyScene();
+            if (DazClient.Connect())
+            {
+                Scene = DazClient.GetScene();
+            }
         }
 
         public void LoadFromFile(string filename, bool triangulate = true)

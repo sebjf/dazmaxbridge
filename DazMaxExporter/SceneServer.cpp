@@ -1,50 +1,58 @@
 #include "SceneServer.h"
 
-MyDazUtility::MyDazUtility()
+TCHAR sharedMemoryName[] = TEXT("Local\\DazMaxBridgeSharedMemory");
+
+void MySceneServer::createSharedMemory(DWORD BUF_SIZE)
 {
-	mySceneServer = new MySceneServer(this);
-	mySceneServer->Listen();
+	   hMapFile = CreateFileMapping(
+					 INVALID_HANDLE_VALUE,    // use paging file
+					 NULL,                    // default security
+					 PAGE_READWRITE,          // read/write access
+					 0,                       // maximum object size (high-order DWORD)
+					 BUF_SIZE,                // maximum object size (low-order DWORD)
+					 sharedMemoryName);       // name of mapping object
+
+	   if (hMapFile == NULL)
+	   {
+		  DWORD error =  GetLastError();
+		  dzApp->log(QString("Could not created shared memory with name: %i (Error: %2)\n").arg(sharedMemoryName,QString::number(error)));
+		  return;
+	   }
+	   pBuf = MapViewOfFile(hMapFile,   // handle to map object
+					FILE_MAP_ALL_ACCESS, // read/write permission
+					0,
+					0,
+					BUF_SIZE);
+
+	   if (pBuf == NULL)
+	   {
+		   DWORD error =  GetLastError();
+		   dzApp->log(QString("Could not create view of shared memory %i (Error: %2)\n").arg(sharedMemoryName,QString::number(error)));
+		   CloseHandle(hMapFile);
+		   return;
+	   }
 }
 
-void MySceneServer::Listen()
+MySceneServer::~MySceneServer()
 {
-	server->listen(QHostAddress::LocalHost, 12121);
+	UnmapViewOfFile(pBuf);
+	CloseHandle(hMapFile);
 }
 
-void MySceneServer::on_newConnection()
+void 	MySceneServer::executeAction()
 {
-	socket = server->nextPendingConnection();
-	socket->setTextModeEnabled(false);
-	if(socket->state() == QTcpSocket::ConnectedState)
-	{
-		printf("New connection established.\n");
-	}
-	connect(socket, SIGNAL(disconnected()),	this, SLOT(on_disconnected()));
-	connect(socket, SIGNAL(readyRead()), this, SLOT(on_readyRead()));
+	MyDazExporter exporter;
+	msgpack::sbuffer sbuf;
+	exporter.write(sbuf, 0);
+	
+	memcpy(pBuf,sbuf.data(),sbuf.size());
+
+	QMessageBox myMessageBox;
+	myMessageBox.setText("Complete!");
+	myMessageBox.exec();	
 }
 
-void MySceneServer::on_readyRead()
+void 	MySceneServer::toggleAction(bool onOff)
 {
-	while(socket->canReadLine())
-	{
-		QByteArray ba = socket->readLine();
 
-		if(strncmp(ba.constData(),"getScene",strlen("getScene")) == 0)
-		{
-			MyDazExporter exporter;
-			exporter.write(*socket, (DzFileIOSettings*)0);
-			socket->flush();
-			continue;
-		}
-
-		printf("Unkown command: %s", ba.constData());
-	}
-}
-
-void MySceneServer::on_disconnected()
-{
-	printf("Connection disconnected.\n");
-	disconnect(socket, SIGNAL(disconnected()));
-	disconnect(socket, SIGNAL(readyRead()));
-	socket->deleteLater();
 }

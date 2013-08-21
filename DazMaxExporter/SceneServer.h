@@ -5,25 +5,25 @@
 
 //http://tsenmu.com/blog/?p=344
 
-class MySceneServer : public QObject
+class MySceneServer : public DzAction
 {
 	Q_OBJECT
 public:
-	MySceneServer(QObject* parent = 0) : QObject(parent) 
+	MySceneServer() : DzAction(QString("MaxBridgeAction"),QString("The MaxBridge Action Object"))
 	{
-		server = new QTcpServer(this);
-		connect(server, SIGNAL(newConnection()),
-		this, SLOT(on_newConnection()));
+		createSharedMemory(400000000); //400Mb
 	}
 
-	void Listen();
+	void createSharedMemory(DWORD BUF_SIZE);
 
 public slots:
-	void on_newConnection();
-	void on_readyRead();
-	void on_disconnected();
+	virtual void 	executeAction();
+	virtual void 	toggleAction (bool onOff);
 
 private:
-	QTcpServer* server;
-	QTcpSocket* socket;
+	HANDLE		hMapFile;
+	LPVOID		pBuf;
+
+	~MySceneServer();
+
 };

@@ -113,7 +113,7 @@ void	MyDazExporter::Reset()
 	sceneFigures = SceneFigureInformation();
 }
 
-DzError MyDazExporter::write(QIODevice& device, const MyFileIOSettings* options)
+DzError MyDazExporter::write(msgpack::sbuffer& sbuf, const DzFileIOSettings* options)
 {
 	Reset();
 	populateSceneFigureInformation();
@@ -125,14 +125,15 @@ DzError MyDazExporter::write(QIODevice& device, const MyFileIOSettings* options)
 
 	//todo get all scene items if none are selcected
 	
-	msgpack::sbuffer sbuf;
 	msgpack::pack(sbuf, scene);
 
-	if(options->prependDataWithSize)
-	{
-		int size = sbuf.size();
-		device.write((char*)&size,sizeof(size));
-	}
+	return DZ_NO_ERROR;
+}
+
+DzError MyDazExporter::write(QIODevice& device, const DzFileIOSettings* options)
+{	
+	msgpack::sbuffer sbuf;
+	write(sbuf, options);
 
 	int written = device.write(sbuf.data(), sbuf.size());
 
@@ -160,7 +161,7 @@ DzError	MyDazExporter::write( const QString &filename, const DzFileIOSettings *o
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
 
-	DzError result = write(myFile, &(MyFileIOSettings(options)));
+	DzError result = write(myFile, (DzFileIOSettings*)0);
 
 	myFile.close();
 

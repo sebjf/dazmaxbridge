@@ -63,27 +63,6 @@ public:
 
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
-class MySceneServer;
-
-class MyDazUtility : public DzAction
-{
-	Q_OBJECT
-public:
-	MyDazUtility();
-	MySceneServer* mySceneServer;
-};
-
-class MyFileIOSettings : public DzFileIOSettings
-{
-public:
-	MyFileIOSettings(DzFileIOSettings* settings) : DzFileIOSettings(settings)
-	{
-		prependDataWithSize = false;
-	}
-
-	bool	prependDataWithSize;
-};
-
 class MyDazExporter : public DzExporter {
 	Q_OBJECT
 public:
@@ -91,7 +70,8 @@ public:
 	/** Constructor **/
 	MyDazExporter() : DzExporter(QString("dazmaxbridge")) { }
 
-	DzError		write(QIODevice& device, const MyFileIOSettings* options);
+	DzError		write(QIODevice& device, const DzFileIOSettings* options);
+	DzError		write(msgpack::sbuffer& sbuf, const DzFileIOSettings* options);
 
 public slots:
 
