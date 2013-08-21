@@ -106,6 +106,7 @@ namespace MaxManagedBridge
         {
             MaxScriptStandardMaterial maxMaterial = new MaxScriptStandardMaterial();
 
+            maxMaterial.name = material.MaterialName;
             maxMaterial.Ambient = material.GetColor("Ambient Color");
             maxMaterial.AmbientMap = material.GetString("Ambient Color Map");
             maxMaterial.AmbientMapAmount = material.GetFloat("Ambient Strength") * 100;

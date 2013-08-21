@@ -18,7 +18,7 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommand>$(DazInstallDirectory)\DAZStudio.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
@@ -114,7 +114,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration)\;$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;msgpack.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +151,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -163,12 +163,18 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mocing "%(Filename)"...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\moc\%(Filename)_moc.cpp</Outputs>
     </CustomBuild>
+    <CustomBuild Include="SceneServer.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(DAZ_STUDIO_SDK)\bin\$(Platform)\moc" "%(FullPath)" -o .\moc\%(Filename)_moc.cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mocing "%(Filename)"...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\moc\%(Filename)_moc.cpp</Outputs>
+    </CustomBuild>
     <ClInclude Include="Types.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DazMaxExporter.cpp" />
+    <ClCompile Include="moc\SceneServer_moc.cpp" />
+    <ClCompile Include="MyDazExporter.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
@@ -186,6 +192,7 @@
     <ClCompile Include="geometry_processing.cpp" />
     <ClCompile Include="material_processing.cpp" />
     <ClCompile Include="moc\DazMaxExporter_moc.cpp" />
+    <ClCompile Include="SceneServer.cpp" />
     <ClCompile Include="skinning_data_processing.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>

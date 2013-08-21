@@ -16,6 +16,15 @@
     <Filter Include="moc">
       <UniqueIdentifier>{13ee741c-829a-4d96-9087-a6201f2a6bd4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene Processing">
+      <UniqueIdentifier>{6754dbd7-746a-40a5-b2d7-c4d20048c08a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Exporter">
+      <UniqueIdentifier>{2c070fc5-3e4e-4169-9e84-b2437cec583f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene Server">
+      <UniqueIdentifier>{3aa3c043-3b86-4f2f-bedf-0bd59c9f3306}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -32,22 +41,28 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="material_processing.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="moc\DazMaxExporter_moc.cpp">
+      <Filter>moc</Filter>
     </ClCompile>
     <ClCompile Include="geometry_processing.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scene Processing</Filter>
     </ClCompile>
-    <ClCompile Include="utilities.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="material_processing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
     </ClCompile>
     <ClCompile Include="skinning_data_processing.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scene Processing</Filter>
     </ClCompile>
-    <ClCompile Include="DazMaxExporter.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MyDazExporter.cpp">
+      <Filter>Source Files\Exporter</Filter>
     </ClCompile>
-    <ClCompile Include="moc\DazMaxExporter_moc.cpp">
+    <ClCompile Include="utilities.cpp">
+      <Filter>Source Files\Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneServer.cpp">
+      <Filter>Source Files\Scene Server</Filter>
+    </ClCompile>
+    <ClCompile Include="moc\SceneServer_moc.cpp">
       <Filter>moc</Filter>
     </ClCompile>
   </ItemGroup>
@@ -58,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="DazMaxExporter.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SceneServer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

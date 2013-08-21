@@ -1,11 +1,12 @@
 
 1. Not selecting anything transfers entire scene
 
-2. MaxScript sets diffuse to 0 on import
+2. MaxScript sets diffuse to 0 on import (why again?)
 
-3. do proper opacity map adjustment
+3. add colour conversion
 
-4. add colour conversion
+4. do proper opacity map adjustment
+
 
 
 Roadmap
@@ -20,3 +21,7 @@ Roadmap
 
 
 Basic skinning for pose adjustments
+
+BUGS!!
+
+- default genesis, lots of empty maps are made when no maps should be made...

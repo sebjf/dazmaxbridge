@@ -102,7 +102,12 @@ namespace MaxManagedBridge
             if (!MaterialProperties.ContainsKey(key))
                 return null;
 
-            return MaterialProperties[key];
+            string v = MaterialProperties[key];
+
+            if (v.Length <= 0)
+                return null;
+
+            return v;
         }
 
         public float GetFloatSafe(string key, float fallback)
