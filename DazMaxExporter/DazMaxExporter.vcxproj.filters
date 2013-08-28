@@ -47,9 +47,6 @@
     <ClCompile Include="MyDazExporter.cpp">
       <Filter>Source Files\Exporter</Filter>
     </ClCompile>
-    <ClCompile Include="utilities.cpp">
-      <Filter>Source Files\Exporter</Filter>
-    </ClCompile>
     <ClCompile Include="SceneServer.cpp">
       <Filter>Source Files\Scene Server</Filter>
     </ClCompile>

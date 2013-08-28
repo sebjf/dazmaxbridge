@@ -37,6 +37,7 @@ namespace MaxManagedBridge
             // 
             // connect_button
             // 
+            this.connect_button.Enabled = false;
             this.connect_button.ForeColor = System.Drawing.Color.Black;
             this.connect_button.Location = new System.Drawing.Point(293, 12);
             this.connect_button.Name = "connect_button";
@@ -48,6 +49,7 @@ namespace MaxManagedBridge
             // 
             // scene_explorer_listbox
             // 
+            this.scene_explorer_listbox.Enabled = false;
             this.scene_explorer_listbox.FormattingEnabled = true;
             this.scene_explorer_listbox.Location = new System.Drawing.Point(12, 12);
             this.scene_explorer_listbox.Name = "scene_explorer_listbox";

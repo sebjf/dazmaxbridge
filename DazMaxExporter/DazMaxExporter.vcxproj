@@ -194,7 +194,6 @@
     <ClCompile Include="moc\DazMaxExporter_moc.cpp" />
     <ClCompile Include="SceneServer.cpp" />
     <ClCompile Include="skinningDataProcessing.cpp" />
-    <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

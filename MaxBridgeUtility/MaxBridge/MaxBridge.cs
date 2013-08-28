@@ -15,12 +15,12 @@ namespace MaxManagedBridge
 
         protected SceneClient DazClient = new SceneClient();
 
-        public void LoadFromDaz()
+        public void UpdateFromDaz()
         {
-            Scene = new MyScene();
-            if (DazClient.Connect())
+            Scene = DazClient.GetScene();
+            foreach (MyMesh m in Scene.Items)
             {
-                Scene = DazClient.GetScene();
+                TriangulateFaces(m);
             }
         }
 
@@ -45,13 +45,6 @@ namespace MaxManagedBridge
 
         #region Utilities
 
-        public T[] BlockCast<T>(byte[] source)
-        {
-            var array = new T[source.Length / Marshal.SizeOf(typeof(T))];
-            Buffer.BlockCopy(source, 0, array, 0, source.Length);
-            return array;
-        }
-
         public Face[] BlockCast(byte[] source)
         {
             int elements = source.Length / Marshal.SizeOf(typeof(Face));
@@ -63,24 +56,6 @@ namespace MaxManagedBridge
                     for (int i = 0; i < dst.Length; i++)
                     {
                         dst[i] = ((Face*)pSrc)[i];
-                    }
-                }
-            }
-
-            return dst;
-        }
-
-        protected int[] BlockCast(Face[] faces)
-        {
-            int dstElements = (Marshal.SizeOf(typeof(Face)) / Marshal.SizeOf(typeof(int))) * faces.Length;
-            int[] dst = new int[dstElements];
-
-            unsafe{
-                fixed( int* pDst = dst)
-                {
-                    for(int i = 0; i < faces.Length; i++)
-                    {
-                        ((Face*)pDst)[i] = faces[i];
                     }
                 }
             }

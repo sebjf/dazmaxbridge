@@ -44,6 +44,7 @@ namespace MaxManagedBridge
 
         public void UpdateAllMeshes()
         {
+            UpdateFromDaz();
             foreach (MyMesh m in Scene.Items)
             {
                 UpdateMesh(m);

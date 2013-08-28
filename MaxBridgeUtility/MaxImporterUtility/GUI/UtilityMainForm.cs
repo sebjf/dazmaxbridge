@@ -15,9 +15,9 @@ namespace MaxManagedBridge
         {
             InitializeComponent();
             this.Utility = parent;
-            this.Bridge = parent.Bridge;
+            this.Plugin = parent.Plugin;
 
-            this.Bridge.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
+            this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
         }
 
         void Bridge_ProgressChanged(float progress, string message)
@@ -27,22 +27,22 @@ namespace MaxManagedBridge
         }
 
         protected MaxBridgeUtility Utility;
-        protected MaxPlugin Bridge;
+        protected MaxPlugin Plugin;
 
         private void connect_button_Click(object sender, EventArgs e)
         {
-            Bridge.LoadFromDaz();
+            Plugin.UpdateFromDaz();
 
             scene_explorer_listbox.Items.Clear();
-            for (int i = 0; i < Bridge.Scene.Items.Count; i++ )
+            for (int i = 0; i < Plugin.Scene.Items.Count; i++ )
             {
-                scene_explorer_listbox.Items.Add(Bridge.Scene.Items[i].Name);
+                scene_explorer_listbox.Items.Add(Plugin.Scene.Items[i].Name);
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Bridge.UpdateAllMeshes();
+            Plugin.UpdateAllMeshes();
         }
 
 

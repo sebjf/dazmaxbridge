@@ -22,11 +22,7 @@ public slots:
 
 private:
 
-	HANDLE	hMapFile;
-	LPVOID	pBuf;
-
 	void	startServer();
-	void	createSharedMemory(DWORD BUF_SIZE);
 
 	~MySceneServer();
 
