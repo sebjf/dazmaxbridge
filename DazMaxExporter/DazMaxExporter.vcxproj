@@ -114,7 +114,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration)\;$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;user32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +151,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -189,11 +189,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="geometry_processing.cpp" />
-    <ClCompile Include="material_processing.cpp" />
+    <ClCompile Include="geometryProcessing.cpp" />
+    <ClCompile Include="materialProcessing.cpp" />
     <ClCompile Include="moc\DazMaxExporter_moc.cpp" />
     <ClCompile Include="SceneServer.cpp" />
-    <ClCompile Include="skinning_data_processing.cpp" />
+    <ClCompile Include="skinningDataProcessing.cpp" />
     <ClCompile Include="utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,9 +1,8 @@
 
 #include "DazMaxExporter.h"
-#include <QtNetwork\qtcpserver.h>
-#include <QtNetwork\qtcpsocket.h>
+#include <QtNetwork\qlocalserver.h>
+#include <QtNetwork\qlocalsocket.h>
 
-//http://tsenmu.com/blog/?p=344
 
 class MySceneServer : public DzAction
 {
@@ -11,19 +10,32 @@ class MySceneServer : public DzAction
 public:
 	MySceneServer() : DzAction(QString("MaxBridgeAction"),QString("The MaxBridge Action Object"))
 	{
-		createSharedMemory(400000000); //400Mb
+		startServer();
 	}
-
-	void createSharedMemory(DWORD BUF_SIZE);
 
 public slots:
 	virtual void 	executeAction();
 	virtual void 	toggleAction (bool onOff);
 
+	void	newConnection();
+	void	messageReceived();
+
 private:
-	HANDLE		hMapFile;
-	LPVOID		pBuf;
+
+	HANDLE	hMapFile;
+	LPVOID	pBuf;
+
+	void	startServer();
+	void	createSharedMemory(DWORD BUF_SIZE);
 
 	~MySceneServer();
+
+	QLocalServer* m_server;
+	QLocalSocket* m_socket;
+
+	void	f_getScene();
+	void	f_getSceneItems();
+
+	MyDazExporter	myDazExporter;
 
 };

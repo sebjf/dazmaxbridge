@@ -31,8 +31,8 @@ namespace MaxManagedBridge
         {
             this.connect_button = new System.Windows.Forms.Button();
             this.scene_explorer_listbox = new System.Windows.Forms.ListBox();
-            this.progressBar1 = new ProgressBarSample.CustomProgressBar();
             this.button1 = new System.Windows.Forms.Button();
+            this.progressBar1 = new ProgressBarSample.CustomProgressBar();
             this.SuspendLayout();
             // 
             // connect_button
@@ -42,7 +42,7 @@ namespace MaxManagedBridge
             this.connect_button.Name = "connect_button";
             this.connect_button.Size = new System.Drawing.Size(87, 28);
             this.connect_button.TabIndex = 0;
-            this.connect_button.Text = "Connect";
+            this.connect_button.Text = "Refresh List";
             this.connect_button.UseVisualStyleBackColor = true;
             this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
             // 
@@ -54,6 +54,17 @@ namespace MaxManagedBridge
             this.scene_explorer_listbox.Size = new System.Drawing.Size(275, 277);
             this.scene_explorer_listbox.TabIndex = 1;
             // 
+            // button1
+            // 
+            this.button1.ForeColor = System.Drawing.Color.Black;
+            this.button1.Location = new System.Drawing.Point(294, 261);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(86, 27);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Update";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // progressBar1
             // 
             this.progressBar1.CustomText = null;
@@ -62,17 +73,6 @@ namespace MaxManagedBridge
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(368, 23);
             this.progressBar1.TabIndex = 2;
-            // 
-            // button1
-            // 
-            this.button1.ForeColor = System.Drawing.Color.Black;
-            this.button1.Location = new System.Drawing.Point(294, 261);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(86, 27);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Update All";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // UtilityMainForm
             // 

@@ -44,15 +44,6 @@
     <ClCompile Include="moc\DazMaxExporter_moc.cpp">
       <Filter>moc</Filter>
     </ClCompile>
-    <ClCompile Include="geometry_processing.cpp">
-      <Filter>Source Files\Scene Processing</Filter>
-    </ClCompile>
-    <ClCompile Include="material_processing.cpp">
-      <Filter>Source Files\Scene Processing</Filter>
-    </ClCompile>
-    <ClCompile Include="skinning_data_processing.cpp">
-      <Filter>Source Files\Scene Processing</Filter>
-    </ClCompile>
     <ClCompile Include="MyDazExporter.cpp">
       <Filter>Source Files\Exporter</Filter>
     </ClCompile>
@@ -64,6 +55,15 @@
     </ClCompile>
     <ClCompile Include="moc\SceneServer_moc.cpp">
       <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="materialProcessing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="geometryProcessing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="skinningDataProcessing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -64,5 +64,4 @@ DZ_PLUGIN_DESCRIPTION( QString(
 	from your plug-in. See the 'ClassIDs' page in the DAZ Studio SDK documentation for more 
 	information.
 **/
-//DZ_PLUGIN_CLASS_GUID( MyDazExporter, 6D5BC89D-014C-4213-8761-3A47279F5D0A );
 DZ_PLUGIN_CLASS_GUID( MySceneServer, 6D5BC89D-014C-4213-8761-3A47279F5D0C );

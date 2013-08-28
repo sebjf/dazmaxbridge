@@ -124,4 +124,13 @@ public:
 	MSGPACK_DEFINE(Items, Skeletons);
 };
 
+class MySceneItems
+{
+public:
+	vector<string> Items;
+
+	MSGPACK_DEFINE(Items);
+};
+
+
 #endif //MAXTYPES

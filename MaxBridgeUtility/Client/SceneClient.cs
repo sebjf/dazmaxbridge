@@ -8,6 +8,7 @@ using System.IO.MemoryMappedFiles;
 using System.Windows.Forms;
 using MsgPack.Serialization;
 using MsgPack;
+using System.IO.Pipes;
 
 
 namespace MaxManagedBridge
@@ -17,6 +18,18 @@ namespace MaxManagedBridge
         protected const string sharedMemoryName = "Local\\DazMaxBridgeSharedMemory";
 
         public bool Connect()
+        {
+            if (namedPipe == null || !namedPipe.IsConnected)
+            {
+                namedPipe = new NamedPipeClientStream("DazMaxBridgePipe");
+                namedPipe.Connect();
+                namedPipeReader = new StreamReader(namedPipe);
+                namedPipeWriter = new StreamWriter(namedPipe);
+            }
+            return true;
+        }
+
+        public bool ConnectMemory()
         {
             if (sharedMemory != null)
             {
@@ -42,8 +55,11 @@ namespace MaxManagedBridge
         }
 
         protected MemoryMappedFile sharedMemory;
+        protected NamedPipeClientStream namedPipe;
+        protected StreamReader namedPipeReader;
+        protected StreamWriter namedPipeWriter;
 
-        public MyScene GetScene()
+        public MyScene GetSceneFromMemory()
         {
             MemoryMappedViewStream accessor = sharedMemory.CreateViewStream();
             accessor.Position = 0;
@@ -51,5 +67,26 @@ namespace MaxManagedBridge
             MyScene Scene = c.Unpack(accessor);
             return Scene;
         }
+
+        protected T GetItem<T>(string command)
+        {
+            namedPipeWriter.WriteLine(command);
+            namedPipeWriter.Flush();
+
+            MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
+            T item = c.Unpack(namedPipeReader.BaseStream);
+            return item;
+        }
+
+        public MyScene GetScene()
+        {
+            return GetItem<MyScene>("getScene()");
+        }
+
+        public MySceneItems GetItemList()
+        {
+            return GetItem<MySceneItems>("getSceneItems()");
+        }
+
     }
 }

@@ -44,12 +44,14 @@
 
 using namespace std;
 
+void ShowMessage(QString message);
+
 class PreparedFigure
 {
 public:
 	DzFigure*		figure;
 	DzObject*		object;
-	DzSkeletonList followers;
+	DzSkeletonList	followers;
 };
 
 class SceneFigureInformation
@@ -63,21 +65,12 @@ public:
 
 /*Remember, if you make a mistake and Daz flips out it may revert to the beta workspace - change it in layout don't reinstall nothing is wrong!*/
 
-class MyDazExporter : public DzExporter {
+class MyDazExporter : public QObject {
 	Q_OBJECT
 public:
 
-	/** Constructor **/
-	MyDazExporter() : DzExporter(QString("dazmaxbridge")) { }
-
 	DzError		write(QIODevice& device, const DzFileIOSettings* options);
 	DzError		write(msgpack::sbuffer& sbuf, const DzFileIOSettings* options);
-
-public slots:
-
-	virtual void    getDefaultOptions( DzFileIOSettings *options ) const;
-	virtual QString getDescription() const { return QString("3DS Max Bridge Unwrapper"); };
-	virtual bool	isFileExporter() const { return true; };
 
 protected:
 

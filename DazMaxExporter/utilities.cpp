@@ -1,5 +1,12 @@
 #include "DazMaxExporter.h"
 
+void ShowMessage(QString message)
+{
+	QMessageBox myMessageBox;
+	myMessageBox.setText(message);
+	myMessageBox.exec();
+}
+
 DzSkeletonList MyDazExporter::getFigureFollowers(DzSkeleton* figure)
 {
 	DzSkeletonList followers;

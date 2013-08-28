@@ -144,11 +144,11 @@ DzError MyDazExporter::write(QIODevice& device, const DzFileIOSettings* options)
 
 	if(log.size() > 0)
 	{
-		QMessageBox myMessageBox;
 		QString message = "Export completed but with problems:\n";
 		for(int i = 0; i < log.size(); i++){
 			message += (log[i] + "\n");
 		}
+		QMessageBox myMessageBox;
 		myMessageBox.setText(message);
 		myMessageBox.exec();	
 	}
