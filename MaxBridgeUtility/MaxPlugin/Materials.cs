@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autodesk.Max;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
@@ -94,6 +95,18 @@ namespace MaxManagedBridge
 
         #endregion
 
+        #region Colour Conversion
+
+        Color? ConvertColour(Color? colour)
+        {
+            if (colour == null)
+                return null;
+
+            return Color.FromArgb(MaxColourValues[colour.Value.A], MaxColourValues[colour.Value.R], MaxColourValues[colour.Value.G], MaxColourValues[colour.Value.B]);
+        }
+
+        #endregion
+
         /// <summary>
         /// Creates a StandardMaterial instance for the provided material by generating and executing a MaxScript. 
         /// This is different from calling back to a MaterialProcessor. This call should be 'transparent' (i.e. you
@@ -107,16 +120,16 @@ namespace MaxManagedBridge
             MaxScriptStandardMaterial maxMaterial = new MaxScriptStandardMaterial();
 
             maxMaterial.name = material.MaterialName;
-            maxMaterial.Ambient = material.GetColor("Ambient Color");
+            maxMaterial.Ambient = ConvertColour(material.GetColor("Ambient Color"));
             maxMaterial.AmbientMap = material.GetString("Ambient Color Map");
             maxMaterial.AmbientMapAmount = material.GetFloat("Ambient Strength") * 100;
             maxMaterial.BumpMap = material.GetString("Bump Strength Map");
             maxMaterial.DiffuseMap = material.GetString("Color Map");
-            maxMaterial.Diffuse = material.GetColor("Diffuse Color");
+            maxMaterial.Diffuse = ConvertColour(material.GetColor("Diffuse Color"));
             maxMaterial.DiffuseMapAmount = material.GetFloat("Diffuse Strength") * 100;
             maxMaterial.OpacityMap = material.GetString("Opacity Map");
             maxMaterial.OpacityMapAmount = material.GetFloat("Opacity Strength") * 100;
-            maxMaterial.Specular = material.GetColor("Specular Color");
+            maxMaterial.Specular = ConvertColour(material.GetColor("Specular Color"));
             maxMaterial.SpecularMap = material.GetString("Specular Color Map");
             maxMaterial.SpecularLevel = material.GetFloat("Specular Strength") * 100;
             maxMaterial.Glossiness = material.GetFloat("Glossiness") * 100;
@@ -139,7 +152,7 @@ namespace MaxManagedBridge
 
         }
 
-
+        protected int[] MaxColourValues = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 23, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31, 32, 32, 33, 34, 35, 35, 36, 37, 38, 38, 39, 40, 41, 42, 42, 43, 44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 87, 88, 89, 90, 92, 93, 94, 95, 97, 98, 99, 101, 102, 103, 105, 106, 107, 109, 110, 112, 113, 114, 116, 117, 118, 120, 122, 123, 125, 126, 128, 129, 131, 132, 134, 135, 137, 138, 140, 142, 143, 144, 146, 148, 150, 151, 153, 155, 156, 158, 160, 162, 163, 165, 167, 168, 170, 172, 174, 176, 177, 179, 181, 183, 185, 187, 188, 190, 192, 193, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 243, 245, 247, 249, 251, 253, 255 };
 
 
     }

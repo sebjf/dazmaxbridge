@@ -1,6 +1,3 @@
-
-1. Not selecting anything transfers entire scene
-
 2. MaxScript sets diffuse to 0 on import (why do we need this again?)
 
 3. add colour conversion
