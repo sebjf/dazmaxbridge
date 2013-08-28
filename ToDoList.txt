@@ -1,24 +1,12 @@
-2. MaxScript sets diffuse to 0 on import (why do we need this again?)
-
-3. add colour conversion
-
-4. do proper opacity map adjustment
-
-
+1. MaxScript sets diffuse to 0 on import (why do we need this again?)
+2. do proper opacity map adjustment
 
 Roadmap
 
-1. Daz plugin converted to utility
-2. Implement communication between managed lib and daz plugin
-3. Have managed plugin pull selected daz objects directly
-4. Have managed plugin present daz scene to user
-5. Have managed plugin update specific items instead of creating new ones (from scratch - i.e. same node new geom)
-6. Update specific geom components
-7. Link this to changed event in daz
-
+1. Have managed plugin pull selected daz objects directly
+2. Have managed plugin present daz scene to user
+3. Have managed plugin update specific items instead of creating new ones (from scratch - i.e. same node new geom)
+4. Update specific geom components
+5. Link this to changed event in daz
 
 Basic skinning for pose adjustments
-
-BUGS!!
-
-- default genesis, lots of empty maps are made when no maps should be made...

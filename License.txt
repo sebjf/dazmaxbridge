@@ -1,6 +1,5 @@
 
-This project is released under the MIT license, with the exception of the
-MaxBridgeImporterPlugin which is GPL.
+This project is released under the MIT license.
 
 The entire license is below but to summarise:
 

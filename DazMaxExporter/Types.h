@@ -23,9 +23,7 @@ using namespace std;
 #define	BYTES				msgpack::type::raw_ref
 #define MATERIALPROPERTIES	map<string,string>
 
-#define		VERTEX_SIZE_IN_BYTES			(sizeof(DzPnt3))
 #define		FACE_SIZE_IN_BYTES				(sizeof(Face))
-#define		FACE_MATERIAL_ID_SIZE_IN_BYTES	(sizeof(int))
 #define		FLOATS_PER_VERTEX				3
 
 class Material
@@ -61,6 +59,7 @@ class MyMesh
 {
 public:	
 	string	Name;
+	string  ParentName;
 
 	int		NumVertices;
 	vector<float>	Vertices;
@@ -75,7 +74,7 @@ public:
 
 	int		SkeletonIndex;
 
-	MSGPACK_DEFINE(Name, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
+	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
 
 	vector<pair<int,QString>> _materialsToProcess;
 

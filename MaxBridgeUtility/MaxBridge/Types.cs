@@ -198,26 +198,28 @@ namespace MaxManagedBridge
     {
         [MessagePackMember(0)]
         public string Name;
-
         [MessagePackMember(1)]
-        public int NumVertices;
+        public string ParentName;
+
         [MessagePackMember(2)]
+        public int NumVertices;
+        [MessagePackMember(3)]
         public List<float> Vertices;
 
-        [MessagePackMember(3)]
-        public int NumTextureCoordinates;
         [MessagePackMember(4)]
+        public int NumTextureCoordinates;
+        [MessagePackMember(5)]
         public List<float> TextureCoordinates;
 
-        [MessagePackMember(5)]
-        public int NumFaces;
         [MessagePackMember(6)]
+        public int NumFaces;
+        [MessagePackMember(7)]
         public byte[] Faces;
 
-        [MessagePackMember(7)]
+        [MessagePackMember(8)]
         public List<Material> Materials;
 
-        [MessagePackMember(8)]
+        [MessagePackMember(9)]
         public int SkeletonIndex;
 
         /* The following properties are .NET only */

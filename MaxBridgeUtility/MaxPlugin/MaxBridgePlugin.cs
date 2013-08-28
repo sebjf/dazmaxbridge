@@ -28,15 +28,15 @@ namespace MaxManagedBridge
 
     public partial class MaxPlugin : MaxBridge
     {
-        public IEnumerable<IINode> GetMappedNodes(MyMesh source)
+        public IEnumerable<IINode> GetMappedNodes(string Name)
         {
             //This is our mapping function for now -> iterate over every node in the scene and return those with the correct name!
-            return (SceneNodes.Where(n => (n.ObjectRef is ITriObject) && (n.Name == source.Name)));
+            return (SceneNodes.Where(n => (n.ObjectRef is ITriObject) && (n.Name == Name)));
         }
 
         public IEnumerable<IMesh> GetMappedMeshes(MyMesh source)
         {
-            foreach (var n in GetMappedNodes(source))
+            foreach (var n in GetMappedNodes(source.Name))
             {
                 yield return (n.ObjectRef as ITriObject).Mesh;
             }
@@ -59,13 +59,13 @@ namespace MaxManagedBridge
 
             UpdateProgress(0.0f, "Getting mapped items...");
 
-            IList<IINode> mappedNodes = GetMappedNodes(myMesh).ToList();
+            IList<IINode> mappedNodes = GetMappedNodes(myMesh.Name).ToList();
 
             //No mesh nodes exist with that name yet, so initialise a new node for the object
             if (mappedNodes.Count < 1)
             {
                 UpdateProgress(0.1f, "Creating object...");
-                mappedNodes.Add(CreateMeshNode(myMesh.Name));
+                mappedNodes.Add(CreateMeshNode(myMesh));
             }
 
             foreach (var m in mappedNodes)
@@ -88,11 +88,11 @@ namespace MaxManagedBridge
             return true;
         }
 
-        public IINode CreateMeshNode(string name)
+        public IINode CreateMeshNode(MyMesh mesh)
         {
             ITriObject meshObject = GlobalInterface.Instance.CreateNewTriObject();
             IINode myNode = GlobalInterface.Instance.COREInterface.CreateObjectNode(meshObject);
-            myNode.Name = name;
+            myNode.Name = mesh.Name;
 
             myNode.Rotate(0, myNode.GetObjectTM(0, 
                 GlobalInterface.Instance.Interval.Create()), 
@@ -100,6 +100,15 @@ namespace MaxManagedBridge
                 true, true, 
                 (int)PivotMode.PIV_OBJECT_ONLY, 
                 true);
+
+            if (mesh.ParentName != null && mesh.ParentName != mesh.Name)
+            {
+                List<IINode> parentNodes = GetMappedNodes(mesh.ParentName).ToList();
+                if (parentNodes.Count > 0)
+                {
+                    parentNodes[0].AttachChild(myNode, false);
+                }
+            }
 
             return myNode;
         }

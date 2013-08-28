@@ -35,6 +35,10 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	{
 		parentSkeleton = figure;
 	}
+	else
+	{
+		myMesh.ParentName = parentSkeleton->getLabel(); //figures are only ever parented to their follow targets, unlike props
+	}
 
 	myMesh.SkeletonIndex = addSkeletonData(parentSkeleton);
 
@@ -62,6 +66,17 @@ void MyDazExporter::addNode(DzNode* node)
 	myMesh.Name = node->getLabel();
 	if(myMesh.Name.size() <= 0){
 		myMesh.Name = "Unnamed Node";
+	}
+
+	DzNode* parent = node->getNodeParent();
+	if(parent != NULL)
+	{
+		if(parent->inherits("DzBone"))
+		{
+			parent = findBoneSkeleton(parent);
+		}
+
+		myMesh.ParentName = parent->getLabel();
 	}
 
 	addGeometryData((DzFacetMesh*)(node->getObject()->getCachedGeom()), myMesh);
