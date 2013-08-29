@@ -20,8 +20,6 @@ namespace MaxManagedBridge
         protected StreamReader namedPipeReader;
         protected StreamWriter namedPipeWriter;
 
-
-
         protected bool Connect()
         {
             if (namedPipe == null || !namedPipe.IsConnected)

@@ -36,7 +36,7 @@ namespace MaxManagedBridge
 
         public override string ClassName
         {
-            get { return "MaxBridgeUtility"; }
+            get { return "Daz Bridge Utility"; }
         }
 
         public override object Create(bool loading)

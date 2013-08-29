@@ -102,7 +102,7 @@ namespace MaxManagedBridge
             if (colour == null)
                 return null;
 
-            return Color.FromArgb(MaxColourValues[colour.Value.A], MaxColourValues[colour.Value.R], MaxColourValues[colour.Value.G], MaxColourValues[colour.Value.B]);
+            return Color.FromArgb(colour.Value.A, MaxColourValues[colour.Value.R], MaxColourValues[colour.Value.G], MaxColourValues[colour.Value.B]);
         }
 
         #endregion

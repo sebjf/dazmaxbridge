@@ -1,5 +1,27 @@
 #include "DazMaxExporter.h"
 
+void MyDazExporter::addBoneWeights(DzFigure* figure, MyMesh& myMesh)
+{
+	int vc = figure->getObject()->getCurrentShape()->getGeometry()->getNumVertices();
+
+	DzSkinBinding* skin = figure->getSkinBinding();
+	if(skin != NULL)
+	{
+		DzBoneBindingListIterator boneBindings = skin->getBoneBindingIterator();
+		while(boneBindings.hasNext())
+		{
+			DzBoneBinding* binding = boneBindings.next();
+
+			DzNode* bone = binding->getBone();
+			bool local = binding->hasLocalWeights();
+			DzWeightMapPtr weights = binding->createAveragedGeneralMap();
+			//int cl = weightsl->getNumWeights();
+			//DzWeightMap* weights = binding->getWeights();
+			int c = weights->getNumWeights();
+		}
+	}
+}
+
 int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 {
 	int index;

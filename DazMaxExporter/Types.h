@@ -73,6 +73,7 @@ public:
 	vector<Material> Materials;
 
 	int		SkeletonIndex;
+	
 
 	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
 

@@ -86,7 +86,7 @@ namespace MaxManagedBridge
             this.Controls.Add(this.scene_explorer_listbox);
             this.Controls.Add(this.connect_button);
             this.Name = "UtilityMainForm";
-            this.Text = "UI";
+            this.Text = "Daz Studio 4 Bridge";
             this.ResumeLayout(false);
 
         }

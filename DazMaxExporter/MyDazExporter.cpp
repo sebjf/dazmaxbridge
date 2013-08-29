@@ -14,7 +14,7 @@ void ShowMessage(QString message)
 	myMessageBox.exec();
 }
 
-void MyDazExporter::addFigure(DzSkeleton* figure)
+void MyDazExporter::addFigure(DzFigure* figure)
 {
 	if(find(sceneFigures.GeograftList.begin(), sceneFigures.GeograftList.end(), figure) != sceneFigures.GeograftList.end()){	//we dont export geografts so if its identified as one return
 		return;
@@ -28,6 +28,7 @@ void MyDazExporter::addFigure(DzSkeleton* figure)
 	}
 
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
+	//addBoneWeights(figure, myMesh);
 	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneFigures.Geografts[figure]), myMesh);
 
 	DzSkeleton* parentSkeleton = figure->getFollowTarget();
@@ -102,9 +103,9 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node)
 		{
 			addedNodes.push_back(node);
 
-			if(node->inherits("DzSkeleton"))
+			if(node->inherits("DzFigure"))
 			{
-				addFigure((DzSkeleton*)node);
+				addFigure((DzFigure*)node);
 			}
 			else
 			{

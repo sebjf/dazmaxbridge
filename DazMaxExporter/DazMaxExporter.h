@@ -37,6 +37,8 @@
 #include "dzmodifier.h"
 #include "dzfigure.h"
 #include "dzshape.h"
+#include "dzskin.h"
+#include "dzskinbinding.h"
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>
@@ -81,12 +83,13 @@ private:
 	MyScene	scene;
 
 	void				resolveSelectedDzNode(DzNode* node);
-	void				addFigure(DzSkeleton* skeleton);
+	void				addFigure(DzFigure* skeleton);
 	void				addNode(DzNode* node);
 
 	void				addGeometryData(DzFacetMesh* dazMesh, MyMesh& MyMesh);
 	void				addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& MyMesh);
 	int					addSkeletonData(DzSkeleton* skeleton);
+	void				addBoneWeights(DzFigure* figure, MyMesh& myMesh);
 
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);
 
