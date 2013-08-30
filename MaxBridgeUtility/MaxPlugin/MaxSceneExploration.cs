@@ -12,48 +12,20 @@ namespace MaxManagedBridge
         {
             get
             {
-                return GetAllSceneNodes(GlobalInterface.Instance.COREInterface.RootNode);
+                return GetChildNodesRecursive(GlobalInterface.Instance.COREInterface.RootNode);
             }
         }
 
-        private IEnumerable<IINode> GetAllSceneNodes(IINode start)
+        private IEnumerable<IINode> GetChildNodesRecursive(IINode start)
         {
             for (int i = 0; i < start.NumChildren; i++)
             {
                 yield return start.GetChildNode(i);
+
+                foreach(var n in GetChildNodesRecursive(start.GetChildNode(i)))
+                    yield return n;
             }
         }
-
-        IEnumerable<IINode> SceneITriObjects
-        {
-            get
-            {
-                foreach (var n in GetAllSceneNodes(GlobalInterface.Instance.COREInterface.RootNode))
-                {
-                    if (n.ObjectRef is ITriObject)
-                    {
-                        yield return n;
-                    }
-                }
-            }
-        }
-
-        IEnumerable<T> GetNodeObjectsByName<T>(string name) where T : class
-        {
-            foreach (var n in SceneNodes)
-            {
-                if (n.ObjectRef is T)
-                {
-                    if (n.Name == name)
-                    {
-                        yield return (n.ObjectRef as T);
-                    }
-                }
-            }
-        }
-
-
-
 
     }
 }
