@@ -13,7 +13,15 @@ namespace MaxBridgeLibTest
         {
             MaxPlugin p = new MaxPlugin();
 
-            p.UpdateFromDaz();
+            var sceneinfo = p.DazClient.GetSceneInformation();
+
+
+            List<string> list = new List<string>();
+            list.Add("Genesis (2)");
+            list.Add("Genesis");
+            list.Add("BG_gun");
+
+            MyScene fs = p.DazClient.GetScene(list);
 
         }
 

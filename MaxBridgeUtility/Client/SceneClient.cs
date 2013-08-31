@@ -25,7 +25,14 @@ namespace MaxManagedBridge
             if (namedPipe == null || !namedPipe.IsConnected)
             {
                 namedPipe = new NamedPipeClientStream("DazMaxBridgePipe");
-                namedPipe.Connect(2000);
+                try
+                {
+                    namedPipe.Connect(2000);
+                }
+                catch (TimeoutException e)
+                {
+                    MessageBox.Show("Unable to find Daz! Is it running?");
+                }
 
                 if (!namedPipe.IsConnected)
                 {
@@ -40,12 +47,22 @@ namespace MaxManagedBridge
 
         protected T GetItem<T>(string command)
         {
+            List<string> list = new List<string>();
+            list.Add(command);
+            return GetItem<T>(list);
+        }
+
+        protected T GetItem<T>(IList<string> commands)
+        {
             if (!Connect())
             {
                 return default(T);
             }
 
-            namedPipeWriter.WriteLine(command);
+            foreach (var command in commands)
+            {
+                namedPipeWriter.WriteLine(command);
+            }
             namedPipeWriter.Flush();
 
             MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
@@ -55,12 +72,18 @@ namespace MaxManagedBridge
 
         public MyScene GetScene()
         {
-            return GetItem<MyScene>("getScene()");
+            return GetItem<MyScene>(new List<string>());
         }
 
-        public MySceneItems GetItemList()
+        public MyScene GetScene(List<string> items)
         {
-            return GetItem<MySceneItems>("getSceneItems()");
+            items.Insert(0, "getSceneItems()");
+            return GetItem<MyScene>(items);
+        }
+
+        public MySceneInformation GetSceneInformation()
+        {
+            return GetItem<MySceneInformation>("getMySceneInformation()");
         }
 
     }

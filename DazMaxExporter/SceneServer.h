@@ -29,8 +29,8 @@ private:
 	QLocalServer* m_server;
 	QLocalSocket* m_socket;
 
-	void	f_getScene();
-	void	f_getSceneItems();
+	void	f_getScene(vector<string>);
+	void	f_getSceneInformation();
 
 	MyDazExporter	myDazExporter;
 

@@ -1,6 +1,41 @@
 #ifndef MAXTYPES
 #define MAXTYPES
 
+#include "dzapp.h"
+#include "dzaction.h"
+#include <dzscene.h>
+#include "dzexporter.h"
+#include "dznode.h"
+#include "dzskeleton.h"
+#include "dzbone.h"
+#include "dzfileio.h"
+#include "dzfileiosettings.h"
+#include "dzobject.h"
+#include "dzvertexmesh.h"
+#include "dzfacetshape.h"
+#include "dzfacetmesh.h"
+#include "dzmaterial.h"
+#include "dzbasicmaterialarea.h"
+#include "dzfacegroup.h"
+#include "dzshaderbrick.h"
+#include "dzshadermixerutility.h"
+#include "dzdefaultmaterial.h"
+#include "dztexture.h"
+#include "dzmap.h"
+#include "dzproperty.h"
+#include "dzimageproperty.h"
+#include "dzfloatproperty.h"
+#include "dzcolorproperty.h"
+#include "dzstringproperty.h"
+#include "dzfileproperty.h"
+#include "dzboolproperty.h"
+#include "dzenumproperty.h"
+#include "dzmodifier.h"
+#include "dzfigure.h"
+#include "dzshape.h"
+#include "dzskin.h"
+#include "dzskinbinding.h"
+
  /*
  Note: it is important that _WINSOCKAPI_ is defined as a project wide preprocessor definition before
  including this header along with those of Daz and Qt 
@@ -124,12 +159,22 @@ public:
 	MSGPACK_DEFINE(Items, Skeletons);
 };
 
-class MySceneItems
+class MySceneInformation
 {
 public:
-	vector<string> Items;
+	vector<string>					TopLevelItemNames;
 
-	MSGPACK_DEFINE(Items);
+	vector<DzNode*>					Shapes;
+	vector<DzFigure*>				Figures;
+	vector<DzSkeleton*>				GeograftList;
+	vector<DzSkeleton*>				FollowersList;
+	map<DzSkeleton*,DzSkeletonList> Geografts;
+	map<DzSkeleton*,DzSkeletonList>	Followers;
+
+	bool IsAGeograft(DzNode* node);
+
+	MSGPACK_DEFINE(TopLevelItemNames);
+
 };
 
 

@@ -318,18 +318,19 @@ namespace MaxManagedBridge
     }
 
     /*
-    class MySceneItems
+    class MySceneInformation
     {
     public:
-	    vector<string> Items;
+	    vector<string>					TopLevelItemNames;
 
-	    MSGPACK_DEFINE(Items);
+	    MSGPACK_DEFINE(TopLevelItemNames);
+
     };
     */
 
-    public class MySceneItems
+    public class MySceneInformation
     {
         [MessagePackMember(0)]
-        public List<String> Items = new List<string>();
+        public List<String> TopLevelItemNames = new List<string>();
     }
 }

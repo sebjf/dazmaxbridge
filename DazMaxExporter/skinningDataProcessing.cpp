@@ -22,12 +22,12 @@ void MyDazExporter::addBoneWeights(DzFigure* figure, MyMesh& myMesh)
 	}
 }
 
-int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
+int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton, MyScene* scene)
 {
 	int index;
-	for(index = 0; index < scene.Skeletons.size(); index++)
+	for(index = 0; index < scene->Skeletons.size(); index++)
 	{
-		if(scene.Skeletons[index]._sourceSkeleton == skeleton){
+		if(scene->Skeletons[index]._sourceSkeleton == skeleton){
 			return index;
 		}
 	}
@@ -61,7 +61,7 @@ int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton)
 
 	mySkeleton._sourceSkeleton = skeleton;
 
-	scene.Skeletons.push_back(mySkeleton);
+	scene->Skeletons.push_back(mySkeleton);
 
 	return index;
 }
