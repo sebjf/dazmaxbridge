@@ -31,18 +31,19 @@ namespace MaxManagedBridge
 
         private void connect_button_Click(object sender, EventArgs e)
         {
-            Plugin.UpdateFromDaz();
-
+            MySceneInformation sceneItems = Plugin.DazClient.GetSceneInformation();
             scene_explorer_listbox.Items.Clear();
-            for (int i = 0; i < Plugin.Scene.Items.Count; i++ )
-            {
-                scene_explorer_listbox.Items.Add(Plugin.Scene.Items[i].Name);
-            }
+            scene_explorer_listbox.Items.AddRange(sceneItems.TopLevelItemNames.ToArray());
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Plugin.UpdateAllMeshes();
+            List<string> itemNames = new List<string>();
+            foreach (var item in scene_explorer_listbox.SelectedItems)
+            {
+                itemNames.Add(item.ToString());
+            }
+            Plugin.UpdateMeshes(itemNames);
         }
 
 

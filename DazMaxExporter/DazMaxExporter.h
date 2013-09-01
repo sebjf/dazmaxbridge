@@ -32,7 +32,7 @@ private:
 
 	void				addNodeData(DzNode* node, MyMesh& myMesh);
 	void				addGeometryData(DzFacetMesh* dazMesh, MyMesh& myMesh);
-	void				addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& myMesh);
+	void				addMaterialData(DzNode* node, MyMesh& myMesh);
 
 	void				addBoneWeights(DzFigure* figure, MyMesh& myMesh);
 	int					addSkeletonData(DzSkeleton* skeleton, MyScene* collection);

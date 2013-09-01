@@ -31,12 +31,6 @@ void MySceneServer::messageReceived()
 		return;
 	}
 
-	if(message == "getScene()")
-	{
-		f_getScene(vector<string>());
-		return;
-	}
-
 	if(message == "getSceneItems()")
 	{
 		vector<string> items;
@@ -91,7 +85,6 @@ void MySceneServer::f_getSceneInformation()
 
 MySceneServer::~MySceneServer()
 {
-
 }
 
 void 	MySceneServer::executeAction()

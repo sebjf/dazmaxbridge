@@ -168,8 +168,8 @@ public:
 	vector<DzFigure*>				Figures;
 	vector<DzSkeleton*>				GeograftList;
 	vector<DzSkeleton*>				FollowersList;
-	map<DzSkeleton*,DzSkeletonList> Geografts;
-	map<DzSkeleton*,DzSkeletonList>	Followers;
+	map<DzNode*,DzSkeletonList>		Geografts;
+	map<DzNode*,DzSkeletonList>		Followers;
 
 	bool IsAGeograft(DzNode* node);
 

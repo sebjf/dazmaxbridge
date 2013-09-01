@@ -17,9 +17,6 @@ namespace MaxBridgeLibTest
 
 
             List<string> list = new List<string>();
-            list.Add("Genesis (2)");
-            list.Add("Genesis");
-            list.Add("BG_gun");
 
             MyScene fs = p.DazClient.GetScene(list);
 

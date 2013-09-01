@@ -75,7 +75,7 @@ namespace MaxManagedBridge
             return GetItem<MyScene>(new List<string>());
         }
 
-        public MyScene GetScene(List<string> items)
+        public MyScene GetScene(IList<string> items)
         {
             items.Insert(0, "getSceneItems()");
             return GetItem<MyScene>(items);

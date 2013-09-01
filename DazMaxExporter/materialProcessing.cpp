@@ -126,8 +126,10 @@ MATERIALPROPERTIES MyDazExporter::getMaterialProperties(DzMaterial* material)
 
 }
 
-void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& myMesh)
+void	MyDazExporter::addMaterialData(DzNode* node, MyMesh& myMesh)
 {
+	DzShape* shape = node->getObject()->getCurrentShape();
+
 	for(int i = 0; i < myMesh._materialsToProcess.size(); i++)
 	{
 		pair<int,QString>& materialToProcess = myMesh._materialsToProcess[i];
@@ -142,11 +144,18 @@ void	MyDazExporter::addMaterialData(DzShape* shape, DzShapeList shapes, MyMesh& 
 		if(material == NULL)
 		{
 			/*geografted geometry may result in faces in one shape referencing a group where the materials are actually defined in another, so here we try to find them*/
-			for(DzShapeList::Iterator itr = shapes.begin(); itr != shapes.end(); itr++)
+			DzSkeletonList geografts = sceneInfo.Geografts[node];
+
+			for(DzSkeletonList::iterator itr = geografts.begin(); itr != geografts.end(); itr++)
 			{
-				DzMaterial* material = (*itr)->findMaterial(materialToProcess.second);
-				if(material != NULL){
-					break;
+				QString geograftName = (*itr)->getLabel();
+				if(materialToProcess.second.midRef(0, geograftName.length()).compare(geograftName) == 0)
+				{
+					QString materialName = materialToProcess.second.mid(geograftName.length() + 1);
+					material = (*itr)->getObject()->getCurrentShape()->findMaterial(materialName);
+					if(material != NULL){
+						break;
+					}
 				}
 			}
 		}

@@ -43,7 +43,7 @@ void MyDazExporter::addFigure(DzFigure* figure, MyScene* collection)
 
 	addNodeData(figure, myMesh);
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
-	addMaterialData(figure->getObject()->getCurrentShape(), getFigureShapes(sceneInfo.Geografts[figure]), myMesh);
+	addMaterialData(figure, myMesh);
 
 	DzSkeleton* parentSkeleton = figure->getFollowTarget();
 	if(parentSkeleton == NULL)
@@ -73,7 +73,7 @@ void MyDazExporter::addNode(DzNode* node, MyScene* collection)
 
 	addNodeData(node, myMesh);
 	addGeometryData((DzFacetMesh*)(node->getObject()->getCachedGeom()), myMesh);
-	addMaterialData(node->getObject()->getCurrentShape(), DzShapeList(), myMesh);
+	addMaterialData(node, myMesh);
 
 	collection->Items.push_back( myMesh );
 }

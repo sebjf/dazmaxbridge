@@ -37,11 +37,10 @@ namespace MaxManagedBridge
             // 
             // connect_button
             // 
-            this.connect_button.Enabled = false;
             this.connect_button.ForeColor = System.Drawing.Color.Black;
-            this.connect_button.Location = new System.Drawing.Point(293, 12);
+            this.connect_button.Location = new System.Drawing.Point(286, 12);
             this.connect_button.Name = "connect_button";
-            this.connect_button.Size = new System.Drawing.Size(87, 28);
+            this.connect_button.Size = new System.Drawing.Size(95, 28);
             this.connect_button.TabIndex = 0;
             this.connect_button.Text = "Refresh List";
             this.connect_button.UseVisualStyleBackColor = true;
@@ -49,21 +48,21 @@ namespace MaxManagedBridge
             // 
             // scene_explorer_listbox
             // 
-            this.scene_explorer_listbox.Enabled = false;
             this.scene_explorer_listbox.FormattingEnabled = true;
             this.scene_explorer_listbox.Location = new System.Drawing.Point(12, 12);
             this.scene_explorer_listbox.Name = "scene_explorer_listbox";
-            this.scene_explorer_listbox.Size = new System.Drawing.Size(275, 277);
+            this.scene_explorer_listbox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.scene_explorer_listbox.Size = new System.Drawing.Size(268, 277);
             this.scene_explorer_listbox.TabIndex = 1;
             // 
             // button1
             // 
             this.button1.ForeColor = System.Drawing.Color.Black;
-            this.button1.Location = new System.Drawing.Point(294, 261);
+            this.button1.Location = new System.Drawing.Point(286, 262);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(86, 27);
+            this.button1.Size = new System.Drawing.Size(95, 27);
             this.button1.TabIndex = 3;
-            this.button1.Text = "Update";
+            this.button1.Text = "Update Selected";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 

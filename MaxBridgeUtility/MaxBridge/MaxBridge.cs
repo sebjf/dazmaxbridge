@@ -15,18 +15,13 @@ namespace MaxManagedBridge
 
         public SceneClient DazClient = new SceneClient();
 
-        public void UpdateFromDaz(List<string> items)
+        public void UpdateFromDaz(IList<string> items)
         {
             Scene = DazClient.GetScene(items);
             foreach (MyMesh m in Scene.Items)
             {
                 TriangulateFaces(m);
             }
-        }
-
-        public void UpdateFromDaz()
-        {
-            UpdateFromDaz(new List<string>());
         }
 
         public void LoadFromFile(string filename, bool triangulate = true)
