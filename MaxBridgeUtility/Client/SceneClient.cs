@@ -29,7 +29,7 @@ namespace MaxManagedBridge
                 {
                     namedPipe.Connect(2000);
                 }
-                catch (TimeoutException e)
+                catch (Exception e)
                 {
                     MessageBox.Show("Unable to find Daz! Is it running?");
                 }
@@ -47,12 +47,10 @@ namespace MaxManagedBridge
 
         protected T GetItem<T>(string command)
         {
-            List<string> list = new List<string>();
-            list.Add(command);
-            return GetItem<T>(list);
+            return GetItem<T>(new string[] { command });
         }
 
-        protected T GetItem<T>(IList<string> commands)
+        protected T GetItem<T>(IEnumerable<string> commands)
         {
             if (!Connect())
             {
@@ -68,11 +66,6 @@ namespace MaxManagedBridge
             MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
             T item = c.Unpack(namedPipeReader.BaseStream);
             return item;
-        }
-
-        public MyScene GetScene()
-        {
-            return GetItem<MyScene>(new List<string>());
         }
 
         public MyScene GetScene(IList<string> items)

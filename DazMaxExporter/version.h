@@ -22,7 +22,7 @@
 
 // Version number for AFirstPlugin
 #define PLUGIN_MAJOR	0
-#define PLUGIN_MINOR	1
+#define PLUGIN_MINOR	2
 #define PLUGIN_REV		0
 #define PLUGIN_BUILD	1
 

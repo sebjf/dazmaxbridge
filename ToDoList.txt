@@ -1,12 +1,11 @@
-1. MaxScript sets diffuse to 0 on import (why do we need this again?)
-2. do proper opacity map adjustment
+
+To Do List
+
+1. Do proper opacity map adjustment so opacity maps on things such as eyelashes behave in Max as they do in Daz
+2. Make enumeration of top level entities in Daz more efficient
+3. Improve efficiency of updating vertex positions in Max (or some other way improve speed such as multithreaded updates, or only updating changed vertices)
 
 Roadmap
 
-1. Have managed plugin pull selected daz objects directly
-2. Have managed plugin present daz scene to user
-3. Have managed plugin update specific items instead of creating new ones (from scratch - i.e. same node new geom)
-4. Update specific geom components
-5. Link this to changed event in daz
-
-Basic skinning for pose adjustments
+1. Link scene updates to changed signals in Max
+2. Include basic skinning for standard Max bones (for basic pose adjustments)

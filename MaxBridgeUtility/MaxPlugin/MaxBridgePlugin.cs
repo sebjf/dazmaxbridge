@@ -34,14 +34,6 @@ namespace MaxManagedBridge
             return (SceneNodes.Where(n => (n.ObjectRef is ITriObject) && (n.Name == Name)));
         }
 
-        public IEnumerable<IMesh> GetMappedMeshes(MyMesh source)
-        {
-            foreach (var n in GetMappedNodes(source.Name))
-            {
-                yield return (n.ObjectRef as ITriObject).Mesh;
-            }
-        }
-
         public void UpdateMeshes(IList<string> items)
         {
             UpdateFromDaz(items);

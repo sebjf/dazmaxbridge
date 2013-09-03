@@ -1,5 +1,7 @@
 #include "DazMaxExporter.h"
 
+/*This method is not in use and is here for documentation purposes. Skinning is on the roadmap but a long way off.*/
+
 void MyDazExporter::addBoneWeights(DzFigure* figure, MyMesh& myMesh)
 {
 	int vc = figure->getObject()->getCurrentShape()->getGeometry()->getNumVertices();

@@ -145,7 +145,6 @@ void	MyDazExporter::addMaterialData(DzNode* node, MyMesh& myMesh)
 		{
 			/*geografted geometry may result in faces in one shape referencing a group where the materials are actually defined in another, so here we try to find them*/
 			DzSkeletonList geografts = sceneInfo.Geografts[node];
-
 			for(DzSkeletonList::iterator itr = geografts.begin(); itr != geografts.end(); itr++)
 			{
 				QString geograftName = (*itr)->getLabel();

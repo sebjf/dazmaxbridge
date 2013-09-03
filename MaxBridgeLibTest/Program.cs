@@ -15,8 +15,8 @@ namespace MaxBridgeLibTest
 
             var sceneinfo = p.DazClient.GetSceneInformation();
 
-
             List<string> list = new List<string>();
+            //list.Add("Genesis");
 
             MyScene fs = p.DazClient.GetScene(list);
 
