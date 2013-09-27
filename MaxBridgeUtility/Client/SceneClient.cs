@@ -20,7 +20,7 @@ namespace MaxManagedBridge
         protected StreamReader namedPipeReader;
         protected StreamWriter namedPipeWriter;
 
-        protected bool Connect()
+        protected bool EnsureConnectionToDaz()
         {
             if (namedPipe == null || !namedPipe.IsConnected)
             {
@@ -32,16 +32,13 @@ namespace MaxManagedBridge
                 catch (Exception e)
                 {
                     MessageBox.Show("Unable to find Daz! Is it running?");
-                }
-
-                if (!namedPipe.IsConnected)
-                {
-                    MessageBox.Show("Unable to find Daz! Is it running?");
+                    return false;
                 }
 
                 namedPipeReader = new StreamReader(namedPipe);
                 namedPipeWriter = new StreamWriter(namedPipe);
             }
+
             return true;
         }
 
@@ -52,7 +49,7 @@ namespace MaxManagedBridge
 
         protected T GetItem<T>(IEnumerable<string> commands)
         {
-            if (!Connect())
+            if (!EnsureConnectionToDaz())
             {
                 return default(T);
             }

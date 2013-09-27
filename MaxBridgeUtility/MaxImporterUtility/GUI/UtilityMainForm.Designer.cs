@@ -29,42 +29,49 @@ namespace MaxManagedBridge
         /// </summary>
         private void InitializeComponent()
         {
-            this.connect_button = new System.Windows.Forms.Button();
-            this.scene_explorer_listbox = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.refreshButton = new System.Windows.Forms.Button();
+            this.sceneListbox = new System.Windows.Forms.ListBox();
+            this.updateButton = new System.Windows.Forms.Button();
             this.progressBar1 = new ProgressBarSample.CustomProgressBar();
+            this.optionsGroup = new System.Windows.Forms.GroupBox();
+            this.bumpScalarTextBox = new System.Windows.Forms.TextBox();
+            this.glossinessScalarTextBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.materialSelectDropDown = new System.Windows.Forms.ComboBox();
+            this.optionsGroup.SuspendLayout();
             this.SuspendLayout();
             // 
-            // connect_button
+            // refreshButton
             // 
-            this.connect_button.ForeColor = System.Drawing.Color.Black;
-            this.connect_button.Location = new System.Drawing.Point(286, 12);
-            this.connect_button.Name = "connect_button";
-            this.connect_button.Size = new System.Drawing.Size(95, 28);
-            this.connect_button.TabIndex = 0;
-            this.connect_button.Text = "Refresh List";
-            this.connect_button.UseVisualStyleBackColor = true;
-            this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
+            this.refreshButton.ForeColor = System.Drawing.Color.Black;
+            this.refreshButton.Location = new System.Drawing.Point(286, 12);
+            this.refreshButton.Name = "refreshButton";
+            this.refreshButton.Size = new System.Drawing.Size(100, 28);
+            this.refreshButton.TabIndex = 0;
+            this.refreshButton.Text = "Refresh List";
+            this.refreshButton.UseVisualStyleBackColor = true;
+            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
             // 
-            // scene_explorer_listbox
+            // sceneListbox
             // 
-            this.scene_explorer_listbox.FormattingEnabled = true;
-            this.scene_explorer_listbox.Location = new System.Drawing.Point(12, 12);
-            this.scene_explorer_listbox.Name = "scene_explorer_listbox";
-            this.scene_explorer_listbox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.scene_explorer_listbox.Size = new System.Drawing.Size(268, 277);
-            this.scene_explorer_listbox.TabIndex = 1;
+            this.sceneListbox.FormattingEnabled = true;
+            this.sceneListbox.Location = new System.Drawing.Point(12, 12);
+            this.sceneListbox.Name = "sceneListbox";
+            this.sceneListbox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.sceneListbox.Size = new System.Drawing.Size(268, 277);
+            this.sceneListbox.TabIndex = 1;
             // 
-            // button1
+            // updateButton
             // 
-            this.button1.ForeColor = System.Drawing.Color.Black;
-            this.button1.Location = new System.Drawing.Point(286, 262);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(95, 27);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Update Selected";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.updateButton.ForeColor = System.Drawing.Color.Black;
+            this.updateButton.Location = new System.Drawing.Point(286, 262);
+            this.updateButton.Name = "updateButton";
+            this.updateButton.Size = new System.Drawing.Size(100, 27);
+            this.updateButton.TabIndex = 3;
+            this.updateButton.Text = "Update All";
+            this.updateButton.UseVisualStyleBackColor = true;
+            this.updateButton.Click += new System.EventHandler(this.updateButton_Click);
             // 
             // progressBar1
             // 
@@ -72,29 +79,96 @@ namespace MaxManagedBridge
             this.progressBar1.DisplayStyle = ProgressBarSample.ProgressBarDisplayText.CustomText;
             this.progressBar1.Location = new System.Drawing.Point(13, 296);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(368, 23);
+            this.progressBar1.Size = new System.Drawing.Size(373, 23);
             this.progressBar1.TabIndex = 2;
+            // 
+            // optionsGroup
+            // 
+            this.optionsGroup.Controls.Add(this.bumpScalarTextBox);
+            this.optionsGroup.Controls.Add(this.glossinessScalarTextBox);
+            this.optionsGroup.Controls.Add(this.label2);
+            this.optionsGroup.Controls.Add(this.label1);
+            this.optionsGroup.Controls.Add(this.materialSelectDropDown);
+            this.optionsGroup.Location = new System.Drawing.Point(12, 344);
+            this.optionsGroup.Name = "optionsGroup";
+            this.optionsGroup.Size = new System.Drawing.Size(374, 232);
+            this.optionsGroup.TabIndex = 4;
+            this.optionsGroup.TabStop = false;
+            this.optionsGroup.Text = "Options";
+            // 
+            // bumpScalarTextBox
+            // 
+            this.bumpScalarTextBox.Location = new System.Drawing.Point(104, 71);
+            this.bumpScalarTextBox.Name = "bumpScalarTextBox";
+            this.bumpScalarTextBox.Size = new System.Drawing.Size(100, 20);
+            this.bumpScalarTextBox.TabIndex = 6;
+            // 
+            // glossinessScalarTextBox
+            // 
+            this.glossinessScalarTextBox.Location = new System.Drawing.Point(104, 45);
+            this.glossinessScalarTextBox.Name = "glossinessScalarTextBox";
+            this.glossinessScalarTextBox.Size = new System.Drawing.Size(100, 20);
+            this.glossinessScalarTextBox.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 79);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Bump Scalar";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 53);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(90, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Glossiness Scalar";
+            // 
+            // materialSelectDropDown
+            // 
+            this.materialSelectDropDown.FormattingEnabled = true;
+            this.materialSelectDropDown.Location = new System.Drawing.Point(7, 20);
+            this.materialSelectDropDown.Name = "materialSelectDropDown";
+            this.materialSelectDropDown.Size = new System.Drawing.Size(361, 21);
+            this.materialSelectDropDown.TabIndex = 0;
+            this.materialSelectDropDown.SelectedIndexChanged += new System.EventHandler(this.materialSelectDropDown_SelectedIndexChanged);
             // 
             // UtilityMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(393, 327);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(396, 588);
+            this.Controls.Add(this.optionsGroup);
+            this.Controls.Add(this.updateButton);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.scene_explorer_listbox);
-            this.Controls.Add(this.connect_button);
+            this.Controls.Add(this.sceneListbox);
+            this.Controls.Add(this.refreshButton);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(412, 626);
+            this.MinimumSize = new System.Drawing.Size(412, 370);
             this.Name = "UtilityMainForm";
             this.Text = "Daz Studio 4 Bridge";
+            this.optionsGroup.ResumeLayout(false);
+            this.optionsGroup.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button connect_button;
-        private System.Windows.Forms.ListBox scene_explorer_listbox;
+        private System.Windows.Forms.Button refreshButton;
+        private System.Windows.Forms.ListBox sceneListbox;
         private CustomProgressBar progressBar1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button updateButton;
+        private System.Windows.Forms.GroupBox optionsGroup;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox materialSelectDropDown;
+        private System.Windows.Forms.TextBox bumpScalarTextBox;
+        private System.Windows.Forms.TextBox glossinessScalarTextBox;
     }
 }

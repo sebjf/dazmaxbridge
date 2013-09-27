@@ -14,39 +14,120 @@ namespace MaxManagedBridge
         public UtilityMainForm(MaxBridgeUtility parent)
         {
             InitializeComponent();
+
+            defaultSize = this.Size;
+
             this.Utility = parent;
             this.Plugin = parent.Plugin;
 
             this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
+            this.Click += new EventHandler(UtilityMainForm_Click);
+            sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
+
+            this.bumpScalarTextBox.Text = this.Plugin.BumpScalar.ToString();
+            this.glossinessScalarTextBox.Text = this.Plugin.GlossinessScalar.ToString();
+
+            this.bumpScalarTextBox.KeyPress += new KeyPressEventHandler(bumpScalarTextBox_KeyPress);
+            this.glossinessScalarTextBox.KeyPress += new KeyPressEventHandler(glossinessScalarTextBox_KeyPress);
+
+            this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterials);
+            this.materialSelectDropDown.SelectedIndex = 0;
+        }
+
+        void glossinessScalarTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 13)
+            {
+                Plugin.GlossinessScalar = GetValidatedUpdateFromTextbox(sender as TextBox, Plugin.GlossinessScalar);
+            }
+        }
+
+        void bumpScalarTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 13)
+            {
+                Plugin.BumpScalar = GetValidatedUpdateFromTextbox(sender as TextBox, Plugin.BumpScalar);
+            }
+        }
+
+        float GetValidatedUpdateFromTextbox(TextBox textbox, float original)
+        {
+            float value;
+            if (!float.TryParse(textbox.Text, out value))
+            {
+                value = original;
+            }
+
+            textbox.Text = value.ToString();
+            return value;
+        }
+
+        private Size defaultSize;
+
+        void sceneListbox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (sceneListbox.SelectedItems.Count > 0)
+            {
+                updateButton.Text = "Update Selected";
+            }
+            else
+            {
+                updateButton.Text = "Update All";
+            }
+
+        }
+
+        void UtilityMainForm_Click(object sender, EventArgs e)
+        {
+            sceneListbox.ClearSelected();
         }
 
         void Bridge_ProgressChanged(float progress, string message)
         {
             progressBar1.Value = (int)(progress * 100.0f);
             progressBar1.CustomText = message;
+            progressBar1.Refresh();
         }
 
         protected MaxBridgeUtility Utility;
         protected MaxPlugin Plugin;
 
-        private void connect_button_Click(object sender, EventArgs e)
+        private void refreshButton_Click(object sender, EventArgs e)
         {
             MySceneInformation sceneItems = Plugin.DazClient.GetSceneInformation();
-            scene_explorer_listbox.Items.Clear();
-            scene_explorer_listbox.Items.AddRange(sceneItems.TopLevelItemNames.ToArray());
+            sceneListbox.Items.Clear();
+            sceneListbox.Items.AddRange(sceneItems.TopLevelItemNames.ToArray());
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void updateButton_Click(object sender, EventArgs e)
         {
             List<string> itemNames = new List<string>();
-            foreach (var item in scene_explorer_listbox.SelectedItems)
+            foreach (var item in sceneListbox.SelectedItems)
             {
                 itemNames.Add(item.ToString());
             }
             Plugin.UpdateMeshes(itemNames);
         }
 
+        private bool optionsVisible = false;
 
+        private void optionsButton_Click(object sender, EventArgs e)
+        {
+            if (optionsVisible)
+            {
+                this.Size = defaultSize;
+            }
+            else
+            {
+                this.Size = new Size(600, defaultSize.Height);
+            }
+            optionsVisible = !optionsVisible;
+        }
+
+        private void materialSelectDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Plugin.SelectedMaterial = (sender as ComboBox).SelectedIndex;
+        }
     }
 }
 

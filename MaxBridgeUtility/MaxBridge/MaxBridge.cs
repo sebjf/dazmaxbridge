@@ -6,22 +6,22 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MsgPack;
 using MsgPack.Serialization;
+using System.Threading.Tasks;
 
 namespace MaxManagedBridge
 {
     public partial class MaxBridge
     {
-        public MyScene Scene { get; private set; }
-
         public SceneClient DazClient = new SceneClient();
 
-        public void UpdateFromDaz(IList<string> items)
+        public MyScene UpdateFromDaz(IList<string> items)
         {
-            Scene = DazClient.GetScene(items);
-            foreach (MyMesh m in Scene.Items)
+            var Scene = DazClient.GetScene(items);
+            foreach(var m in Scene.Items)
             {
                 TriangulateFaces(m);
-            }
+            };
+            return Scene;
         }
 
         public void LoadFromFile(string filename, bool triangulate = true)
@@ -30,7 +30,7 @@ namespace MaxManagedBridge
             BinaryReader reader = new BinaryReader(fs);
 
             MessagePackSerializer<MyScene> c = MessagePackSerializer.Create<MyScene>();
-            Scene = c.Unpack(fs);
+            var Scene = c.Unpack(fs);
 
             reader.Close();
 

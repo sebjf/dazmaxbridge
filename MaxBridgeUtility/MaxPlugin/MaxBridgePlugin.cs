@@ -7,6 +7,7 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
+
     /* http://code.google.com/p/snakengine/source/browse/trunk/OtherLibs/3dmax+sdk/2012/include/INodeTransformModes.h?r=5 */
     enum PivotMode : int
     {
@@ -36,7 +37,7 @@ namespace MaxManagedBridge
 
         public void UpdateMeshes(IList<string> items)
         {
-            UpdateFromDaz(items);
+            var Scene = UpdateFromDaz(items);
             foreach (MyMesh m in Scene.Items)
             {
                 UpdateMesh(m);
@@ -95,10 +96,10 @@ namespace MaxManagedBridge
 
             if (mesh.ParentName != null && mesh.ParentName != mesh.Name)
             {
-                List<IINode> parentNodes = GetMappedNodes(mesh.ParentName).ToList();
-                if (parentNodes.Count > 0)
+                var parentNode = GetMappedNodes(mesh.ParentName).FirstOrDefault();
+                if (parentNode != null)
                 {
-                    parentNodes[0].AttachChild(myNode, false);
+                    parentNode.AttachChild(myNode, false);
                 }
             }
 
