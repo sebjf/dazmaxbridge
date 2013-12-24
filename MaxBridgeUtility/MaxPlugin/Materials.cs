@@ -240,26 +240,51 @@ namespace MaxManagedBridge
             Commands.Add(string.Format("admaterial.showInViewport = {0}", showInViewport));
 
             Commands.Add(string.Format("admaterial.diffuse_weight = {0}", diffuseMapAmount));
+
+            // CompositeTextureMap help page: http://docs.autodesk.com/3DSMAX/15/ENU/MAXScript-Help/index.html?url=files/GUID-611E1342-F976-4E95-8F78-88175B329745.htm,topicNumber=d30e510982
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map = CompositeTextureMap()"));
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map.add()"));
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map.blendMode[2] = 2"));
+
+            string addDiffuseMapCommand = "";
             if (diffuseMap != null)
             {
-                Commands.Add(string.Format("admaterial.Diffuse_Color_Map = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", diffuseMap, diffuse.R * diffuseMapAmount, diffuse.G * diffuseMapAmount, diffuse.B * diffuseMapAmount));
-                Commands.Add(string.Format("admaterial.Diffuse_Color_Map.map1.coords.u_tiling = {0}; admaterial.Diffuse_Color_Map.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                addDiffuseMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", diffuseMap);
+            }
+
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, diffuse.R, diffuse.G, diffuse.B));
+
+            if (diffuseMap != null)
+            {
+                Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[1].map1.coords.u_tiling = {0}; admaterial.Diffuse_Color_Map.mapList[1].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.map1.filtering = 2;"));
+                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[1].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[1].map1.filtering = 2;"));
                 }
             }
-            else
+
+            string addAmbientMapCommand = "";
+            if (ambientMap != null)
             {
-                Commands.Add(string.Format("admaterial.diffuse = color {0} {1} {2};", diffuse.R * diffuseMapAmount, diffuse.G * diffuseMapAmount, diffuse.B * diffuseMapAmount));
+                addAmbientMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", ambientMap);
             }
+
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, ambient.R * ambientMapAmount, ambient.G * ambientMapAmount, ambient.B * ambientMapAmount));
 
             if (ambientMap != null)
             {
-                MessageBox.Show("Warning: MentalRay Arch&Design Material does not have an Ambient Map equivalent");
+                Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[2].map1.coords.u_tiling = {0}; admaterial.Diffuse_Color_Map.mapList[2].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[2].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mapList[2].map1.filtering = 2;"));
+                }
             }
+
+            Commands.Add(string.Format("admaterial.Diffuse_Color_Map.mask[2] = admaterial.Diffuse_Color_Map.mapList[1]"));
 
             if (bumpMap != null)
             {
