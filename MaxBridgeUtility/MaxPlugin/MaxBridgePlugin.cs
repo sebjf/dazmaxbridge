@@ -29,6 +29,13 @@ namespace MaxManagedBridge
 
     public partial class MaxPlugin : MaxBridge
     {
+        protected IGlobal globalInterface = null;
+
+        public MaxPlugin(IGlobal globalinterface)
+        {
+            this.globalInterface = globalinterface;
+        }
+
         public IEnumerable<IINode> GetMappedNodes(string Name)
         {
             //This is our mapping function for now -> iterate over every node in the scene and return those with the correct name!
@@ -37,6 +44,7 @@ namespace MaxManagedBridge
 
         public void UpdateMeshes(IList<string> items)
         {
+
             var Scene = UpdateFromDaz(items);
             foreach (MyMesh m in Scene.Items)
             {
@@ -47,8 +55,8 @@ namespace MaxManagedBridge
         public bool UpdateMesh(MyMesh myMesh)
         {
             //Autodesk.Max.IInterface.DisableSceneRedraw()
-            GlobalInterface.Instance.COREInterface.DisableSceneRedraw();
-            GlobalInterface.Instance.COREInterface.EnableUndo(false);
+            globalInterface.COREInterface.DisableSceneRedraw();
+            globalInterface.COREInterface.EnableUndo(false);
 
             UpdateProgress(0.0f, "Getting mapped items...");
 
@@ -75,21 +83,21 @@ namespace MaxManagedBridge
 
             UpdateProgress(1.0f, "Done.");
 
-            GlobalInterface.Instance.COREInterface.EnableUndo(true);
-            GlobalInterface.Instance.COREInterface.EnableSceneRedraw();
+            globalInterface.COREInterface.EnableUndo(true);
+            globalInterface.COREInterface.EnableSceneRedraw();
 
             return true;
         }
 
         public IINode CreateMeshNode(MyMesh mesh)
         {
-            ITriObject meshObject = GlobalInterface.Instance.CreateNewTriObject();
-            IINode myNode = GlobalInterface.Instance.COREInterface.CreateObjectNode(meshObject);
+            ITriObject meshObject = globalInterface.CreateNewTriObject();
+            IINode myNode = globalInterface.COREInterface.CreateObjectNode(meshObject);
             myNode.Name = mesh.Name;
 
             myNode.Rotate(0, myNode.GetObjectTM(0, 
-                GlobalInterface.Instance.Interval.Create()), 
-                GlobalInterface.Instance.AngAxis.Create(1.0f, 0.0f, 0.0f, (float)DegreeToRadian(-90.0f)), 
+                globalInterface.Interval.Create()), 
+                globalInterface.AngAxis.Create(1.0f, 0.0f, 0.0f, (float)DegreeToRadian(-90.0f)), 
                 true, true, 
                 (int)PivotMode.PIV_OBJECT_ONLY, 
                 true);

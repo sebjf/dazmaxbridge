@@ -34,6 +34,8 @@ namespace MaxManagedBridge
             this.updateButton = new System.Windows.Forms.Button();
             this.progressBar1 = new ProgressBarSample.CustomProgressBar();
             this.optionsGroup = new System.Windows.Forms.GroupBox();
+            this.getMaterialProperties_button = new System.Windows.Forms.Button();
+            this.writeDebugCheckbox = new System.Windows.Forms.CheckBox();
             this.bumpScalarTextBox = new System.Windows.Forms.TextBox();
             this.glossinessScalarTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -84,6 +86,8 @@ namespace MaxManagedBridge
             // 
             // optionsGroup
             // 
+            this.optionsGroup.Controls.Add(this.getMaterialProperties_button);
+            this.optionsGroup.Controls.Add(this.writeDebugCheckbox);
             this.optionsGroup.Controls.Add(this.bumpScalarTextBox);
             this.optionsGroup.Controls.Add(this.glossinessScalarTextBox);
             this.optionsGroup.Controls.Add(this.label2);
@@ -95,6 +99,27 @@ namespace MaxManagedBridge
             this.optionsGroup.TabIndex = 4;
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Options";
+            // 
+            // getMaterialProperties_button
+            // 
+            this.getMaterialProperties_button.ForeColor = System.Drawing.Color.Black;
+            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 129);
+            this.getMaterialProperties_button.Name = "getMaterialProperties_button";
+            this.getMaterialProperties_button.Size = new System.Drawing.Size(140, 23);
+            this.getMaterialProperties_button.TabIndex = 8;
+            this.getMaterialProperties_button.Text = "View Material Properties";
+            this.getMaterialProperties_button.UseVisualStyleBackColor = true;
+            this.getMaterialProperties_button.Click += new System.EventHandler(this.getMaterialProperties_button_Click);
+            // 
+            // writeDebugCheckbox
+            // 
+            this.writeDebugCheckbox.AutoSize = true;
+            this.writeDebugCheckbox.Location = new System.Drawing.Point(10, 105);
+            this.writeDebugCheckbox.Name = "writeDebugCheckbox";
+            this.writeDebugCheckbox.Size = new System.Drawing.Size(107, 17);
+            this.writeDebugCheckbox.TabIndex = 7;
+            this.writeDebugCheckbox.Text = "Write Debug Log";
+            this.writeDebugCheckbox.UseVisualStyleBackColor = true;
             // 
             // bumpScalarTextBox
             // 
@@ -170,5 +195,7 @@ namespace MaxManagedBridge
         private System.Windows.Forms.ComboBox materialSelectDropDown;
         private System.Windows.Forms.TextBox bumpScalarTextBox;
         private System.Windows.Forms.TextBox glossinessScalarTextBox;
+        private System.Windows.Forms.CheckBox writeDebugCheckbox;
+        private System.Windows.Forms.Button getMaterialProperties_button;
     }
 }

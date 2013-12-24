@@ -6,7 +6,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MsgPack;
 using MsgPack.Serialization;
-using System.Threading.Tasks;
 
 namespace MaxManagedBridge
 {

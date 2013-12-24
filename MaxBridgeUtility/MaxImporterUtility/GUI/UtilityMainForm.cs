@@ -99,14 +99,22 @@ namespace MaxManagedBridge
             sceneListbox.Items.AddRange(sceneItems.TopLevelItemNames.ToArray());
         }
 
+        private IList<string> selectedItemNames
+        {
+            get
+            {
+                List<string> itemNames = new List<string>();
+                foreach (var item in sceneListbox.SelectedItems)
+                {
+                    itemNames.Add(item.ToString());
+                }
+                return itemNames;
+            }
+        }
+
         private void updateButton_Click(object sender, EventArgs e)
         {
-            List<string> itemNames = new List<string>();
-            foreach (var item in sceneListbox.SelectedItems)
-            {
-                itemNames.Add(item.ToString());
-            }
-            Plugin.UpdateMeshes(itemNames);
+            Plugin.UpdateMeshes(selectedItemNames);
         }
 
         private bool optionsVisible = false;
@@ -128,6 +136,18 @@ namespace MaxManagedBridge
         {
             Plugin.SelectedMaterial = (sender as ComboBox).SelectedIndex;
         }
+
+        private void getMaterialProperties_button_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "TXT|*.txt";
+            DialogResult result = dlg.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                System.IO.File.WriteAllText(dlg.FileName, Plugin.PrintMaterialProperties(selectedItemNames));
+            }
+        }
+
     }
 }
 

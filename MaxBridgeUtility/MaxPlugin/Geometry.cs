@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Max;
-using System.Threading.Tasks;
 
 namespace MaxManagedBridge
 {

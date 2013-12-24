@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\SceneClient.cs" />
+    <Compile Include="Logger\Logger.cs" />
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
     <Compile Include="MaxImporterUtility\Descriptor.cs" />

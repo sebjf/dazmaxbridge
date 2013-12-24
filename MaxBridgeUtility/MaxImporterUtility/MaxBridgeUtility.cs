@@ -28,7 +28,7 @@ namespace MaxManagedBridge
         public MaxBridgeUtility()
         {
             Global = Autodesk.Max.GlobalInterface.Instance;
-            Plugin = new MaxPlugin();
+            Plugin = new MaxPlugin(Global);
             GUI = new UtilityMainForm(this);
             GUI.ShowModeless();
         }
@@ -36,6 +36,7 @@ namespace MaxManagedBridge
         protected IInterface Interface;
         protected IIUtil UtilityInterface;
         protected IGlobal Global;
+        protected ILogSys Log;
 
         protected UtilityMainForm GUI;
         public    MaxPlugin Plugin; 
@@ -44,11 +45,13 @@ namespace MaxManagedBridge
         {
             Interface = ip;
             UtilityInterface = iu;
+            Log = ip.Log;
+//          ip.PushPrompt();
         }
 
         public override void EndEditParams(IInterface ip, IIUtil iu)
         {
-            ip.PopPrompt();
+//            ip.PopPrompt();
         }
 
         public override void Dispose()
