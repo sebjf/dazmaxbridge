@@ -16,10 +16,16 @@ namespace MaxManagedBridge
         public MyScene UpdateFromDaz(IList<string> items)
         {
             var Scene = DazClient.GetScene(items);
+
+            Log.Add("[m6] Recieved scene from Daz. Triangulating meshes.");
+
             foreach(var m in Scene.Items)
             {
                 TriangulateFaces(m);
-            };
+            }
+
+            Log.Add("[m7] Triangulation complete.");
+
             return Scene;
         }
 

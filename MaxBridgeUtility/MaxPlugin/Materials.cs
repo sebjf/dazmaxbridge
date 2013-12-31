@@ -228,7 +228,9 @@ namespace MaxManagedBridge
             Name = "mrArchDesignMaxScriptMaterial";
             DisableFiltering = true;
         }
-        
+
+        public bool EnableAO = true;
+
         private float BumpModifier = 0.5f; //this is to bring it in line with BumpScalar above, not to control it.
 
         public override string MakeScript()
@@ -331,6 +333,14 @@ namespace MaxManagedBridge
             else
             {
                 Commands.Add(string.Format("admaterial.Reflection_Color = (color {0} {1} {2})", specular.R, specular.G, specular.B));
+            }
+
+            if(EnableAO){
+                Commands.Add("admaterial.opts_ao_on = true");
+                Commands.Add("admaterial.opts_ao_use_global_ambient = true");
+                Commands.Add("admaterial.opts_ao_exact = true");
+                Commands.Add("admaterial.opts_ao_samples = 128");
+                Commands.Add("admaterial.opts_ao_distance = 40");
             }
 
             Commands.Add("(getHandleByAnim admaterial) as String");

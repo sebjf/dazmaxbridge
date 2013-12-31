@@ -44,20 +44,55 @@ namespace MaxManagedBridge
 
         public void UpdateMeshes(IList<string> items)
         {
+            Log.Add("[m0] Updating meshes from Daz.");
 
-            var Scene = UpdateFromDaz(items);
-            foreach (MyMesh m in Scene.Items)
+            try
             {
-                UpdateMesh(m);
+                var Scene = UpdateFromDaz(items);
+                UpdateMeshes(Scene.Items);
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show("Caught exception in UpdateMeshes(): " + e.Message + e.TargetSite);
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show("Caught unknown exception in UpdateMeshes()");
             }
         }
 
-        public bool UpdateMesh(MyMesh myMesh)
+        public void UpdateMeshes(IEnumerable<MyMesh> myMeshes)
         {
+            Log.Add("[m2] Disabling undo and redraw");
+
             //Autodesk.Max.IInterface.DisableSceneRedraw()
             globalInterface.COREInterface.DisableSceneRedraw();
             globalInterface.COREInterface.EnableUndo(false);
 
+            foreach (var m in myMeshes)
+            {
+                Log.Add("[m3] Updating mesh...");
+
+                UpdateMeshData(m);
+            }
+
+            Log.Add("[m4] Enabling undo and redraw");
+
+            globalInterface.COREInterface.EnableUndo(true);
+            globalInterface.COREInterface.EnableSceneRedraw();
+        }
+
+        //public void AddToSelectionSet(string selectionSetName, IINode node)
+        //{
+        //    ITab<IINode> selectionSetNodes = globalInterface.Tab.Create<IINode>();
+        //    selectionSetNodes.Append(1, node., 0);
+        //    globalInterface.INamedSelectionSetManager.Instance.GetNamedSelSetList(selectionSetNodes,  globalInterface.INamedSelectionSetManager.Instance.get
+
+        //    globalInterface.INamedSelectionSetManager.Instance.ReplaceNamedSelSet(
+        //}
+
+        public void UpdateMeshData(MyMesh myMesh)
+        {
             UpdateProgress(0.0f, "Getting mapped items...");
 
             IList<IINode> mappedNodes = GetMappedNodes(myMesh.Name).ToList();
@@ -82,11 +117,6 @@ namespace MaxManagedBridge
             }
 
             UpdateProgress(1.0f, "Done.");
-
-            globalInterface.COREInterface.EnableUndo(true);
-            globalInterface.COREInterface.EnableSceneRedraw();
-
-            return true;
         }
 
         public IINode CreateMeshNode(MyMesh mesh)

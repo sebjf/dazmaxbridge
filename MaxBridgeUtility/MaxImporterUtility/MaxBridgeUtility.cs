@@ -36,7 +36,7 @@ namespace MaxManagedBridge
         protected IInterface Interface;
         protected IIUtil UtilityInterface;
         protected IGlobal Global;
-        protected ILogSys Log;
+        protected ILogSys LogSys;
 
         protected UtilityMainForm GUI;
         public    MaxPlugin Plugin; 
@@ -45,7 +45,9 @@ namespace MaxManagedBridge
         {
             Interface = ip;
             UtilityInterface = iu;
-            Log = ip.Log;
+            LogSys = ip.Log;
+            Log.logger = LogSys;
+            Log.EnableLog = true;
 //          ip.PushPrompt();
         }
 
