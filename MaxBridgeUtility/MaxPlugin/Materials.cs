@@ -300,30 +300,24 @@ namespace MaxManagedBridge
                 }
             }
 
-            //For the case where daz has cut the entire object out of view (e.g. when using materials to remove part of clothing items). Arch&Design's Transparency does not
-            //make it transparent to all effects.
-            //Perhaps we should modify the script to combine any map and the opacity value into rgb_multiply all the time and leave transparency alone? Until then...
-            if (opacityMapAmount == 0)
+            string addOpacityMapCommand = "";
+            if (opacityMap != null)
             {
-                Commands.Add(string.Format("admaterial.cutout_map = RGB_Multiply color1:(color 0 0 0)"));
+                addOpacityMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", opacityMap);
             }
-            else
+
+            Commands.Add(string.Format("admaterial.cutout_map = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapAmount, opacityMapAmount, opacityMapAmount));
+
+            if (opacityMap != null)
             {
-                Commands.Add(string.Format("admaterial.Transparency = {0}", 1 - opacityMapAmount));
+                Commands.Add(string.Format("admaterial.cutout_map.map1.coords.u_tiling = {0}; admaterial.cutout_map.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
-                if (opacityMap != null)
+                if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("admaterial.cutout_map = (bitmapTexture filename:\"{0}\")", opacityMap));
-                    Commands.Add(string.Format("admaterial.cutout_map.coords.u_tiling = {0}; admaterial.cutout_map.coords.v_tiling = {1};", u_tiling, v_tiling));
-
-                    if (DisableFiltering)
-                    {
-                        Commands.Add(string.Format("admaterial.cutout_map.coords.blur = 0.01;"));
-                        Commands.Add(string.Format("admaterial.cutout_map.filtering = 2;"));
-                    }
+                    Commands.Add(string.Format("admaterial.cutout_map.map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("admaterial.cutout_map.map1.filtering = 2;"));
                 }
             }
-
 
             Commands.Add(string.Format("admaterial.Reflectivity = {0}", specularLevel));
             Commands.Add(string.Format("admaterial.Reflection_Glossiness = {0}", glossiness));
@@ -348,8 +342,8 @@ namespace MaxManagedBridge
                 Commands.Add("admaterial.opts_ao_on = true");
                 Commands.Add("admaterial.opts_ao_use_global_ambient = true");
                 Commands.Add("admaterial.opts_ao_exact = true");
-                Commands.Add("admaterial.opts_ao_samples = 128");
-                Commands.Add("admaterial.opts_ao_distance = 40");
+                Commands.Add("admaterial.opts_ao_samples = 48");
+                Commands.Add("admaterial.opts_ao_distance = 350");
             }
 
             Commands.Add("(getHandleByAnim admaterial) as String");

@@ -7,12 +7,43 @@
 TCHAR sharedMemoryName[] = TEXT("Local\\DazMaxBridgeSharedMemory");
 TCHAR namedPipeName[] = TEXT("DazMaxBridgePipe");
 
+int CountOtherPipes()
+{
+	WIN32_FIND_DATA FindFileData;
+    HANDLE hFind;
+	memset(&FindFileData, 0, sizeof(FindFileData));
+
+	const char* filter = "//./pipe/*";
+
+	hFind = FindFirstFileA(filter, &FindFileData);
+
+	int count = 0;
+
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+        {
+			if(strstr(FindFileData.cFileName, namedPipeName) != NULL){
+				count++;
+			}
+        }
+        while (FindNextFile(hFind, &FindFileData));
+
+		FindClose(hFind);
+	}
+	
+	return count;
+}
+
 void MySceneServer::startServer()
 {
-	dazInstanceName = "Daz Instance";
+	int instanceNumber = CountOtherPipes() + 1;
+	dazInstanceName = QString("Daz Instance #%1").arg(QString::number(instanceNumber)).toLocal8Bit().data();
+
+	QString uniquePipeName = QString(namedPipeName) + "_" + QUuid::createUuid().toString();
 
 	m_server = new QLocalServer(this);
-	if(!m_server->listen(namedPipeName)){
+	if(!m_server->listen(uniquePipeName)){
 		ShowMessage("Unable to created named pipe.");
 	}
 
@@ -112,7 +143,8 @@ Run this line of DazScript to execute this action from the GUI:
 
 void 	MySceneServer::executeAction()
 {
-	ShowMessage(QString::fromStdString("Daz Instance name is: " + dazInstanceName));
+	string message = "Daz Instance name is: " + dazInstanceName;
+	ShowMessage(message.c_str());
 }
 
 void 	MySceneServer::toggleAction(bool onOff)

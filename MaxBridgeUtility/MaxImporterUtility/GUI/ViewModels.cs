@@ -21,7 +21,7 @@ namespace MaxManagedBridge
             this.SceneView = sceneview;
             this.ItemName = name;
 
-            Label = string.Format("{0} : {1}", sceneview.Client.DazInstanceName, name);
+            Label = string.Format("{0}: {1}", sceneview.Client.DazInstanceName, name);
         }
     }
 
