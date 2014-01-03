@@ -1,12 +1,16 @@
 #include "SceneServer.h"
 #include <Winuser.h>
 #include <tchar.h>
+#include <Windows.h>
+#include <Psapi.h>
 
 TCHAR sharedMemoryName[] = TEXT("Local\\DazMaxBridgeSharedMemory");
 TCHAR namedPipeName[] = TEXT("DazMaxBridgePipe");
 
 void MySceneServer::startServer()
 {
+	dazInstanceName = "Daz Instance";
+
 	m_server = new QLocalServer(this);
 	if(!m_server->listen(namedPipeName)){
 		ShowMessage("Unable to created named pipe.");
@@ -50,6 +54,12 @@ void MySceneServer::messageReceived()
 		f_getSceneInformation();
 		return;
 	}
+
+	if(message == "getInstanceName()")
+	{
+		f_getInstanceName();
+		return;
+	}
 }
 
 void MySceneServer::f_getScene(vector<string> items)
@@ -83,13 +93,26 @@ void MySceneServer::f_getSceneInformation()
 	m_socket->flush();
 }
 
+void MySceneServer::f_getInstanceName()
+{
+	msgpack::sbuffer sbuf;
+	msgpack::pack(sbuf, dazInstanceName);
+	m_socket->write(sbuf.data(), sbuf.size());
+	m_socket->flush();
+}
+
 MySceneServer::~MySceneServer()
 {
 }
 
+/*
+Run this line of DazScript to execute this action from the GUI:
+	MainWindow.getActionMgr().findAction("MySceneServer").executeAction()
+*/
+
 void 	MySceneServer::executeAction()
 {
-	ShowMessage("MySceneServer action executed.");
+	ShowMessage(QString::fromStdString("Daz Instance name is: " + dazInstanceName));
 }
 
 void 	MySceneServer::toggleAction(bool onOff)

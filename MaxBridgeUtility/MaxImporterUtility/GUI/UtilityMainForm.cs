@@ -23,6 +23,7 @@ namespace MaxManagedBridge
             this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
             this.Click += new EventHandler(UtilityMainForm_Click);
             sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
+            sceneListbox.DisplayMember = "Label";
 
             this.bumpScalarTextBox.Text = this.Plugin.BumpScalar.ToString();
             this.glossinessScalarTextBox.Text = this.Plugin.GlossinessScalar.ToString();
@@ -75,6 +76,21 @@ namespace MaxManagedBridge
                 updateButton.Text = "Update All";
             }
 
+            UpdateAllSelectedItems();
+        }
+
+        void UpdateAllSelectedItems()
+        {
+            foreach(MySceneViewModel sceneview in scenesView)
+            {
+                sceneview.SelectedItems.Clear();
+            }
+
+            foreach (var o in sceneListbox.SelectedItems)
+            {
+                MySceneItemViewModel item = o as MySceneItemViewModel;
+                item.SceneView.SelectedItems.Add(item.ItemName);
+            }
         }
 
         void UtilityMainForm_Click(object sender, EventArgs e)
@@ -92,29 +108,38 @@ namespace MaxManagedBridge
         protected MaxBridgeUtility Utility;
         protected MaxPlugin Plugin;
 
+        protected List<MySceneViewModel> scenesView = new List<MySceneViewModel>();
+
         private void refreshButton_Click(object sender, EventArgs e)
         {
-            MySceneInformation sceneItems = Plugin.DazClient.GetSceneInformation();
+            scenesView.Clear();
             sceneListbox.Items.Clear();
-            sceneListbox.Items.AddRange(sceneItems.TopLevelItemNames.ToArray());
-        }
 
-        private IList<string> selectedItemNames
-        {
-            get
+            Plugin.DazClientManager.FindAllInstances();
+            foreach (var client in Plugin.DazClientManager.Instances)
             {
-                List<string> itemNames = new List<string>();
-                foreach (var item in sceneListbox.SelectedItems)
-                {
-                    itemNames.Add(item.ToString());
-                }
-                return itemNames;
+                MySceneViewModel sceneView = new MySceneViewModel(client);
+                scenesView.Add(sceneView);
+                sceneListbox.Items.AddRange(sceneView.Items.ToArray());
             }
         }
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            Plugin.UpdateMeshes(selectedItemNames);
+            foreach (var sceneview in scenesView)
+            {
+                if (sceneListbox.SelectedItems.Count > 0)
+                {
+                    if (sceneview.SelectedItems.Count > 0)
+                    {
+                        Plugin.UpdateMeshes(sceneview.Client.GetScene(sceneview.SelectedItems));
+                    }
+                }
+                else
+                {
+                    Plugin.UpdateMeshes(sceneview.Client.GetScene(new List<string>()));
+                }
+            }
         }
 
         private bool optionsVisible = false;
@@ -139,12 +164,15 @@ namespace MaxManagedBridge
 
         private void getMaterialProperties_button_Click(object sender, EventArgs e)
         {
+            
+
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "TXT|*.txt";
             DialogResult result = dlg.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-                System.IO.File.WriteAllText(dlg.FileName, Plugin.PrintMaterialProperties(selectedItemNames));
+                //System.IO.File.WriteAllText(dlg.FileName, Plugin.PrintMaterialProperties(selectedItemNames));
+                throw new NotImplementedException();
             }
         }
 

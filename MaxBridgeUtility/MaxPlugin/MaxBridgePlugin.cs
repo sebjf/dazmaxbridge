@@ -42,14 +42,13 @@ namespace MaxManagedBridge
             return (SceneNodes.Where(n => (n.ObjectRef is ITriObject) && (n.Name == Name)));
         }
 
-        public void UpdateMeshes(IList<string> items)
+        public void UpdateMeshes(MyScene scene)
         {
             Log.Add("[m0] Updating meshes from Daz.");
 
             try
             {
-                var Scene = UpdateFromDaz(items);
-                UpdateMeshes(Scene.Items);
+                UpdateMeshes(scene.Items);
             }
             catch (Exception e)
             {

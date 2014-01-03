@@ -32,11 +32,10 @@ namespace MaxManagedBridge
             return maxMaterial;
         }
 
-        public string PrintMaterialProperties(IList<string> items)
+        public string PrintMaterialProperties(MyScene scene)
         {
             List<String> lines = new List<string>();
-            var Scene = UpdateFromDaz(items);
-            foreach (MyMesh m in Scene.Items)
+            foreach (MyMesh m in scene.Items)
             {
                 lines.Add("-------------------------------------------");
                 lines.Add("Mesh Name: " + m.Name);
@@ -301,17 +300,27 @@ namespace MaxManagedBridge
                 }
             }
 
-            Commands.Add(string.Format("admaterial.Transparency = {0}", 1 - opacityMapAmount ));
-
-            if (opacityMap != null)
+            //For the case where daz has cut the entire object out of view (e.g. when using materials to remove part of clothing items). Arch&Design's Transparency does not
+            //make it transparent to all effects.
+            //Perhaps we should modify the script to combine any map and the opacity value into rgb_multiply all the time and leave transparency alone? Until then...
+            if (opacityMapAmount == 0)
             {
-                Commands.Add(string.Format("admaterial.cutout_map = (bitmapTexture filename:\"{0}\")", opacityMap));
-                Commands.Add(string.Format("admaterial.cutout_map.coords.u_tiling = {0}; admaterial.cutout_map.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("admaterial.cutout_map = RGB_Multiply color1:(color 0 0 0)"));
+            }
+            else
+            {
+                Commands.Add(string.Format("admaterial.Transparency = {0}", 1 - opacityMapAmount));
 
-                if (DisableFiltering)
+                if (opacityMap != null)
                 {
-                    Commands.Add(string.Format("admaterial.cutout_map.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("admaterial.cutout_map.filtering = 2;"));
+                    Commands.Add(string.Format("admaterial.cutout_map = (bitmapTexture filename:\"{0}\")", opacityMap));
+                    Commands.Add(string.Format("admaterial.cutout_map.coords.u_tiling = {0}; admaterial.cutout_map.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                    if (DisableFiltering)
+                    {
+                        Commands.Add(string.Format("admaterial.cutout_map.coords.blur = 0.01;"));
+                        Commands.Add(string.Format("admaterial.cutout_map.filtering = 2;"));
+                    }
                 }
             }
 

@@ -73,6 +73,7 @@
     <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.Designer.cs">
       <DependentUpon>UtilityMainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MaxImporterUtility\GUI\ViewModels.cs" />
     <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
     <Compile Include="MaxPlugin\PropertyAccessors.cs" />
     <Compile Include="MaxPlugin\MaxSceneExploration.cs" />

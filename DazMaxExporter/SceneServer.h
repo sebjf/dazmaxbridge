@@ -31,7 +31,10 @@ private:
 
 	void	f_getScene(vector<string>);
 	void	f_getSceneInformation();
+	void	f_getInstanceName();
 
 	MyDazExporter	myDazExporter;
+
+	string	dazInstanceName;
 
 };

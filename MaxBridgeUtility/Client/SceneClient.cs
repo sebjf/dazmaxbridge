@@ -13,31 +13,73 @@ using System.IO.Pipes;
 
 namespace MaxManagedBridge
 {
+    public class ClientManager
+    {
+        protected const string filter = @"\\.\pipe\";
+
+        public ClientManager()
+        {
+            Instances = new List<SceneClient>();
+        }
+
+        public void FindAllInstances()
+        {
+            Instances.Clear();
+            String[] listOfPipes = System.IO.Directory.GetFiles(filter);
+            foreach (var pipe in listOfPipes)
+            {
+                if (pipe.Contains("DazMaxBridge"))
+                {
+                    var client = new SceneClient(pipe.Substring(filter.Length));
+                    if (client.Reconnect())
+                    {
+                        Instances.Add(client);
+                    }
+                }
+            }
+        }
+
+        public IList<SceneClient> Instances { get; protected set; }
+    }
+
     public class SceneClient
     {
-        protected MemoryMappedFile sharedMemory;
         protected NamedPipeClientStream namedPipe;
         protected StreamReader namedPipeReader;
         protected StreamWriter namedPipeWriter;
 
-        protected bool EnsureConnectionToDaz()
-        {
-            if (namedPipe == null || !namedPipe.IsConnected)
-            {
-                namedPipe = new NamedPipeClientStream("DazMaxBridgePipe");
-                try
-                {
-                    namedPipe.Connect(2000);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Unable to find Daz! Is it running?");
-                    return false;
-                }
+        public string DazInstanceName { get; protected set; }
 
-                namedPipeReader = new StreamReader(namedPipe);
-                namedPipeWriter = new StreamWriter(namedPipe);
+        public SceneClient(string pipeName)
+        {
+            namedPipe = new NamedPipeClientStream(pipeName);
+        }
+
+        public bool IsConnected()
+        {
+            return (namedPipe != null && namedPipe.IsConnected);
+        }
+
+        public bool Reconnect()
+        {
+            if (IsConnected())
+            {
+                return true;
             }
+
+            try
+            {
+                namedPipe.Connect(2000);
+            }
+            catch
+            {
+                return false;
+            }
+
+            namedPipeReader = new StreamReader(namedPipe);
+            namedPipeWriter = new StreamWriter(namedPipe);
+
+            DazInstanceName = GetItem<string>("getInstanceName()");
 
             return true;
         }
@@ -49,7 +91,7 @@ namespace MaxManagedBridge
 
         protected T GetItem<T>(IEnumerable<string> commands)
         {
-            if (!EnsureConnectionToDaz())
+            if(!Reconnect())
             {
                 return default(T);
             }
