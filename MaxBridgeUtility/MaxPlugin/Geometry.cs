@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Max;
+using System.Runtime.InteropServices;
 
 namespace MaxManagedBridge
 {
@@ -18,15 +19,13 @@ namespace MaxManagedBridge
                 countChanged = true;
             }
 
-            for (int i = 0; i < myMesh.NumVertices; i++) 
-            { 
-                maxMesh.SetVert(i, myMesh.Vertices[(i * 3) + 0], myMesh.Vertices[(i * 3) + 1], myMesh.Vertices[(i * 3) + 2]); 
-            };
+            IPoint3 p3 = maxMesh.GetVertPtr(0);
+            Marshal.Copy(myMesh.Vertices.ToArray(), 0, p3.Handle, myMesh.NumVertices * 3);
 
             return countChanged;
         }
 
-        public bool SetTextureVertices(IMesh maxMesh, MyMesh myMesh)
+        unsafe public bool SetTextureVertices(IMesh maxMesh, MyMesh myMesh)
         {
             bool countChanged = false;
 
@@ -36,24 +35,63 @@ namespace MaxManagedBridge
                 countChanged = true;
             }
 
+            IntPtr p3h = maxMesh.GetTVertPtr(0).Handle;
+            float* p3 = (float*)p3h.ToPointer();
+
             int elementsPerVertex = myMesh.TextureCoordinates.Count / myMesh.NumTextureCoordinates;
             switch (elementsPerVertex)
             {
                 case 2:
-                    for (int i = 0; i < myMesh.NumTextureCoordinates; i++) 
+                    for (int i = 0; i < myMesh.NumTextureCoordinates; i++)
                     {
-                        maxMesh.SetTVert(i, myMesh.TextureCoordinates[(i * 2) + 0], myMesh.TextureCoordinates[(i * 2) + 1], 0.0f);
+                        p3[(i * 3) + 0] = myMesh.TextureCoordinates[(i * 2) + 0];
+                        p3[(i * 3) + 1] = myMesh.TextureCoordinates[(i * 2) + 1];
+                        p3[(i * 3) + 2] = 0.0f;
                     };
                     break;
                 case 3:
-                    for (int i = 0; i < myMesh.NumTextureCoordinates; i++) 
-                    {
-                        maxMesh.SetTVert(i, myMesh.TextureCoordinates[(i * 3) + 0], myMesh.TextureCoordinates[(i * 3) + 1], myMesh.TextureCoordinates[(i * 3) + 2]);
-                    };
+                    Marshal.Copy(myMesh.TextureCoordinates.ToArray(), 0, p3h, myMesh.NumTextureCoordinates * 3);
                     break;
                 default:
                     throw new NotImplementedException(("Unable to handle texture coordinates with " + elementsPerVertex + " coordinates."));
             }
+
+            return countChanged;
+        }
+
+       unsafe struct MaxFace
+        {
+            fixed UInt32 v[3];
+            UInt32 smGroup;
+            UInt32 flags;
+        }
+
+        unsafe public bool SetFaces2(IMesh maxMesh, MyMesh myMesh)
+        {
+            bool countChanged = false;
+
+            TriangulateFaces(myMesh);
+
+            if (maxMesh.NumFaces != myMesh.TriangulatedFaces.Length)
+            {
+                maxMesh.SetNumFaces(myMesh.TriangulatedFaces.Length, false, false);
+                maxMesh.SetNumTVFaces(myMesh.TriangulatedFaces.Length, false, 0);
+                countChanged = true;
+            }
+
+            IFace referenceface = globalInterface.Face.Create();
+            referenceface.SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
+
+            MaxFace template = new MaxFace();
+
+            for (int i = 0; i < myMesh.TriangulatedFaces.Length; i++)
+            {
+                Face myFace = myMesh.TriangulatedFaces[i];
+                maxMesh.Faces[i].SetVerts(myFace.PositionVertex1, myFace.PositionVertex2, myFace.PositionVertex3);
+                maxMesh.TvFace[i].SetTVerts(myFace.TextureVertex1, myFace.TextureVertex2, myFace.TextureVertex3);
+                maxMesh.Faces[i].MatID = (ushort)myFace.MaterialId;
+                maxMesh.Faces[i].SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
+            };
 
             return countChanged;
         }
@@ -106,6 +144,8 @@ namespace MaxManagedBridge
 
             maxMesh.InvalidateGeomCache();
             maxMesh.InvalidateTopologyCache();
+
+            
         }
         
     }
