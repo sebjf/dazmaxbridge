@@ -28,7 +28,14 @@ namespace MaxManagedBridge
         public MaxBridgeUtility()
         {
             Global = Autodesk.Max.GlobalInterface.Instance;
+            Log.logger = Global.COREInterface.Log;
+            Log.EnableLog = true;
+            Log.Add("[m] Starting DazMaxBridge.");
+
             Plugin = new MaxPlugin(Global);
+
+            Log.Add("[m] Starting UI.");
+
             GUI = new UtilityMainForm(this);
             GUI.ShowModeless();
         }
@@ -36,7 +43,6 @@ namespace MaxManagedBridge
         protected IInterface Interface;
         protected IIUtil UtilityInterface;
         protected IGlobal Global;
-        protected ILogSys LogSys;
 
         protected UtilityMainForm GUI;
         public    MaxPlugin Plugin; 
@@ -45,10 +51,6 @@ namespace MaxManagedBridge
         {
             Interface = ip;
             UtilityInterface = iu;
-            LogSys = ip.Log;
-            Log.logger = LogSys;
-            Log.EnableLog = true;
-//          ip.PushPrompt();
         }
 
         public override void EndEditParams(IInterface ip, IIUtil iu)

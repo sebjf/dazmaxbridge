@@ -20,7 +20,9 @@ namespace MaxManagedBridge
             this.Utility = parent;
             this.Plugin = parent.Plugin;
 
-            this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
+            //this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
+            this.Plugin.ProgressCallback = Bridge_ProgressChanged;
+
             this.Click += new EventHandler(UtilityMainForm_Click);
             sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
             sceneListbox.DisplayMember = "Label";
@@ -112,6 +114,8 @@ namespace MaxManagedBridge
 
         private void refreshButton_Click(object sender, EventArgs e)
         {
+            Log.Add("[m] Refresh list clicked");
+
             scenesView.Clear();
             sceneListbox.Items.Clear();
 
@@ -126,6 +130,8 @@ namespace MaxManagedBridge
 
         private void updateButton_Click(object sender, EventArgs e)
         {
+            Log.Add("[m] Update meshes clicked");
+
             foreach (var sceneview in scenesView)
             {
                 if (sceneListbox.SelectedItems.Count > 0)

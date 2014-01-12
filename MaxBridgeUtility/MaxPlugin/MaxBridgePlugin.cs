@@ -120,12 +120,20 @@ namespace MaxManagedBridge
 
         public IINode CreateMeshNode(MyMesh mesh)
         {
+            IMatrix3 identity = globalInterface.Matrix3.Create();
+            identity.IdentityMatrix();
+
             ITriObject meshObject = globalInterface.CreateNewTriObject();
             IINode myNode = globalInterface.COREInterface.CreateObjectNode(meshObject);
             myNode.Name = mesh.Name;
 
-            myNode.Rotate(0, myNode.GetObjectTM(0, 
-                globalInterface.Interval.Create()), 
+            /* In this section we reset the transform of the node (as it may have been initialised with a rotation depending on what viewport was selected)
+             * and rotate it with OBJECT ONLY flag set, which will set the object-offset transform which sits been the vertex position data and WSM */
+
+            myNode.SetNodeTM(0, identity);
+
+            myNode.Rotate(0, 
+                identity,
                 globalInterface.AngAxis.Create(1.0f, 0.0f, 0.0f, (float)DegreeToRadian(-90.0f)), 
                 true, true, 
                 (int)PivotMode.PIV_OBJECT_ONLY, 
@@ -149,9 +157,14 @@ namespace MaxManagedBridge
             {
                 ProgressChanged(progress, message);
             }
+            if (ProgressCallback != null)
+            {
+                ProgressCallback(progress, message);
+            }
         }
 
         public delegate void ProgressUpdateHandler(float progress, string message);
+        public ProgressUpdateHandler ProgressCallback;
         public event ProgressUpdateHandler ProgressChanged;
     }
 }
