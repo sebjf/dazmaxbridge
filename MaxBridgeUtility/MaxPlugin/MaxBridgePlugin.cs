@@ -44,7 +44,7 @@ namespace MaxManagedBridge
 
         public void UpdateMeshes(MyScene scene)
         {
-            Log.Add("[m0] Updating meshes from Daz.");
+            Log.Add("[m0] Received scene from Daz. Updating mesh data...");
 
             try
             {
@@ -65,12 +65,12 @@ namespace MaxManagedBridge
             Log.Add("[m2] Disabling undo and redraw");
 
             //Autodesk.Max.IInterface.DisableSceneRedraw()
-            globalInterface.COREInterface.DisableSceneRedraw();
+    //        globalInterface.COREInterface.DisableSceneRedraw();
             globalInterface.COREInterface.EnableUndo(false);
 
             foreach (var m in myMeshes)
             {
-                Log.Add("[m3] Updating mesh...");
+                Log.Add("[m3] Updating mesh " + m.Name);
 
                 UpdateMeshData(m);
             }
@@ -78,7 +78,7 @@ namespace MaxManagedBridge
             Log.Add("[m4] Enabling undo and redraw");
 
             globalInterface.COREInterface.EnableUndo(true);
-            globalInterface.COREInterface.EnableSceneRedraw();
+  //          globalInterface.COREInterface.EnableSceneRedraw();
         }
 
         //public void AddToSelectionSet(string selectionSetName, IINode node)
@@ -92,6 +92,8 @@ namespace MaxManagedBridge
 
         public void UpdateMeshData(MyMesh myMesh)
         {
+            Log.Add("[m] (UpdateMeshData()) Finding and creating nodes...");
+
             UpdateProgress(0.0f, "Getting mapped items...");
 
             IList<IINode> mappedNodes = GetMappedNodes(myMesh.Name).ToList();
@@ -106,11 +108,15 @@ namespace MaxManagedBridge
             foreach (var m in mappedNodes)
             {
                 UpdateProgress(0.2f, "Updating geometry...");
+                Log.Add("[m] (UpdateMeshData()) Updating geometry for one mesh");
+
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
 
                 if (m.Mtl == null)
                 {
                     UpdateProgress(0.6f, "Updating materials...");
+                    Log.Add("[m] (UpdateMeshData()) Creating and applying materials for one mesh...");
+
                     m.Mtl = CreateMaterial(myMesh);
                 }
             }

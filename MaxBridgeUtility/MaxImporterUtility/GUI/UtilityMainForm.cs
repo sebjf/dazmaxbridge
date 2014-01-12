@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace MaxManagedBridge
 {
@@ -130,7 +131,7 @@ namespace MaxManagedBridge
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            Log.Add("[m] Update meshes clicked");
+            Log.Add("[m] (updateButton_Click()) Update meshes clicked");
 
             foreach (var sceneview in scenesView)
             {
@@ -146,6 +147,7 @@ namespace MaxManagedBridge
                     Plugin.UpdateMeshes(sceneview.Client.GetScene(new List<string>()));
                 }
             }
+
         }
 
         private bool optionsVisible = false;

@@ -109,6 +109,8 @@ namespace MaxManagedBridge
 
         public MyScene GetScene(IList<string> items)
         {
+            Log.Add("[m] (GetScene()) GetScene called for " + items.Count + " items.");
+
             items.Insert(0, "getSceneItems()");
             return GetItem<MyScene>(items);
         }

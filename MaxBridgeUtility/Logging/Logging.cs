@@ -21,12 +21,47 @@ namespace MaxManagedBridge
         public static bool EnableLog { get; set; }
         public static ILogSys logger { get; set; }
 
+        [DllImport("Kernel32.dll")]
+        private static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
+
+        [DllImport("Kernel32.dll")]
+        private static extern bool QueryPerformanceFrequency(out long lpFrequency);
+
         public static void Add(string message)
         {
             if (EnableLog && (logger != null))
             {
-                logger.LogEntry(SYSLOG_INFO, false, "DazMaxBridge", message + "\n");
+                logger.LogEntry(SYSLOG_INFO, false, "DazMaxBridge", message + "( " + GetElapsedTime() + "s)\n");
             }
+        }
+
+        private static long lastTime = 0;
+        private static long pcFrequency = 0;
+
+        public static float GetElapsedTime()
+        {
+            if(pcFrequency == 0)
+            {
+                QueryPerformanceFrequency(out pcFrequency);
+            }
+
+            long currentTime = 0;
+            QueryPerformanceCounter(out currentTime);
+
+            float elapsed = 0;
+            if (lastTime == 0)
+            {
+                elapsed = 0;
+            }
+            else
+            {
+                elapsed = currentTime - lastTime;
+                elapsed = elapsed / pcFrequency;
+            }
+
+            lastTime = currentTime;
+
+            return elapsed;
         }
     }
 }
