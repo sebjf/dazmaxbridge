@@ -51,6 +51,26 @@ public:
 private:	
 	vector<QString> log;
 
+	LARGE_INTEGER frequency;
+	LARGE_INTEGER endTime;	
+	LARGE_INTEGER startTime;
+
+public:
+	void startProfiling()
+	{
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&startTime);
+	}
+
+	void endProfiling(QString message)
+	{
+		QueryPerformanceCounter(&endTime);
+		dzApp->statusLine(message + QString::number(double(endTime.QuadPart-startTime.QuadPart)/double(frequency.QuadPart)) + " seconds.");
+	}
+
 };
+
+
+
 
 #endif // DAZ_CHARACTER_EXPORTER

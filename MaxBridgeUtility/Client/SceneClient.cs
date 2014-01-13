@@ -9,10 +9,47 @@ using System.Windows.Forms;
 using MsgPack.Serialization;
 using MsgPack;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 
 
 namespace MaxManagedBridge
 {
+    unsafe public class SharedMemory
+    {
+        protected MemoryMappedFile memoryMappedFile;
+        protected MemoryMappedViewAccessor memoryMappedAccessor;
+        protected string name;
+        protected byte* ptr;
+        public int size;
+
+        public SharedMemory()
+        {
+            ptr = (byte*)0;
+        }
+
+        public byte* Open(string name)
+        {
+            if (this.name == name)
+            {
+                return ptr;
+            }
+
+            if (memoryMappedAccessor != null)
+            {
+                memoryMappedAccessor.SafeMemoryMappedViewHandle.ReleasePointer();
+                memoryMappedAccessor = null;
+            }
+
+            memoryMappedFile = MemoryMappedFile.OpenExisting(name);
+            memoryMappedAccessor = memoryMappedFile.CreateViewAccessor();
+            memoryMappedAccessor.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);
+
+            size = (int)memoryMappedAccessor.SafeMemoryMappedViewHandle.ByteLength;
+
+            return ptr;
+        }
+    }
+
     public class ClientManager
     {
         protected const string filter = @"\\.\pipe\";
@@ -47,6 +84,8 @@ namespace MaxManagedBridge
         protected NamedPipeClientStream namedPipe;
         protected StreamReader namedPipeReader;
         protected StreamWriter namedPipeWriter;
+
+        protected SharedMemory sharedMemory = new SharedMemory();
 
         public string DazInstanceName { get; protected set; }
 
@@ -89,7 +128,7 @@ namespace MaxManagedBridge
             return GetItem<T>(new string[] { command });
         }
 
-        protected T GetItem<T>(IEnumerable<string> commands)
+        unsafe protected T GetItem<T>(IEnumerable<string> commands)
         {
             if(!Reconnect())
             {
@@ -103,8 +142,21 @@ namespace MaxManagedBridge
             namedPipeWriter.Flush();
 
             MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
-            T item = c.Unpack(namedPipeReader.BaseStream);
-            return item;
+
+            if (commands.FirstOrDefault() == "getSceneItems()")
+            {
+                string name = namedPipeReader.ReadLine();
+                byte* ptr = sharedMemory.Open(name);
+                byte[] array = new byte[sharedMemory.size];
+                Marshal.Copy(new IntPtr(ptr), array, 0, sharedMemory.size);
+                return c.UnpackSingleObject(array);
+            }
+            else
+            {
+                T item = c.Unpack(namedPipeReader.BaseStream);
+                return item;
+            }
+
         }
 
         public MyScene GetScene(IList<string> items)
@@ -119,6 +171,5 @@ namespace MaxManagedBridge
         {
             return GetItem<MySceneInformation>("getMySceneInformation()");
         }
-
     }
 }

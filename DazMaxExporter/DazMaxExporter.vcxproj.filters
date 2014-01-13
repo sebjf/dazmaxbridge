@@ -36,6 +36,9 @@
     <ClInclude Include="Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryMappedFiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -61,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="skinningDataProcessing.cpp">
       <Filter>Source Files\Scene Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryMappedFiles.cpp">
+      <Filter>Source Files\Scene Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

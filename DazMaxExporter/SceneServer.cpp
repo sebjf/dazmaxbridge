@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <Psapi.h>
 
-TCHAR sharedMemoryName[] = TEXT("Local\\DazMaxBridgeSharedMemory");
 TCHAR namedPipeName[] = TEXT("DazMaxBridgePipe");
 
 int CountOtherPipes()
@@ -104,13 +103,24 @@ void MySceneServer::f_getScene(vector<string> items)
 
 	dzApp->statusLine("Started exporting scene...",false);
 
+	myDazExporter.startProfiling();
+
 	msgpack::sbuffer sbuf;
 	myDazExporter.write(items, sbuf);
 
-	dzApp->statusLine("Started writing scene to pipe...",false);
+	myDazExporter.endProfiling("packed scene in");
 
-	m_socket->write(sbuf.data(),sbuf.size());
+	myDazExporter.startProfiling();
+
+//	m_socket->write(sbuf.data(),sbuf.size());
+
+	void* sharedptr = sharedMemory.open(sbuf.size());
+	memcpy(sharedptr, sbuf.data(), sbuf.size());
+
+	m_socket->write(sharedMemory.name + "\n");
 	m_socket->flush();
+
+	myDazExporter.endProfiling("wrote scene in");
 
 	dzApp->statusLine("Completed sending scene.",false);
 }

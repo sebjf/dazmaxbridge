@@ -143,6 +143,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DAZMAXEXPORTER_EXPORTS;_WINSOCKAPI_;QT3_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(DAZ_STUDIO_SDK)\include;$(ProjectDir)msgpack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,11 +175,13 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mocing "%(Filename)"...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\moc\%(Filename)_moc.cpp</Outputs>
     </CustomBuild>
+    <ClInclude Include="MemoryMappedFiles.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MemoryMappedFiles.cpp" />
     <ClCompile Include="moc\SceneServer_moc.cpp" />
     <ClCompile Include="MyDazExporter.cpp" />
     <ClCompile Include="dllmain.cpp">

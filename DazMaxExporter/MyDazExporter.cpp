@@ -42,7 +42,10 @@ void MyDazExporter::addFigure(DzFigure* figure, MyScene* collection)
 	MyMesh myMesh;
 
 	addNodeData(figure, myMesh);
+
+	/* If headless make sure update() is called before getCachedGeom() */
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
+
 	addMaterialData(figure, myMesh);
 
 	DzSkeleton* parentSkeleton = figure->getFollowTarget();
@@ -60,6 +63,7 @@ void MyDazExporter::addFigure(DzFigure* figure, MyScene* collection)
 	collection->Items.push_back( myMesh );
 
 	/*Get the clothes (geografts will be filtered out by the statement at the top)*/
+	/*(This loop processes siblings of the item, the one at the end of resolveSelectedDzNode() will process descendants)*/
 	DzSkeletonList followers = sceneInfo.Followers[figure];
 	for(int i = 0; i < followers.size(); i++)
 	{
@@ -122,7 +126,7 @@ DzError MyDazExporter::write(vector<string> labels, msgpack::sbuffer& sbuf)
 			resolveSelectedDzNode(start, &sceneCollection);
 		}	
 	}
-	
+
 	msgpack::pack(sbuf, sceneCollection);
 
 	return DZ_NO_ERROR;

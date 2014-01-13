@@ -2,7 +2,7 @@
 #include "DazMaxExporter.h"
 #include <QtNetwork\qlocalserver.h>
 #include <QtNetwork\qlocalsocket.h>
-
+#include "MemoryMappedFiles.h"
 
 class MySceneServer : public DzAction
 {
@@ -10,6 +10,10 @@ class MySceneServer : public DzAction
 public:
 	MySceneServer() : DzAction(QString("MaxBridgeAction"),QString("The MaxBridge Action Object"))
 	{
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		performanceCounterFrequency = double(frequency.QuadPart);
+
 		startServer();
 	}
 
@@ -36,5 +40,9 @@ private:
 	MyDazExporter	myDazExporter;
 
 	string	dazInstanceName;
+
+	double performanceCounterFrequency;
+
+	MemoryMappedFile sharedMemory;
 
 };
