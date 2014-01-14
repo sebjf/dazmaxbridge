@@ -105,21 +105,18 @@ void MySceneServer::f_getScene(vector<string> items)
 
 	myDazExporter.startProfiling();
 
-	//msgpack::sbuffer sbuf;
-
 	myDazExporter.write(items, sbuf);
 
 	myDazExporter.endProfiling("packed scene in");
 
 	myDazExporter.startProfiling();
 
-//	m_socket->write(sbuf.data(),sbuf.size());
-
-//	void* sharedptr = sharedMemory.open(sbuf.size());
-//	memcpy(sharedptr, sbuf.data(), sbuf.size());
-
 	m_socket->write(sbuf.sharedMemory.name + "\n");
 	m_socket->flush();
+
+	/* This resets the position so the buffer can be reused with the existing allocated memory, assuming that Daz and Max will negotiate access */
+
+	sbuf.clear();
 
 	myDazExporter.endProfiling("wrote scene in");
 

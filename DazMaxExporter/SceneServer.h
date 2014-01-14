@@ -42,7 +42,6 @@ private:
 
 	double performanceCounterFrequency;
 
-	MemoryMappedFile sharedMemory;
 	msgpack::sharedmembuffer sbuf;
 
 };

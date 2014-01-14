@@ -9,6 +9,13 @@ MemoryMappedFile::MemoryMappedFile()
 	this->handle = NULL;
 }
 
+MemoryMappedFile::~MemoryMappedFile()
+{
+	if(handle != NULL){
+		CloseHandle(handle);
+	}
+}
+
 void* MemoryMappedFile::open(int size)
 {
 	if(this->size < size)
@@ -27,11 +34,9 @@ void* MemoryMappedFile::open(int size)
 	}
 
 	name = QString(sharedMemoryName) + "_" + QUuid::createUuid().toString();
-	LPCWSTR fname = (LPCWSTR)malloc(512);
-	
-	name.toWCharArray((wchar_t*)fname);
+
 	handle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, name.toStdWString().c_str() );
-	ptr = MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, size);
+	ptr = MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, size);	
 
 	if(ptr > 0)
 	{

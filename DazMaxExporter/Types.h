@@ -177,5 +177,4 @@ public:
 
 };
 
-
 #endif //MAXTYPES

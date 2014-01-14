@@ -10,6 +10,7 @@ class MemoryMappedFile
 {
 public:
 	MemoryMappedFile();
+	~MemoryMappedFile();
 
 	QString name;
 	long size;
@@ -23,6 +24,9 @@ private:
 	HANDLE handle;
 
 };
+
+#pragma warning(push)
+#pragma warning( disable : 4267)
 
 namespace msgpack {
 
@@ -56,7 +60,7 @@ public:
 
 	~sharedmembuffer()
 	{
-		::free(base::data);
+
 	}
 
 public:
@@ -116,6 +120,8 @@ private:
 	}
 
 };
+
+#pragma warning(pop)
 
 
 }  // namespace msgpack
