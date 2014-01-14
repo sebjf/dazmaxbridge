@@ -127,11 +127,11 @@ namespace MaxManagedBridge
 
         }
 
-        #region Colour Conversion
+        #region Gamma Correction
 
         public static Color ConvertColour(Color colour)
         {
-            return Color.FromArgb(colour.A, MaxColourValues[colour.R], MaxColourValues[colour.G], MaxColourValues[colour.B]);
+            return Color.FromArgb(colour.A, CorrectGamma(colour.R), CorrectGamma(colour.G), CorrectGamma(colour.B));
         }
 
         public static Color? ConvertColour(Color? colour)
@@ -142,12 +142,15 @@ namespace MaxManagedBridge
             return ConvertColour(colour.Value);
         }
 
-        public static int ConvertColourChannelValue(int value)
+        /*This is far from ideal but since Daz doesn't follow a linear workflow we can assume the colour channels will never go above white*/
+
+        protected static byte CorrectGamma(byte v)
         {
-            return MaxColourValues[value]; 
+            float c = (float)v;
+            return (byte)(Math.Pow(c / 255.0f, 2.2f) * 255.0f);
         }
 
-        protected static int[] MaxColourValues = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 23, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31, 32, 32, 33, 34, 35, 35, 36, 37, 38, 38, 39, 40, 41, 42, 42, 43, 44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 87, 88, 89, 90, 92, 93, 94, 95, 97, 98, 99, 101, 102, 103, 105, 106, 107, 109, 110, 112, 113, 114, 116, 117, 118, 120, 122, 123, 125, 126, 128, 129, 131, 132, 134, 135, 137, 138, 140, 142, 143, 144, 146, 148, 150, 151, 153, 155, 156, 158, 160, 162, 163, 165, 167, 168, 170, 172, 174, 176, 177, 179, 181, 183, 185, 187, 188, 190, 192, 193, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 243, 245, 247, 249, 251, 253, 255 };
+     //   protected static int[] MaxColourValues = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 23, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31, 32, 32, 33, 34, 35, 35, 36, 37, 38, 38, 39, 40, 41, 42, 42, 43, 44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 87, 88, 89, 90, 92, 93, 94, 95, 97, 98, 99, 101, 102, 103, 105, 106, 107, 109, 110, 112, 113, 114, 116, 117, 118, 120, 122, 123, 125, 126, 128, 129, 131, 132, 134, 135, 137, 138, 140, 142, 143, 144, 146, 148, 150, 151, 153, 155, 156, 158, 160, 162, 163, 165, 167, 168, 170, 172, 174, 176, 177, 179, 181, 183, 185, 187, 188, 190, 192, 193, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 243, 245, 247, 249, 251, 253, 255 };
 
         #endregion
     }
@@ -320,8 +323,9 @@ namespace MaxManagedBridge
                     addOpacityMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", opacityMap);
                 }
 
-                float opacityMapConstant = MaxPlugin.ConvertColourChannelValue((int)(255f * opacityMapAmount));
+            //    float opacityMapConstant = MaxPlugin.ConvertColourChannelValue((int)(255f * opacityMapAmount));
 
+                float opacityMapConstant = (int)(255f * opacityMapAmount);
                 Commands.Add(string.Format("admaterial.cutout_map = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
 
                 if (opacityMap != null)
@@ -358,9 +362,9 @@ namespace MaxManagedBridge
             if(EnableAO){
                 Commands.Add("admaterial.opts_ao_on = true");
                 Commands.Add("admaterial.opts_ao_use_global_ambient = true");
-                Commands.Add("admaterial.opts_ao_exact = true");
-                Commands.Add("admaterial.opts_ao_samples = 48");
-                Commands.Add("admaterial.opts_ao_distance = 350");
+                Commands.Add("admaterial.opts_ao_exact = false");
+                Commands.Add("admaterial.opts_ao_samples = 12");
+                Commands.Add("admaterial.opts_ao_distance = 400");
             }
 
             Commands.Add("(getHandleByAnim admaterial) as String");

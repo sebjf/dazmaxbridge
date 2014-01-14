@@ -115,7 +115,6 @@ void MySceneServer::f_getScene(vector<string> items)
 	m_socket->flush();
 
 	/* This resets the position so the buffer can be reused with the existing allocated memory, assuming that Daz and Max will negotiate access */
-
 	sbuf.clear();
 
 	myDazExporter.endProfiling("wrote scene in");
