@@ -2,7 +2,6 @@
 #include "DazMaxExporter.h"
 #include <QtNetwork\qlocalserver.h>
 #include <QtNetwork\qlocalsocket.h>
-#include "MemoryMappedFiles.h"
 
 class MySceneServer : public DzAction
 {
@@ -44,5 +43,6 @@ private:
 	double performanceCounterFrequency;
 
 	MemoryMappedFile sharedMemory;
+	msgpack::sharedmembuffer sbuf;
 
 };

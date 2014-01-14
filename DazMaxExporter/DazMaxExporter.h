@@ -4,6 +4,7 @@
 #pragma warning (error: 4715)
 
 #include "Types.h"
+#include "MemoryMappedFiles.h"
 
 #include <QtCore\qfile.h>
 #include <QtCore\qmetaobject.h>
@@ -20,8 +21,8 @@ class MyDazExporter : public QObject {
 	Q_OBJECT
 public:
 
-	DzError		write(msgpack::sbuffer& sbuf);
-	DzError		write(vector<string> labels, msgpack::sbuffer& sbuf);
+	DzError		write(msgpack::sharedmembuffer& sbuf);
+	DzError		write(vector<string> labels, sharedmembuffer& sbuf);
 	DzError		write( const QString &filename );
 
 private:

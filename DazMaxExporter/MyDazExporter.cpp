@@ -107,12 +107,12 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 	}
 }
 
-DzError MyDazExporter::write(msgpack::sbuffer& sbuf)
+DzError MyDazExporter::write(msgpack::sharedmembuffer& sbuf)
 {
 	return write(sceneInfo.TopLevelItemNames, sbuf);
 }
 
-DzError MyDazExporter::write(vector<string> labels, msgpack::sbuffer& sbuf)
+DzError MyDazExporter::write(vector<string> labels, sharedmembuffer& sbuf)
 {
 	updateMySceneInformation();
 
@@ -137,7 +137,7 @@ DzError MyDazExporter::write(const QString &filename)
 	QFile myFile(filename);
 	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
 
-	msgpack::sbuffer sbuf;
+	msgpack::sharedmembuffer sbuf;
 	write(sbuf);
 
 	int written = myFile.write(sbuf.data(), sbuf.size());

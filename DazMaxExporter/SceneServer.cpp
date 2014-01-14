@@ -105,7 +105,8 @@ void MySceneServer::f_getScene(vector<string> items)
 
 	myDazExporter.startProfiling();
 
-	msgpack::sbuffer sbuf;
+	//msgpack::sbuffer sbuf;
+
 	myDazExporter.write(items, sbuf);
 
 	myDazExporter.endProfiling("packed scene in");
@@ -114,10 +115,10 @@ void MySceneServer::f_getScene(vector<string> items)
 
 //	m_socket->write(sbuf.data(),sbuf.size());
 
-	void* sharedptr = sharedMemory.open(sbuf.size());
-	memcpy(sharedptr, sbuf.data(), sbuf.size());
+//	void* sharedptr = sharedMemory.open(sbuf.size());
+//	memcpy(sharedptr, sbuf.data(), sbuf.size());
 
-	m_socket->write(sharedMemory.name + "\n");
+	m_socket->write(sbuf.sharedMemory.name + "\n");
 	m_socket->flush();
 
 	myDazExporter.endProfiling("wrote scene in");
