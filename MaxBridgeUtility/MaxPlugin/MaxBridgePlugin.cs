@@ -52,7 +52,7 @@ namespace MaxManagedBridge
             }
             catch (Exception e)
             {
-                System.Windows.Forms.MessageBox.Show("Caught exception in UpdateMeshes(): " + e.Message + e.TargetSite);
+                System.Windows.Forms.MessageBox.Show("Caught exception in UpdateMeshes(): " + e.Message + e.TargetSite + e.StackTrace);
             }
             catch
             {

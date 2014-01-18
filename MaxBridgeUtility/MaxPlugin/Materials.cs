@@ -13,7 +13,7 @@ namespace MaxManagedBridge
 
     public partial class MaxPlugin : MaxBridge
     {
-        public string[] AvailableMaterials = { "mental ray Arch & Design", "3DS Max Standard" };
+        public string[] AvailableMaterials = { "mental ray Arch & Design", "3DS Max Standard", "VRay" };
         public int SelectedMaterial = 0;
 
         public float BumpScalar = 500.0f;
@@ -86,6 +86,9 @@ namespace MaxManagedBridge
                 case 1:
                     maxMaterial = new MaxScriptStandardMaterial();
                     break;
+                case 2:
+                    maxMaterial = new MaxScriptVRayMaterial();
+                    break;
                 default:
                 case 0:
                     maxMaterial = new MaxScriptMentalRayArchAndDesignMaterial();
@@ -114,17 +117,28 @@ namespace MaxManagedBridge
             maxMaterial.BumpMapAmount = (material.GetFloatSafe("Positive Bump", 0) - material.GetFloatSafe("Negative Bump", 0)) * material.GetFloatSafe("Bump Strength", 0.03f) * BumpScalar;
 
             string script = maxMaterial.MakeScript();
-         
-            string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(script);
-            handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
-            System.Int64 handle = System.Int64.Parse(handle_string);
-            if (handle < 0)
+
+            try
             {
-                throw new Exception(string.Format("MaxScript could not return a valid handle. There is an error in the script: \n\n{0}\n\n",script));
+                string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(script);
+                handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
+                System.Int64 handle = System.Int64.Parse(handle_string);
+                IMtl nativeMtl = (Convert(handle) as IMtl);
+                if (nativeMtl == null)
+                {
+                    throw new Exception("Could not resolve string from MaxScript to handle of material object");
+                }
+                return nativeMtl;
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    "Copy the full script out of this window with Ctrl+C and run it in 3DS Max listener without the parenthesis to find the error.\n\n" + script,
+                    "Exception: Could not create material.",
+                    MessageBoxButtons.OK);
             }
 
-            return (Convert(handle) as IMtl);
-
+            return null;
         }
 
         #region Gamma Correction
@@ -149,8 +163,6 @@ namespace MaxManagedBridge
             float c = (float)v;
             return (byte)(Math.Pow(c / 255.0f, 2.2f) * 255.0f);
         }
-
-     //   protected static int[] MaxColourValues = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 23, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31, 32, 32, 33, 34, 35, 35, 36, 37, 38, 38, 39, 40, 41, 42, 42, 43, 44, 45, 46, 47, 48, 49, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 87, 88, 89, 90, 92, 93, 94, 95, 97, 98, 99, 101, 102, 103, 105, 106, 107, 109, 110, 112, 113, 114, 116, 117, 118, 120, 122, 123, 125, 126, 128, 129, 131, 132, 134, 135, 137, 138, 140, 142, 143, 144, 146, 148, 150, 151, 153, 155, 156, 158, 160, 162, 163, 165, 167, 168, 170, 172, 174, 176, 177, 179, 181, 183, 185, 187, 188, 190, 192, 193, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 243, 245, 247, 249, 251, 253, 255 };
 
         #endregion
     }
@@ -323,8 +335,6 @@ namespace MaxManagedBridge
                     addOpacityMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", opacityMap);
                 }
 
-            //    float opacityMapConstant = MaxPlugin.ConvertColourChannelValue((int)(255f * opacityMapAmount));
-
                 float opacityMapConstant = (int)(255f * opacityMapAmount);
                 Commands.Add(string.Format("admaterial.cutout_map = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
 
@@ -368,6 +378,147 @@ namespace MaxManagedBridge
             }
 
             Commands.Add("(getHandleByAnim admaterial) as String");
+
+            string script = "";
+            foreach (var c in Commands)
+            {
+                script += (c + "; ");
+            }
+            return "(" + script + ")"; //Note, remove these brackets to have max print the results of each command in the set when debugging.
+
+        }
+    }
+
+    public class MaxScriptVRayMaterial : MaxScriptMaterial
+    {
+        public MaxScriptVRayMaterial()
+        {
+            Name = "VRayMaxScriptMaterial";
+            DisableFiltering = true;
+        }
+
+        private float BumpModifier = 0.5f; //this is to bring it in line with BumpScalar above, not to control it.
+
+        public override string MakeScript()
+        {
+            List<String> Commands = new List<string>();
+
+            Commands.Add(string.Format("vmaterial = VRayMtl name:(\"{0}\")", Name));
+
+            Commands.Add(string.Format("vmaterial.showInViewport = {0}", showInViewport));
+
+            Commands.Add(string.Format("vmaterial.texmap_diffuse_multiplier = {0}", diffuseMapAmount));
+
+            // CompositeTextureMap help page: http://docs.autodesk.com/3DSMAX/15/ENU/MAXScript-Help/index.html?url=files/GUID-611E1342-F976-4E95-8F78-88175B329745.htm,topicNumber=d30e510982
+            Commands.Add(string.Format("vmaterial.texmap_diffuse = CompositeTextureMap()"));
+            Commands.Add(string.Format("vmaterial.texmap_diffuse.add()"));
+            Commands.Add(string.Format("vmaterial.texmap_diffuse.blendMode[2] = 2"));
+
+            string addDiffuseMapCommand = "";
+            if (diffuseMap != null)
+            {
+                addDiffuseMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", diffuseMap);
+            }
+
+            Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, diffuse.R, diffuse.G, diffuse.B));
+            
+            /*becaus even if theres no texture we use the map slot to set the colour...*/
+            Commands.Add(string.Format("vmaterial.texmap_diffuse_on = true"));
+
+            if (diffuseMap != null)
+            {
+                Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.coords.u_tiling = {0}; vmaterial.texmap_diffuse.mapList[1].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.filtering = 2;"));
+                }
+            }
+
+            string addAmbientMapCommand = "";
+            if (ambientMap != null)
+            {
+                addAmbientMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", ambientMap);
+            }
+
+            Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, ambient.R * ambientMapAmount, ambient.G * ambientMapAmount, ambient.B * ambientMapAmount));
+
+            if (ambientMap != null)
+            {
+                Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.coords.u_tiling = {0}; vmaterial.texmap_diffuse.mapList[2].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.filtering = 2;"));
+                }
+            }
+
+            Commands.Add(string.Format("vmaterial.texmap_diffuse.mask[2] = vmaterial.texmap_diffuse.mapList[1]"));
+
+            if (bumpMap != null)
+            {
+                Commands.Add(string.Format("vmaterial.texmap_bump = (bitmapTexture filename:\"{0}\")", bumpMap));
+                Commands.Add(string.Format("vmaterial.texmap_bump_on = true"));
+                Commands.Add(string.Format("vmaterial.texmap_bump_multiplier = {0}", (bumpMapAmount * 0.01 * BumpModifier)));
+                Commands.Add(string.Format("vmaterial.texmap_bump.coords.u_tiling = {0}; vmaterial.bump_map.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("vmaterial.texmap_bump.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("vmaterial.texmap_bump.filtering = 2;"));
+                }
+            }
+
+            //If a cutout map is set, it marks all items as translucent to max which makes multiple pass alpha blending tricky, meaning that while the renders look ok, in the viewports it looks like the z-buffer
+            //is being completely ignored, so, if there isn't actually any translucency/transparency, just dont do anything...
+            if (opacityMap != null || opacityMapAmount != 1)
+            {
+                string addOpacityMapCommand = "";
+                if (opacityMap != null)
+                {
+                    addOpacityMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", opacityMap);
+
+                }
+
+                float opacityMapConstant = (int)(255f * opacityMapAmount);
+                Commands.Add(string.Format("vmaterial.texmap_opacity = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
+                Commands.Add(string.Format("vmaterial.texmap_opacity_on = true"));
+
+                if (opacityMap != null)
+                {
+                    Commands.Add(string.Format("vmaterial.texmap_opacity.map1.coords.u_tiling = {0}; vmaterial.texmap_opacity.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                    if (DisableFiltering)
+                    {
+                        Commands.Add(string.Format("vmaterial.texmap_opacity.map1.coords.blur = 0.01;"));
+                        Commands.Add(string.Format("vmaterial.texmap_opacity.map1.filtering = 2;"));
+                    }
+                }
+            }
+
+            Commands.Add(string.Format("vmaterial.reflection_glossiness = {0}", glossiness));
+
+            if (specularMap != null)
+            {
+                Commands.Add(string.Format("vmaterial.texmap_reflection = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
+                Commands.Add(string.Format("vmaterial.texmap_reflection.map1.coords.u_tiling = {0}; vmaterial.texmap_reflection.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("vmaterial.texmap_reflection_on = true"));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("vmaterial.texmap_reflection.map1.coords.blur = 0.01"));
+                    Commands.Add(string.Format("vmaterial.texmap_reflection.map1.filtering = 2"));
+                }
+            }
+            else
+            {
+                Commands.Add(string.Format("vmaterial.reflection = (color {0} {1} {2})", specularLevel * specular.R, specularLevel * specular.G, specularLevel * specular.B));
+            }
+
+
+            Commands.Add("(getHandleByAnim vmaterial) as String");
 
             string script = "";
             foreach (var c in Commands)

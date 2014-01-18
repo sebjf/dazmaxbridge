@@ -1,0 +1,12 @@
+Hello and Welcome to Daz Max Bridge.
+	
+Please find the Wiki on the project page on GitHub: https://github.com/sebjf/dazmaxbridge/wiki
+
+To install:
+
+1. Copy the 'bin' folder to your 3DS Max Installation Directory (e.g. C:\Program Files\Autodesk\3ds Max 2014\)
+2. Copy the 'plugins' folder to your Daz Studio 4 Installation Directory (e.g. C:\Program Files\DAZ 3D\DAZStudio4\)
+
+You are done.
+
+Enjoy Daz Max Bridge!

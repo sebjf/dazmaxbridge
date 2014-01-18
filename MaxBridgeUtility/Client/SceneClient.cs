@@ -135,6 +135,8 @@ namespace MaxManagedBridge
                 return default(T);
             }
 
+            Log.Add("[m] (GetItem<T>()) Sending request...");
+
             foreach (var command in commands)
             {
                 namedPipeWriter.WriteLine(command);
