@@ -14,6 +14,8 @@ using System.Runtime.InteropServices;
 
 namespace MaxManagedBridge
 {
+
+
     unsafe public class SharedMemory
     {
         protected MemoryMappedFile memoryMappedFile;
@@ -130,6 +132,8 @@ namespace MaxManagedBridge
 
         unsafe protected T GetItem<T>(IEnumerable<string> commands)
         {
+            Log.Add("[m] (GetItem<T>()) Checking connection...");
+
             if(!Reconnect())
             {
                 return default(T);
@@ -143,22 +147,45 @@ namespace MaxManagedBridge
             }
             namedPipeWriter.Flush();
 
-            MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
+            Log.Add("[m] (GetItem<T>()) Sent...Waiting for pipe drain...");
+
+            namedPipe.WaitForPipeDrain();
+
+            Log.Add("[m] Fetching deserialiser...");
+
+            /* We find that
+             * MessagePackSerializer<T> c = MessagePackSerializer.Create<T>(); 
+             * can cause Max to crash. Not sure why but until then we will prebuild the deserialisers
+             * and reuse them, hence the following... */ 
+
+     //       MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
+            MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
 
             if (commands.FirstOrDefault() == "getSceneItems()")
             {
+                Log.Add("[ma] (GetItem<T>()) Reading shared mem name from pipe...");
                 string name = namedPipeReader.ReadLine();
+
+                Log.Add("[ma] (GetItem<T>()) Opening shared memory...");
                 byte* ptr = sharedMemory.Open(name);
                 byte[] array = new byte[sharedMemory.size];
                 Marshal.Copy(new IntPtr(ptr), array, 0, sharedMemory.size);
-                return c.UnpackSingleObject(array);
+
+                Log.Add("[ma] Unpacking...");
+                T item = c.UnpackSingleObject(array);
+
+                Log.Add("[ma] (GetItem<T>()) Unpacked..returning scene update.");
+                return item;
+
             }
             else
             {
+                Log.Add("[mb] Unpacking from stream...");
                 T item = c.Unpack(namedPipeReader.BaseStream);
+
+                Log.Add("[mb] (GetItem<T>()) Unpacked..returning scene update.");
                 return item;
             }
-
         }
 
         public MyScene GetScene(IList<string> items)
@@ -173,5 +200,35 @@ namespace MaxManagedBridge
         {
             return GetItem<MySceneInformation>("getMySceneInformation()");
         }
+
+
+    }
+
+    class MessagePackSerialisers
+    {
+        /* Put the deserialiser code in a shared class, because if it breaks easily we want to run it as few times as possible */
+
+        public static MessagePackSerializer<T> GetUnpacker<T>()
+        {
+            return instance.unpackers[typeof(T)] as MessagePackSerializer<T>;
+        }
+
+        protected static MessagePackSerialisers instance = new MessagePackSerialisers();
+
+        protected MessagePackSerialisers()
+        {
+            Log.Add("[m] Building deserialisers...");
+
+            CreateUnpacker<MyScene>();
+            CreateUnpacker<string>();
+            CreateUnpacker<MySceneInformation>();
+        }
+
+        protected void CreateUnpacker<T>()
+        {
+            unpackers[typeof(T)] = MessagePackSerializer.Create<T>();
+        }
+
+        protected Dictionary<Type, object> unpackers = new Dictionary<Type, object>();
     }
 }

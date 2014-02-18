@@ -53,7 +53,7 @@ namespace MaxManagedBridge
                     Marshal.Copy(myMesh.TextureCoordinates.ToArray(), 0, p3h, myMesh.NumTextureCoordinates * 3);
                     break;
                 default:
-                    throw new NotImplementedException(("Unable to handle texture coordinates with " + elementsPerVertex + " coordinates."));
+                    throw new NotImplementedException(("Unable to handle texture coordinates with " + elementsPerVertex + " elements."));
             }
 
             return countChanged;

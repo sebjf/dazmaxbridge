@@ -254,6 +254,7 @@ namespace MaxManagedBridge
         }
 
         public bool EnableAO = true;
+        public bool EnableHighlightsFGOnly = true;
 
         private float BumpModifier = 0.5f; //this is to bring it in line with BumpScalar above, not to control it.
 
@@ -327,7 +328,10 @@ namespace MaxManagedBridge
 
             //If a cutout map is set, it marks all items as translucent to max which makes multiple pass alpha blending tricky, meaning that while the renders look ok, in the viewports it looks like the z-buffer
             //is being completely ignored, so, if there isn't actually any translucency/transparency, just dont do anything...
-            if (opacityMap != null || opacityMapAmount != 1)
+
+            bool isTranslucent = ((opacityMap != null) || (opacityMapAmount != 1));
+
+            if (isTranslucent)
             {
                 string addOpacityMapCommand = "";
                 if (opacityMap != null)
@@ -375,6 +379,21 @@ namespace MaxManagedBridge
                 Commands.Add("admaterial.opts_ao_exact = false");
                 Commands.Add("admaterial.opts_ao_samples = 12");
                 Commands.Add("admaterial.opts_ao_distance = 400");
+            }
+
+            if (EnableHighlightsFGOnly)
+            {
+                Commands.Add("admaterial.refl_hlonly = true");
+            }
+
+            /*If a material is opaque, then flag it as so for mental ray to improve render times. The property in mental ray connection is that of the slot however and not the material, so we have to 'assign' the material,
+             then make the change - http://forums.cgsociety.org/archive/index.php/t-914476.html*/
+            if (!isTranslucent)
+            {
+                Commands.Add("m = meditmaterials[1]");
+                Commands.Add("meditmaterials[1] = admaterial");
+                Commands.Add("admaterial.mental_ray__material_custom_attribute.Opaque = true");
+                Commands.Add("meditmaterials[1] = m");
             }
 
             Commands.Add("(getHandleByAnim admaterial) as String");
