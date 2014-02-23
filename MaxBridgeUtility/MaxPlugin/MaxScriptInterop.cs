@@ -8,13 +8,12 @@ using System.Drawing;
 namespace MaxManagedBridge
 {
     /*
-     * MaxScript contains alot of functionality that is unavailable or would have to be reimplemented in a plugin such as this if it were native only.
-     * While we have all the information to do things such as set aribtrary properties of objects, we have to write alot of glue logic, most of which
-     * has already been done.
+     * MaxScript contains alot of functionality that is unavailable or would have to be reimplemented in a plugin like this one.
+     * While we have all the information to do things such as set aribtrary properties of objects, we have to write alot of glue logic, which Autodesk as already done and made available in MaxScript.
      * 
      * Luckily there are a number of ways to interact with MaxScript:
      * 
-     *  * MaxScript can use reflection to access the native properties of all .NET types in a tree once a member of it has been created in a MaxScript with 'dotNetObject'
+     *  * MaxScript can use reflection to access the native properties of all .NET types in a graph once a member of it has been created in a MaxScript with 'dotNetObject'
      *  * MaxScript & .NET 'move' objects between contexts by passing Integer handles and getting the 'native' version of an object in each
      *  * .NET can execute MaxScript using SDK APIs
      *  * .NET can execute MaxScript using events which MaxScript can hook. This method allows passing of objects directly to MaxScript.

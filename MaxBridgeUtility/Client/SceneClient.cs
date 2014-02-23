@@ -120,26 +120,18 @@ namespace MaxManagedBridge
             namedPipeReader = new StreamReader(namedPipe);
             namedPipeWriter = new StreamWriter(namedPipe);
 
-            DazInstanceName = GetItem<string>("getInstanceName()");
+            DazInstanceName = GetItemStream<string>("getInstanceName()");
 
             return true;
         }
 
-        protected T GetItem<T>(string command)
+        protected bool SendRequest(IEnumerable<string> commands)
         {
-            return GetItem<T>(new string[] { command });
-        }
+            Log.Add("[m] (SendRequest()) Sending request to Daz...");
 
-        unsafe protected T GetItem<T>(IEnumerable<string> commands)
-        {
-            Log.Add("[m] (GetItem<T>()) Checking connection...");
-
-            if(!Reconnect())
-            {
-                return default(T);
+            if (!Reconnect()){
+                return false;
             }
-
-            Log.Add("[m] (GetItem<T>()) Sending request...");
 
             foreach (var command in commands)
             {
@@ -147,66 +139,69 @@ namespace MaxManagedBridge
             }
             namedPipeWriter.Flush();
 
-            Log.Add("[m] (GetItem<T>()) Sent...Waiting for pipe drain...");
+            Log.Add("[m] (SendRequest()) Done.");
 
             namedPipe.WaitForPipeDrain();
 
-            Log.Add("[m] Fetching deserialiser...");
+            return true;
+        }
 
-            /* We find that
-             * MessagePackSerializer<T> c = MessagePackSerializer.Create<T>(); 
-             * can cause Max to crash. Not sure why but until then we will prebuild the deserialisers
-             * and reuse them, hence the following... */ 
+        protected T GetItemStream<T>(string command)
+        {
+            if (!SendRequest(new string[] { command })){
+                return default(T);
+            }
 
-     //       MessagePackSerializer<T> c = MessagePackSerializer.Create<T>();
+            Log.Add("[m] Fetching deserialiser to unpack from stream...");
+
             MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
 
-            if (commands.FirstOrDefault() == "getSceneItems()")
-            {
-                Log.Add("[ma] (GetItem<T>()) Reading shared mem name from pipe...");
-                string name = namedPipeReader.ReadLine();
+            T item = c.Unpack(namedPipeReader.BaseStream);
 
-                Log.Add("[ma] (GetItem<T>()) Opening shared memory...");
-                byte* ptr = sharedMemory.Open(name);
-                byte[] array = new byte[sharedMemory.size];
-                Marshal.Copy(new IntPtr(ptr), array, 0, sharedMemory.size);
+            Log.Add("[mb] (GetItemStream<T>()) Unpacked..returning scene update.");
+            return item;
 
-                Log.Add("[ma] Unpacking...");
-                T item = c.UnpackSingleObject(array);
+        }
 
-                Log.Add("[ma] (GetItem<T>()) Unpacked..returning scene update.");
-                return item;
-
+        unsafe protected T GetItemMemory<T>(IEnumerable<string> commands)
+        {
+            if (!SendRequest(commands)){
+                return default(T);
             }
-            else
-            {
-                Log.Add("[mb] Unpacking from stream...");
-                T item = c.Unpack(namedPipeReader.BaseStream);
 
-                Log.Add("[mb] (GetItem<T>()) Unpacked..returning scene update.");
-                return item;
-            }
+            Log.Add("[m] Fetching deserialiser to unpack from memory...");
+            MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
+
+            string name = namedPipeReader.ReadLine();
+
+            Log.Add("[ma] (GetItemMemory<T>()) Opening shared memory...");
+            byte* ptr = sharedMemory.Open(name);
+            byte[] array = new byte[sharedMemory.size];
+            Marshal.Copy(new IntPtr(ptr), array, 0, sharedMemory.size);
+
+            T item = c.UnpackSingleObject(array);
+
+            Log.Add("[ma] (GetItemMemory<T>()) Unpacked..returning scene update.");
+            return item;
+
         }
 
         public MyScene GetScene(IList<string> items)
         {
-            Log.Add("[m] (GetScene()) GetScene called for " + items.Count + " items.");
-
             items.Insert(0, "getSceneItems()");
-            return GetItem<MyScene>(items);
+            return GetItemMemory<MyScene>(items);
         }
 
         public MySceneInformation GetSceneInformation()
         {
-            return GetItem<MySceneInformation>("getMySceneInformation()");
+            return GetItemStream<MySceneInformation>("getMySceneInformation()");
         }
-
 
     }
 
     class MessagePackSerialisers
     {
-        /* Put the deserialiser code in a shared class, because if it breaks easily we want to run it as few times as possible */
+        /* Put the deserialiser code in a shared class, because if it breaks easily during some odd interaction with something in Max we want to run it as few times as possible */
 
         public static MessagePackSerializer<T> GetUnpacker<T>()
         {
@@ -226,6 +221,11 @@ namespace MaxManagedBridge
 
         protected void CreateUnpacker<T>()
         {
+            /* We find that
+             * MessagePackSerializer<T> c = MessagePackSerializer.Create<T>(); 
+             * can cause Max to crash. Not sure why, but it may be a threading issue since it only occurs when the Max viewport is under high load.
+             * We prebuild the serialisers to avoid this issue, but it results in higher performance anyway so we may as well leave it. */
+
             unpackers[typeof(T)] = MessagePackSerializer.Create<T>();
         }
 

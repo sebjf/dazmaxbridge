@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Autodesk.Max;
 
+/* The methods in this file are for setting properties of Max objects by name. This is intended to allow materials to be built without the 
+ * generated MaxScript. They are not used anywhere currently but remain for reference in case we pursue building materials entirely within C# */
 
 namespace MaxManagedBridge
 {

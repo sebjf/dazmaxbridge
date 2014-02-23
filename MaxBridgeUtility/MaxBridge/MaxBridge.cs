@@ -13,37 +13,6 @@ namespace MaxManagedBridge
     {
         public ClientManager DazClientManager = new ClientManager();
 
-        public void UpdateFromDaz(MyScene scene)
-        {
-            Log.Add("[m6] Recieved scene from Daz. Triangulating meshes.");
-
-            foreach (var m in scene.Items)
-            {
-                TriangulateFaces(m);
-            }
-
-            Log.Add("[m7] Triangulation complete.");
-        }
-
-        public void LoadFromFile(string filename, bool triangulate = true)
-        {
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            BinaryReader reader = new BinaryReader(fs);
-
-            MessagePackSerializer<MyScene> c = MessagePackSerializer.Create<MyScene>();
-            var Scene = c.Unpack(fs);
-
-            reader.Close();
-
-            if (triangulate)
-            {
-                foreach (MyMesh m in Scene.Items)
-                {
-                    TriangulateFaces(m);
-                }
-            }
-        }
-
         #region Utilities
 
         public Face[] BlockCast(byte[] source)

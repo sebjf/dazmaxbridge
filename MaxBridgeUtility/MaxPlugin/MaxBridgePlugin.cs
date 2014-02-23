@@ -64,8 +64,7 @@ namespace MaxManagedBridge
         {
             Log.Add("[m2] Disabling undo and redraw");
 
-            //Autodesk.Max.IInterface.DisableSceneRedraw()
-    //        globalInterface.COREInterface.DisableSceneRedraw();
+            globalInterface.COREInterface.DisableSceneRedraw();
             globalInterface.COREInterface.EnableUndo(false);
 
             foreach (var m in myMeshes)
@@ -78,8 +77,10 @@ namespace MaxManagedBridge
             Log.Add("[m4] Enabling undo and redraw");
 
             globalInterface.COREInterface.EnableUndo(true);
-  //          globalInterface.COREInterface.EnableSceneRedraw();
+            globalInterface.COREInterface.EnableSceneRedraw();
         }
+
+        /* Ideally we would create selection sets for each character so that they can be easily included/excluded from things like lighting */
 
         //public void AddToSelectionSet(string selectionSetName, IINode node)
         //{
@@ -92,8 +93,6 @@ namespace MaxManagedBridge
 
         public void UpdateMeshData(MyMesh myMesh)
         {
-            Log.Add("[m] (UpdateMeshData()) Finding and creating nodes...");
-
             UpdateProgress(0.0f, "Getting mapped items...");
 
             IList<IINode> mappedNodes = GetMappedNodes(myMesh.Name).ToList();
@@ -102,20 +101,19 @@ namespace MaxManagedBridge
             if (mappedNodes.Count < 1)
             {
                 UpdateProgress(0.1f, "Creating object...");
+
                 mappedNodes.Add(CreateMeshNode(myMesh));
             }
 
             foreach (var m in mappedNodes)
             {
                 UpdateProgress(0.2f, "Updating geometry...");
-                Log.Add("[m] (UpdateMeshData()) Updating geometry for one mesh");
 
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
 
                 if (m.Mtl == null)
                 {
                     UpdateProgress(0.6f, "Updating materials...");
-                    Log.Add("[m] (UpdateMeshData()) Creating and applying materials for one mesh...");
 
                     m.Mtl = CreateMaterial(myMesh);
                 }
