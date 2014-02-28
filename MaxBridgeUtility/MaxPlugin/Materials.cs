@@ -674,27 +674,59 @@ namespace MaxManagedBridge
             Commands.Add(string.Format("material.adLock = {0}", adLock));
             Commands.Add(string.Format("material.dsLock = {0}", dsLock));
 
-            if (ambientMap != null)
+            Commands.Add(string.Format("material.diffuseMapEnable = true;"));
+            Commands.Add(string.Format("material.diffuseMapAmount = {0}", diffuseMapAmount * 100f));
+
+            // CompositeTextureMap help page: http://docs.autodesk.com/3DSMAX/15/ENU/MAXScript-Help/index.html?url=files/GUID-611E1342-F976-4E95-8F78-88175B329745.htm,topicNumber=d30e510982
+            Commands.Add(string.Format("material.diffuseMap = CompositeTextureMap()"));
+            Commands.Add(string.Format("material.diffuseMap.add()"));
+            Commands.Add(string.Format("material.diffuseMap.blendMode[2] = 2"));
+
+            string addDiffuseMapCommand = "";
+            if (diffuseMap != null)
             {
-                Commands.Add(string.Format("material.ambientMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", ambientMap, ambient.R, ambient.G, ambient.B));
-                Commands.Add(string.Format("material.ambientMapAmount = {0}", ambientMapAmount * 100.0));
-                Commands.Add(string.Format("material.ambientMap.map1.coords.u_tiling = {0}; material.ambientMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                addDiffuseMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", diffuseMap);
+            }
+
+            Commands.Add(string.Format("material.diffuseMap.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, diffuse.R, diffuse.G, diffuse.B));
+
+            if (diffuseMap != null)
+            {
+                Commands.Add(string.Format("material.diffuseMap.mapList[1].map1.coords.u_tiling = {0}; material.diffuseMap.mapList[1].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("material.ambientMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("material.ambientMap.map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.diffuseMap.mapList[1].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.diffuseMap.mapList[1].map1.filtering = 2;"));
                 }
             }
-            else
+
+            string addAmbientMapCommand = "";
+            if (ambientMap != null)
             {
-                Commands.Add(string.Format("material.ambient = color {0} {1} {2}", ambient.R, ambient.G, ambient.B));
+                addAmbientMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", ambientMap);
             }
+
+            Commands.Add(string.Format("material.diffuseMap.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, ambient.R * ambientMapAmount, ambient.G * ambientMapAmount, ambient.B * ambientMapAmount));
+
+            if (ambientMap != null)
+            {
+                Commands.Add(string.Format("material.diffuseMap.mapList[2].map1.coords.u_tiling = {0}; material.diffuseMap.mapList[2].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                if (DisableFiltering)
+                {
+                    Commands.Add(string.Format("material.diffuseMap.mapList[2].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.diffuseMap.mapList[2].map1.filtering = 2;"));
+                }
+            }
+
+            Commands.Add(string.Format("material.diffuseMap.mask[2] = material.diffuseMap.mapList[1]"));
 
             if (bumpMap != null)
             {
+                Commands.Add(string.Format("material.bumpMapEnable = true;"));
                 Commands.Add(string.Format("material.bumpMap = (bitmapTexture filename:\"{0}\")", bumpMap));
-                Commands.Add(string.Format("material.bumpMapAmount = {0}", bumpMapAmount * BumpScalar));
+                Commands.Add(string.Format("material.bumpMapAmount = {0}", (bumpMapAmount * BumpScalar * 100f)));
                 Commands.Add(string.Format("material.bumpMap.coords.u_tiling = {0}; material.bumpMap.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
@@ -704,49 +736,49 @@ namespace MaxManagedBridge
                 }
             }
 
-            if (diffuseMap != null)
-            {
-                Commands.Add(string.Format("material.diffuseMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", diffuseMap, diffuse.R, diffuse.G, diffuse.B));
-                Commands.Add(string.Format("material.diffuseMapAmount = {0}", diffuseMapAmount * 100.0));
-                Commands.Add(string.Format("material.diffuseMap.map1.coords.u_tiling = {0}; material.diffuseMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+            //If a cutout map is set, it marks all items as translucent to max which makes multiple pass alpha blending tricky, meaning that while the renders look ok, in the viewports it looks like the z-buffer
+            //is being completely ignored, so, if there isn't actually any translucency/transparency, just dont do anything...
 
-                if (DisableFiltering)
+            bool isTranslucent = ((opacityMap != null) || (opacityMapAmount != 1));
+
+            if (isTranslucent)
+            {
+                Commands.Add(string.Format("material.opacityMapEnable = true;"));
+
+                string addOpacityMapCommand = "";
+                if (opacityMap != null)
                 {
-                    Commands.Add(string.Format("material.diffuseMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("material.diffuseMap.map1.filtering = 2;"));
+                    addOpacityMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", opacityMap);
+                }
+
+                float opacityMapConstant = (int)(255f * opacityMapAmount);
+                Commands.Add(string.Format("material.opacityMap = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
+
+                if (opacityMap != null)
+                {
+                    Commands.Add(string.Format("material.opacityMap.map1.coords.u_tiling = {0}; material.opacityMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+
+                    if (DisableFiltering)
+                    {
+                        Commands.Add(string.Format("material.opacityMap.map1.coords.blur = 0.01;"));
+                        Commands.Add(string.Format("material.opacityMap.map1.filtering = 2;"));
+                    }
                 }
             }
-            else
-            {
-                Commands.Add(string.Format("material.diffuse = color {0} {1} {2}", diffuse.R, diffuse.G, diffuse.B));
-            }
 
-            if (opacityMap != null)
-            {
-                Commands.Add(string.Format("material.opacityMap = (bitmapTexture filename:\"{0}\")", opacityMap));
-                Commands.Add(string.Format("material.opacityMapAmount = {0}", opacityMapAmount * 100.0));
-                Commands.Add(string.Format("material.opacityMap.coords.u_tiling = {0}; material.opacityMap.coords.v_tiling = {1};", u_tiling, v_tiling));
-
-                if (DisableFiltering)
-                {
-                    Commands.Add(string.Format("material.opacityMap.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("material.opacityMap.filtering = 2;"));
-                }
-            }
-            else
-            {
-                Commands.Add(string.Format("material.opacity = {0}", opacityMapAmount * 100.0));
-            }
+            Commands.Add(string.Format("material.specularLevel = {0}", specularLevel));
+            Commands.Add(string.Format("material.glossiness = {0}", glossiness * GlossScalar));
 
             if (specularMap != null)
             {
+                Commands.Add(string.Format("material.specularMapEnable = true;"));
                 Commands.Add(string.Format("material.specularMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
                 Commands.Add(string.Format("material.specularMap.map1.coords.u_tiling = {0}; material.specularMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("material.specularMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("material.specularMap.map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.specularMap.map1.coords.blur = 0.01"));
+                    Commands.Add(string.Format("material.specularMap.map1.filtering = 2"));
                 }
             }
             else
@@ -754,8 +786,15 @@ namespace MaxManagedBridge
                 Commands.Add(string.Format("material.specular = (color {0} {1} {2})", specular.R, specular.G, specular.B));
             }
 
-            Commands.Add(string.Format("material.specularLevel = {0}", specularLevel * 100.0));
-            Commands.Add(string.Format("material.glossiness = {0}", glossiness * 100.0 * GlossScalar));
+            /*If a material is opaque, then flag it as such for mental ray to improve render times. The property in mental ray connection is that of the slot however and not the material, so we have to 'assign' the material,
+             then make the change - http://forums.cgsociety.org/archive/index.php/t-914476.html*/
+            if (!isTranslucent)
+            {
+                Commands.Add("m = meditmaterials[1]");
+                Commands.Add("meditmaterials[1] = material");
+                Commands.Add("material.mental_ray__material_custom_attribute.Opaque = true");
+                Commands.Add("meditmaterials[1] = m");
+            }
 
             Commands.Add("(getHandleByAnim material) as String");
 
