@@ -28,30 +28,9 @@ namespace MaxManagedBridge
             sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
             sceneListbox.DisplayMember = "Label";
 
-            this.bumpScalarTextBox.Text = this.Plugin.BumpScalar.ToString();
-            this.glossinessScalarTextBox.Text = this.Plugin.GlossinessScalar.ToString();
-
-            this.bumpScalarTextBox.KeyPress += new KeyPressEventHandler(bumpScalarTextBox_KeyPress);
-            this.glossinessScalarTextBox.KeyPress += new KeyPressEventHandler(glossinessScalarTextBox_KeyPress);
-
             this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterials);
+            this.materialSelectDropDown.DisplayMember = "MaterialName";
             this.materialSelectDropDown.SelectedIndex = 0;
-        }
-
-        void glossinessScalarTextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 13)
-            {
-                Plugin.GlossinessScalar = GetValidatedUpdateFromTextbox(sender as TextBox, Plugin.GlossinessScalar);
-            }
-        }
-
-        void bumpScalarTextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 13)
-            {
-                Plugin.BumpScalar = GetValidatedUpdateFromTextbox(sender as TextBox, Plugin.BumpScalar);
-            }
         }
 
         float GetValidatedUpdateFromTextbox(TextBox textbox, float original)
@@ -129,25 +108,38 @@ namespace MaxManagedBridge
             }
         }
 
-        private void updateButton_Click(object sender, EventArgs e)
+        private IEnumerable<MyScene> GetSelectedItemsUpdates
         {
-            Log.Add("[m] (updateButton_Click()) Update meshes clicked");
-
-            foreach (var sceneview in scenesView)
+            get
             {
                 if (sceneListbox.SelectedItems.Count > 0)
                 {
-                    if (sceneview.SelectedItems.Count > 0)
+                    foreach (var sceneview in scenesView)
                     {
-                        Plugin.UpdateMeshes(sceneview.Client.GetScene(sceneview.SelectedItems));
+                        if (sceneview.SelectedItems.Count > 0)
+                        {
+                            yield return sceneview.Client.GetScene(sceneview.SelectedItems);
+                        }
                     }
                 }
                 else
                 {
-                    Plugin.UpdateMeshes(sceneview.Client.GetScene(new List<string>()));
+                    foreach (var sceneview in scenesView)
+                    {
+                        yield return sceneview.Client.GetScene(new List<string>());
+                    }
                 }
             }
+        }
 
+        private void updateButton_Click(object sender, EventArgs e)
+        {
+            Log.Add("[m] (updateButton_Click()) Update meshes clicked");
+
+            foreach (var update in GetSelectedItemsUpdates)
+            {
+                Plugin.UpdateMeshes(update);
+            }
         }
 
         private bool optionsVisible = false;
@@ -165,23 +157,78 @@ namespace MaxManagedBridge
             optionsVisible = !optionsVisible;
         }
 
+        private class BindingCache
+        {
+            public BindingCache(Control control, Binding binding)
+            {
+                this.control = control;
+                this.binding = binding;
+                this.enabled = true;
+            }
+
+            private Binding binding;
+            private bool enabled;
+            private Control control;
+
+            public void RemakeBinding()
+            {
+                control.DataBindings.Clear();
+                if (enabled)
+                {
+                    try
+                    {
+                        control.DataBindings.Add(binding);
+                    }
+                    catch
+                    {
+                        enabled = false;
+                    }
+                }
+                control.Enabled = enabled;
+
+            }
+        }
+
         private void materialSelectDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Plugin.SelectedMaterial = (sender as ComboBox).SelectedIndex;
+            IMaterialCreationOptions MaterialOptions = (sender as ComboBox).SelectedItem as IMaterialCreationOptions;
+
+            Plugin.MaterialOptions = MaterialOptions;
+
+            /* We create and use the array of cached bindings in this function only so we can use hardcoded indices safely */
+
+            if((MaterialOptions.BindingInfo as BindingCache[]) == null){
+                MaterialOptions.BindingInfo = new BindingCache[5];
+
+                /* When this material is first selected, we attempt to bind all the possible UI controls. If the binding fails (because there is no appropriate property for that control)
+                 * the binding is disabled in the BindingCache object from then on, and the control is disabled. This way, we only throw an exception once at the first use of the material. */
+
+                (MaterialOptions.BindingInfo as BindingCache[])[0] = new BindingCache(glossinessScalarTextBox, new Binding("Text", MaterialOptions, "GlossScalar"));
+                (MaterialOptions.BindingInfo as BindingCache[])[1] = new BindingCache(bumpScalarTextBox, new Binding("Text", MaterialOptions, "BumpScalar"));
+                (MaterialOptions.BindingInfo as BindingCache[])[2] = new BindingCache(disableMapFilteringCheckbox, new Binding("Checked", MaterialOptions, "MapFilteringDisable"));
+                (MaterialOptions.BindingInfo as BindingCache[])[3] = new BindingCache(ambientOcclusionEnableCheckbox, new Binding("Checked", MaterialOptions, "AOEnable"));
+                (MaterialOptions.BindingInfo as BindingCache[])[4] = new BindingCache(ambientOcclusionDistanceTextBox, new Binding("Text", MaterialOptions, "AODistance"));
+            }
+
+            BindingCache[] bindingInfo = MaterialOptions.BindingInfo as BindingCache[];
+
+            foreach (BindingCache binding in bindingInfo)
+            {
+                binding.RemakeBinding();
+            }
         }
 
         private void getMaterialProperties_button_Click(object sender, EventArgs e)
         {
-            
-
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "TXT|*.txt";
-            DialogResult result = dlg.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
+            string materialContents = "Press CTRL + C with this window in focus to copy the content.\n\n";
+                       
+            foreach (var update in GetSelectedItemsUpdates)
             {
-                //System.IO.File.WriteAllText(dlg.FileName, Plugin.PrintMaterialProperties(selectedItemNames));
-                throw new NotImplementedException();
+                materialContents += Plugin.PrintMaterialProperties(update);
             }
+
+            EditableMessageBox messagebox = new EditableMessageBox(materialContents, "Material Properties in Update from Daz");
+            messagebox.Show();
         }
 
     }

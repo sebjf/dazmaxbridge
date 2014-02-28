@@ -54,10 +54,6 @@ namespace MaxManagedBridge
             {
                 System.Windows.Forms.MessageBox.Show("Caught exception in UpdateMeshes(): " + e.Message + e.TargetSite + e.StackTrace);
             }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show("Caught unknown exception in UpdateMeshes()");
-            }
         }
 
         public void UpdateMeshes(IEnumerable<MyMesh> myMeshes)

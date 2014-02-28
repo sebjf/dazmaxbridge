@@ -9,15 +9,34 @@ using System.Windows.Forms;
 
 namespace MaxManagedBridge
 {
-
+    public interface IMaterialCreationOptions
+    {
+        IMaxScriptMaterialProperties GetNewMaterial();
+        string MaterialName { get; }
+        object BindingInfo { get; set; } //This is for use by the GUI
+    }
 
     public partial class MaxPlugin : MaxBridge
     {
-        public string[] AvailableMaterials = { "mental ray Arch & Design", "3DS Max Standard", "VRay" };
-        public int SelectedMaterial = 0;
+        protected IMaterialCreationOptions materialOptions = new MaterialOptionsMentalRayArchAndDesign();
+        public IMaterialCreationOptions MaterialOptions
+        {
+            set
+            {
+                if (value is IMaterialCreationOptions)
+                {
+                    materialOptions = value;
+                }
+                else
+                {
+                    string message = "MaterialOptions must be valid object implementing GetNewMaterial()";
+                    Log.Add(message);
+                    throw new ArgumentException(message);
+                }
+            }
+        }
 
-        public float BumpScalar = 500.0f;
-        public float GlossinessScalar = 0.4f;
+        public IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
 
         public IMultiMtl CreateMaterial(MyMesh myMesh)
         {
@@ -63,7 +82,7 @@ namespace MaxManagedBridge
             string final = "";
             foreach (var s in lines)
             {
-                final += (s + "\n");
+                final += (s + Environment.NewLine);
             }
 
             return final;
@@ -79,21 +98,7 @@ namespace MaxManagedBridge
         /// <returns></returns>
         public IMtl CreateMaterialMaxScript(Material material)
         {
-            IMaxScriptMaterialProperties maxMaterial;
-
-            switch (SelectedMaterial)
-            {
-                case 1:
-                    maxMaterial = new MaxScriptStandardMaterial();
-                    break;
-                case 2:
-                    maxMaterial = new MaxScriptVRayMaterial();
-                    break;
-                default:
-                case 0:
-                    maxMaterial = new MaxScriptMentalRayArchAndDesignMaterial();
-                    break;
-            };
+            IMaxScriptMaterialProperties maxMaterial = materialOptions.GetNewMaterial();
 
             /* All percentages should be between 0-1 and any conversions done in the script generation */
 
@@ -110,11 +115,11 @@ namespace MaxManagedBridge
             maxMaterial.Specular = ConvertColour(material.GetColor("Specular Color"));
             maxMaterial.SpecularMap = material.GetString("Specular Color Map");
             maxMaterial.SpecularLevel = material.GetFloat("Specular Strength");
-            maxMaterial.Glossiness = material.GetFloat("Glossiness") * GlossinessScalar;
+            maxMaterial.Glossiness = material.GetFloat("Glossiness");
             maxMaterial.U_tiling = material.GetFloat("Horizontal Tiles");
             maxMaterial.V_tiling = material.GetFloat("Vertical Tiles");
 
-            maxMaterial.BumpMapAmount = (material.GetFloatSafe("Positive Bump", 0) - material.GetFloatSafe("Negative Bump", 0)) * material.GetFloatSafe("Bump Strength", 0.03f) * BumpScalar;
+            maxMaterial.BumpMapAmount = ((material.GetFloatSafe(new string[]{"Positive Bump", "Bump Maximum"}, 0.1f) - material.GetFloatSafe(new string[]{"Negative Bump", "Bump Minimum"}, -0.1f)) * material.GetFloatSafe("Bump Strength", 1.0f));
 
             string script = maxMaterial.MakeScript();
 
@@ -130,7 +135,7 @@ namespace MaxManagedBridge
                 }
                 return nativeMtl;
             }
-            catch (Exception e)
+            catch
             {
                 System.Windows.Forms.MessageBox.Show(
                     "Copy the full script out of this window with Ctrl+C and run it in 3DS Max listener without the parenthesis to find the error.\n\n" + script,
@@ -186,7 +191,6 @@ namespace MaxManagedBridge
         Nullable<float> Glossiness { set; }
         Nullable<float> U_tiling { set; }
         Nullable<float> V_tiling { set; }
-        bool DisableFiltering { set; }
 
         string MakeScript();
     }
@@ -212,20 +216,14 @@ namespace MaxManagedBridge
         public Nullable<float> U_tiling { set { if (value != null) u_tiling = value.Value; } }
         public Nullable<float> V_tiling { set { if (value != null) v_tiling = value.Value; } }
 
-        public bool DisableFiltering { get; set; }
-
-        public bool twoSided = true;
         public bool showInViewport = true;
-        public bool adTextureLock = true;
-        public bool adLock = true;
-        public bool dsLock = true;
 
         protected Color ambient = Color.Black;
         protected string ambientMap = null;
         protected float ambientMapAmount = 1.0f;
 
         protected string bumpMap = null;
-        protected float bumpMapAmount = 100.0f;
+        protected float bumpMapAmount = 1.0f;
 
         protected Color diffuse = Color.FromArgb(127, 127, 127);
         protected string diffuseMap = null;
@@ -245,18 +243,57 @@ namespace MaxManagedBridge
         public abstract string MakeScript();
     }
 
+    public class MaterialOptionsMentalRayArchAndDesign : IMaterialCreationOptions
+    {
+        /* Here are the options that should be exposed through the UI - they will be databound to controls on the form when this option is selected in the drop down list */
+
+        public bool  MapFilteringDisable { get; set; }
+        public bool  AOEnable { get; set; }
+        public int   AODistance { get; set; }
+        public float GlossScalar { get; set; }
+        public float BumpScalar { get; set; }
+
+        public MaterialOptionsMentalRayArchAndDesign()
+        {
+            MapFilteringDisable = true;
+            AOEnable = true;
+            AODistance = 200;
+            GlossScalar = 0.4f;
+            BumpScalar = 2.5f;
+        }
+    
+        public IMaxScriptMaterialProperties GetNewMaterial()
+        {
+ 	        MaxScriptMentalRayArchAndDesignMaterial material = new MaxScriptMentalRayArchAndDesignMaterial();
+            material.DisableFiltering = MapFilteringDisable;
+            material.AOEnable = AOEnable;
+            material.AORayDistance = AODistance;
+            material.GlossScalar = GlossScalar;
+            material.BumpScalar = BumpScalar;
+            return material;
+        }
+
+        public string MaterialName
+        {
+            get { return "MentalRay Arch & Design Material"; }
+        }
+
+        public object BindingInfo { get; set; }
+    }
+
     public class MaxScriptMentalRayArchAndDesignMaterial : MaxScriptMaterial
     {
         public MaxScriptMentalRayArchAndDesignMaterial()
         {
             Name = "mrArchDesignMaxScriptMaterial";
-            DisableFiltering = true;
         }
 
-        public bool EnableAO = true;
+        public bool AOEnable = true;
+        public int  AORayDistance = 100;
+        public bool DisableFiltering = true;
+        public float GlossScalar = 0.4f;
+        public float BumpScalar = 2.5f;
         public bool EnableHighlightsFGOnly = true;
-
-        private const float BumpModifier = 0.5f; //this is to bring it in line with BumpScalar above, not to control it.
 
         public override string MakeScript()
         {
@@ -316,7 +353,7 @@ namespace MaxManagedBridge
             if (bumpMap != null)
             {
                 Commands.Add(string.Format("material.bump_map = (bitmapTexture filename:\"{0}\")", bumpMap));
-                Commands.Add(string.Format("material.Bump_Map_Amount = {0}", (bumpMapAmount * 0.01 * BumpModifier)));
+                Commands.Add(string.Format("material.Bump_Map_Amount = {0}", (bumpMapAmount * BumpScalar)));
                 Commands.Add(string.Format("material.bump_map.coords.u_tiling = {0}; material.bump_map.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
@@ -355,7 +392,7 @@ namespace MaxManagedBridge
             }
 
             Commands.Add(string.Format("material.Reflectivity = {0}", specularLevel));
-            Commands.Add(string.Format("material.Reflection_Glossiness = {0}", glossiness));
+            Commands.Add(string.Format("material.Reflection_Glossiness = {0}", glossiness * GlossScalar));
 
             if (specularMap != null)
             {
@@ -373,12 +410,12 @@ namespace MaxManagedBridge
                 Commands.Add(string.Format("material.Reflection_Color = (color {0} {1} {2})", specular.R, specular.G, specular.B));
             }
 
-            if(EnableAO){
+            if(AOEnable){
                 Commands.Add("material.opts_ao_on = true");
                 Commands.Add("material.opts_ao_use_global_ambient = true");
-                Commands.Add("material.opts_ao_exact = false");
+                Commands.Add("material.opts_ao_exact = true");
                 Commands.Add("material.opts_ao_samples = 12");
-                Commands.Add("material.opts_ao_distance = 400");
+                Commands.Add(string.Format("material.opts_ao_distance = {0}", AORayDistance));
             }
 
             if (EnableHighlightsFGOnly)
@@ -386,7 +423,7 @@ namespace MaxManagedBridge
                 Commands.Add("material.refl_hlonly = true");
             }
 
-            /*If a material is opaque, then flag it as so for mental ray to improve render times. The property in mental ray connection is that of the slot however and not the material, so we have to 'assign' the material,
+            /*If a material is opaque, then flag it as such for mental ray to improve render times. The property in mental ray connection is that of the slot however and not the material, so we have to 'assign' the material,
              then make the change - http://forums.cgsociety.org/archive/index.php/t-914476.html*/
             if (!isTranslucent)
             {
@@ -408,30 +445,61 @@ namespace MaxManagedBridge
         }
     }
 
+    public class MaterialOptionsVRayMaterial : IMaterialCreationOptions
+    {
+        public bool MapFilteringDisable { get; set; }
+        public float GlossScalar { get; set; }
+        public float BumpScalar { get; set; }
+
+        public MaterialOptionsVRayMaterial()
+        {
+            MapFilteringDisable = true;
+            GlossScalar = 0.4f;
+            BumpScalar = 2.5f;
+        }
+
+        public IMaxScriptMaterialProperties GetNewMaterial()
+        {
+            MaxScriptVRayMaterial material = new MaxScriptVRayMaterial();
+            material.DisableFiltering = MapFilteringDisable;
+            material.GlossScalar = GlossScalar;
+            material.BumpScalar = BumpScalar;
+            return material;
+        }
+
+        public string MaterialName
+        {
+            get { return "VRay Material"; }
+        }
+
+        public object BindingInfo { get; set; }
+    }
+
     public class MaxScriptVRayMaterial : MaxScriptMaterial
     {
         public MaxScriptVRayMaterial()
         {
             Name = "VRayMaxScriptMaterial";
-            DisableFiltering = true;
         }
 
-        private const float BumpModifier = 0.5f; //this is to bring it in line with BumpScalar above, not to control it.
+        public bool DisableFiltering = true;
+        public float GlossScalar = 0.4f;
+        public float BumpScalar = 2.5f;
 
         public override string MakeScript()
         {
             List<String> Commands = new List<string>();
 
-            Commands.Add(string.Format("vmaterial = VRayMtl name:(\"{0}\")", Name));
+            Commands.Add(string.Format("material = VRayMtl name:(\"{0}\")", Name));
 
-            Commands.Add(string.Format("vmaterial.showInViewport = {0}", showInViewport));
+            Commands.Add(string.Format("material.showInViewport = {0}", showInViewport));
 
-            Commands.Add(string.Format("vmaterial.texmap_diffuse_multiplier = {0}", diffuseMapAmount));
+            Commands.Add(string.Format("material.texmap_diffuse_multiplier = {0}", diffuseMapAmount));
 
             // CompositeTextureMap help page: http://docs.autodesk.com/3DSMAX/15/ENU/MAXScript-Help/index.html?url=files/GUID-611E1342-F976-4E95-8F78-88175B329745.htm,topicNumber=d30e510982
-            Commands.Add(string.Format("vmaterial.texmap_diffuse = CompositeTextureMap()"));
-            Commands.Add(string.Format("vmaterial.texmap_diffuse.add()"));
-            Commands.Add(string.Format("vmaterial.texmap_diffuse.blendMode[2] = 2"));
+            Commands.Add(string.Format("material.texmap_diffuse = CompositeTextureMap()"));
+            Commands.Add(string.Format("material.texmap_diffuse.add()"));
+            Commands.Add(string.Format("material.texmap_diffuse.blendMode[2] = 2"));
 
             string addDiffuseMapCommand = "";
             if (diffuseMap != null)
@@ -439,19 +507,19 @@ namespace MaxManagedBridge
                 addDiffuseMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", diffuseMap);
             }
 
-            Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, diffuse.R, diffuse.G, diffuse.B));
+            Commands.Add(string.Format("material.texmap_diffuse.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, diffuse.R, diffuse.G, diffuse.B));
             
             /*becaus even if theres no texture we use the map slot to set the colour...*/
-            Commands.Add(string.Format("vmaterial.texmap_diffuse_on = true"));
+            Commands.Add(string.Format("material.texmap_diffuse_on = true"));
 
             if (diffuseMap != null)
             {
-                Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.coords.u_tiling = {0}; vmaterial.texmap_diffuse.mapList[1].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.texmap_diffuse.mapList[1].map1.coords.u_tiling = {0}; material.texmap_diffuse.mapList[1].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[1].map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.texmap_diffuse.mapList[1].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.texmap_diffuse.mapList[1].map1.filtering = 2;"));
                 }
             }
 
@@ -461,32 +529,32 @@ namespace MaxManagedBridge
                 addAmbientMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", ambientMap);
             }
 
-            Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, ambient.R * ambientMapAmount, ambient.G * ambientMapAmount, ambient.B * ambientMapAmount));
+            Commands.Add(string.Format("material.texmap_diffuse.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, ambient.R * ambientMapAmount, ambient.G * ambientMapAmount, ambient.B * ambientMapAmount));
 
             if (ambientMap != null)
             {
-                Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.coords.u_tiling = {0}; vmaterial.texmap_diffuse.mapList[2].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.texmap_diffuse.mapList[2].map1.coords.u_tiling = {0}; material.texmap_diffuse.mapList[2].map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("vmaterial.texmap_diffuse.mapList[2].map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.texmap_diffuse.mapList[2].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.texmap_diffuse.mapList[2].map1.filtering = 2;"));
                 }
             }
 
-            Commands.Add(string.Format("vmaterial.texmap_diffuse.mask[2] = vmaterial.texmap_diffuse.mapList[1]"));
+            Commands.Add(string.Format("material.texmap_diffuse.mask[2] = material.texmap_diffuse.mapList[1]"));
 
             if (bumpMap != null)
             {
-                Commands.Add(string.Format("vmaterial.texmap_bump = (bitmapTexture filename:\"{0}\")", bumpMap));
-                Commands.Add(string.Format("vmaterial.texmap_bump_on = true"));
-                Commands.Add(string.Format("vmaterial.texmap_bump_multiplier = {0}", (bumpMapAmount * 0.01 * BumpModifier)));
-                Commands.Add(string.Format("vmaterial.texmap_bump.coords.u_tiling = {0}; vmaterial.bump_map.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.texmap_bump = (bitmapTexture filename:\"{0}\")", bumpMap));
+                Commands.Add(string.Format("material.texmap_bump_on = true"));
+                Commands.Add(string.Format("material.texmap_bump_multiplier = {0}", (bumpMapAmount * BumpScalar)));
+                Commands.Add(string.Format("material.texmap_bump.coords.u_tiling = {0}; material.bump_map.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("vmaterial.texmap_bump.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("vmaterial.texmap_bump.filtering = 2;"));
+                    Commands.Add(string.Format("material.texmap_bump.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.texmap_bump.filtering = 2;"));
                 }
             }
 
@@ -502,42 +570,42 @@ namespace MaxManagedBridge
                 }
 
                 float opacityMapConstant = (int)(255f * opacityMapAmount);
-                Commands.Add(string.Format("vmaterial.texmap_opacity = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
-                Commands.Add(string.Format("vmaterial.texmap_opacity_on = true"));
+                Commands.Add(string.Format("material.texmap_opacity = RGB_Multiply {0} color2:(color {1} {2} {3})", addOpacityMapCommand, opacityMapConstant, opacityMapConstant, opacityMapConstant));
+                Commands.Add(string.Format("material.texmap_opacity_on = true"));
 
                 if (opacityMap != null)
                 {
-                    Commands.Add(string.Format("vmaterial.texmap_opacity.map1.coords.u_tiling = {0}; vmaterial.texmap_opacity.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                    Commands.Add(string.Format("material.texmap_opacity.map1.coords.u_tiling = {0}; material.texmap_opacity.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                     if (DisableFiltering)
                     {
-                        Commands.Add(string.Format("vmaterial.texmap_opacity.map1.coords.blur = 0.01;"));
-                        Commands.Add(string.Format("vmaterial.texmap_opacity.map1.filtering = 2;"));
+                        Commands.Add(string.Format("material.texmap_opacity.map1.coords.blur = 0.01;"));
+                        Commands.Add(string.Format("material.texmap_opacity.map1.filtering = 2;"));
                     }
                 }
             }
 
-            Commands.Add(string.Format("vmaterial.reflection_glossiness = {0}", glossiness));
+            Commands.Add(string.Format("material.reflection_glossiness = {0}", glossiness * GlossScalar));
 
             if (specularMap != null)
             {
-                Commands.Add(string.Format("vmaterial.texmap_reflection = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
-                Commands.Add(string.Format("vmaterial.texmap_reflection.map1.coords.u_tiling = {0}; vmaterial.texmap_reflection.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
-                Commands.Add(string.Format("vmaterial.texmap_reflection_on = true"));
+                Commands.Add(string.Format("material.texmap_reflection = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
+                Commands.Add(string.Format("material.texmap_reflection.map1.coords.u_tiling = {0}; material.texmap_reflection.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.texmap_reflection_on = true"));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("vmaterial.texmap_reflection.map1.coords.blur = 0.01"));
-                    Commands.Add(string.Format("vmaterial.texmap_reflection.map1.filtering = 2"));
+                    Commands.Add(string.Format("material.texmap_reflection.map1.coords.blur = 0.01"));
+                    Commands.Add(string.Format("material.texmap_reflection.map1.filtering = 2"));
                 }
             }
             else
             {
-                Commands.Add(string.Format("vmaterial.reflection = (color {0} {1} {2})", specularLevel * specular.R, specularLevel * specular.G, specularLevel * specular.B));
+                Commands.Add(string.Format("material.reflection = (color {0} {1} {2})", specularLevel * specular.R, specularLevel * specular.G, specularLevel * specular.B));
             }
 
 
-            Commands.Add("(getHandleByAnim vmaterial) as String");
+            Commands.Add("(getHandleByAnim material) as String");
 
             string script = "";
             foreach (var c in Commands)
@@ -549,110 +617,147 @@ namespace MaxManagedBridge
         }
     }
 
+    public class MaterialOptionsStandardMaterial : IMaterialCreationOptions
+    {
+        public bool MapFilteringDisable { get; set; }
+        public float GlossScalar { get; set; }
+        public float BumpScalar { get; set; }
+
+        public MaterialOptionsStandardMaterial()
+        {
+            MapFilteringDisable = true;
+            GlossScalar = 0.4f;
+            BumpScalar = 2.5f;
+        }
+
+        public IMaxScriptMaterialProperties GetNewMaterial()
+        {
+            MaxScriptStandardMaterial material = new MaxScriptStandardMaterial();
+            material.DisableFiltering = MapFilteringDisable;
+            material.GlossScalar = GlossScalar;
+            material.BumpScalar = BumpScalar;
+            return material;
+        }
+
+        public string MaterialName
+        {
+            get { return "Autodesk 3DS Max Standard Material"; }
+        }
+
+        public object BindingInfo { get; set; }
+    }
+
     public class MaxScriptStandardMaterial : MaxScriptMaterial
     {
         public MaxScriptStandardMaterial()
         {
             Name = "standardMaxScriptMaterial";
-            DisableFiltering = true;
         }
+
+        public bool twoSided = true;
+        public bool adTextureLock = true;
+        public bool adLock = true;
+        public bool dsLock = true;
+        public bool DisableFiltering = true;
+        public float GlossScalar = 0.4f;
+        public float BumpScalar = 2.5f;
 
         public override string MakeScript()
         {
             List<String> Commands = new List<string>();
 
-            Commands.Add(string.Format("stdmaterial = StandardMaterial name:(\"{0}\")", Name));
+            Commands.Add(string.Format("material = StandardMaterial name:(\"{0}\")", Name));
 
-            Commands.Add(string.Format("stdmaterial.twoSided = {0}", twoSided));
-            Commands.Add(string.Format("stdmaterial.showInViewport = {0}", showInViewport));
-            Commands.Add(string.Format("stdmaterial.adTextureLock = {0}", adTextureLock));
-            Commands.Add(string.Format("stdmaterial.adLock = {0}", adLock));
-            Commands.Add(string.Format("stdmaterial.dsLock = {0}", dsLock));
+            Commands.Add(string.Format("material.twoSided = {0}", twoSided));
+            Commands.Add(string.Format("material.showInViewport = {0}", showInViewport));
+            Commands.Add(string.Format("material.adTextureLock = {0}", adTextureLock));
+            Commands.Add(string.Format("material.adLock = {0}", adLock));
+            Commands.Add(string.Format("material.dsLock = {0}", dsLock));
 
             if (ambientMap != null)
             {
-                Commands.Add(string.Format("stdmaterial.ambientMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", ambientMap, ambient.R, ambient.G, ambient.B));
-                Commands.Add(string.Format("stdmaterial.ambientMapAmount = {0}", ambientMapAmount * 100.0));
-                Commands.Add(string.Format("stdmaterial.ambientMap.map1.coords.u_tiling = {0}; stdmaterial.ambientMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.ambientMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", ambientMap, ambient.R, ambient.G, ambient.B));
+                Commands.Add(string.Format("material.ambientMapAmount = {0}", ambientMapAmount * 100.0));
+                Commands.Add(string.Format("material.ambientMap.map1.coords.u_tiling = {0}; material.ambientMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("stdmaterial.ambientMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("stdmaterial.ambientMap.map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.ambientMap.map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.ambientMap.map1.filtering = 2;"));
                 }
             }
             else
             {
-                Commands.Add(string.Format("stdmaterial.ambient = color {0} {1} {2}", ambient.R, ambient.G, ambient.B));
+                Commands.Add(string.Format("material.ambient = color {0} {1} {2}", ambient.R, ambient.G, ambient.B));
             }
 
             if (bumpMap != null)
             {
-                Commands.Add(string.Format("stdmaterial.bumpMap = (bitmapTexture filename:\"{0}\")", bumpMap));
-                Commands.Add(string.Format("stdmaterial.bumpMapAmount = {0}", bumpMapAmount));
-                Commands.Add(string.Format("stdmaterial.bumpMap.coords.u_tiling = {0}; stdmaterial.bumpMap.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.bumpMap = (bitmapTexture filename:\"{0}\")", bumpMap));
+                Commands.Add(string.Format("material.bumpMapAmount = {0}", bumpMapAmount * BumpScalar));
+                Commands.Add(string.Format("material.bumpMap.coords.u_tiling = {0}; material.bumpMap.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("stdmaterial.bumpMap.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("stdmaterial.bumpMap.filtering = 2;"));
+                    Commands.Add(string.Format("material.bumpMap.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.bumpMap.filtering = 2;"));
                 }
             }
 
             if (diffuseMap != null)
             {
-                Commands.Add(string.Format("stdmaterial.diffuseMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", diffuseMap, diffuse.R, diffuse.G, diffuse.B));
-                Commands.Add(string.Format("stdmaterial.diffuseMapAmount = {0}", diffuseMapAmount * 100.0));
-                Commands.Add(string.Format("stdmaterial.diffuseMap.map1.coords.u_tiling = {0}; stdmaterial.diffuseMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.diffuseMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", diffuseMap, diffuse.R, diffuse.G, diffuse.B));
+                Commands.Add(string.Format("material.diffuseMapAmount = {0}", diffuseMapAmount * 100.0));
+                Commands.Add(string.Format("material.diffuseMap.map1.coords.u_tiling = {0}; material.diffuseMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("stdmaterial.diffuseMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("stdmaterial.diffuseMap.map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.diffuseMap.map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.diffuseMap.map1.filtering = 2;"));
                 }
             }
             else
             {
-                Commands.Add(string.Format("stdmaterial.diffuse = color {0} {1} {2}", diffuse.R, diffuse.G, diffuse.B));
+                Commands.Add(string.Format("material.diffuse = color {0} {1} {2}", diffuse.R, diffuse.G, diffuse.B));
             }
 
             if (opacityMap != null)
             {
-                Commands.Add(string.Format("stdmaterial.opacityMap = (bitmapTexture filename:\"{0}\")", opacityMap));
-                Commands.Add(string.Format("stdmaterial.opacityMapAmount = {0}", opacityMapAmount * 100.0));
-                Commands.Add(string.Format("stdmaterial.opacityMap.coords.u_tiling = {0}; stdmaterial.opacityMap.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.opacityMap = (bitmapTexture filename:\"{0}\")", opacityMap));
+                Commands.Add(string.Format("material.opacityMapAmount = {0}", opacityMapAmount * 100.0));
+                Commands.Add(string.Format("material.opacityMap.coords.u_tiling = {0}; material.opacityMap.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("stdmaterial.opacityMap.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("stdmaterial.opacityMap.filtering = 2;"));
+                    Commands.Add(string.Format("material.opacityMap.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.opacityMap.filtering = 2;"));
                 }
             }
             else
             {
-                Commands.Add(string.Format("stdmaterial.opacity = {0}", opacityMapAmount * 100.0));
+                Commands.Add(string.Format("material.opacity = {0}", opacityMapAmount * 100.0));
             }
 
             if (specularMap != null)
             {
-                Commands.Add(string.Format("stdmaterial.specularMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
-                Commands.Add(string.Format("stdmaterial.specularMap.map1.coords.u_tiling = {0}; stdmaterial.specularMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
+                Commands.Add(string.Format("material.specularMap = RGB_Multiply map1:(bitmapTexture filename:\"{0}\") color2:(color {1} {2} {3})", specularMap, specular.R, specular.G, specular.B));
+                Commands.Add(string.Format("material.specularMap.map1.coords.u_tiling = {0}; material.specularMap.map1.coords.v_tiling = {1};", u_tiling, v_tiling));
 
                 if (DisableFiltering)
                 {
-                    Commands.Add(string.Format("stdmaterial.specularMap.map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("stdmaterial.specularMap.map1.filtering = 2;"));
+                    Commands.Add(string.Format("material.specularMap.map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("material.specularMap.map1.filtering = 2;"));
                 }
             }
             else
             {
-                Commands.Add(string.Format("stdmaterial.specular = (color {0} {1} {2})", specular.R, specular.G, specular.B));
+                Commands.Add(string.Format("material.specular = (color {0} {1} {2})", specular.R, specular.G, specular.B));
             }
 
-            Commands.Add(string.Format("stdmaterial.specularLevel = {0}", specularLevel * 100.0));
-            Commands.Add(string.Format("stdmaterial.glossiness = {0}", glossiness * 100.0));
+            Commands.Add(string.Format("material.specularLevel = {0}", specularLevel * 100.0));
+            Commands.Add(string.Format("material.glossiness = {0}", glossiness * 100.0 * GlossScalar));
 
-            Commands.Add("(getHandleByAnim stdmaterial) as String");
+            Commands.Add("(getHandleByAnim material) as String");
 
             string script = "";
             foreach (var c in Commands)

@@ -34,8 +34,13 @@ namespace MaxManagedBridge
             this.updateButton = new System.Windows.Forms.Button();
             this.progressBar1 = new ProgressBarSample.CustomProgressBar();
             this.optionsGroup = new System.Windows.Forms.GroupBox();
+            this.disableMapFilteringCheckbox = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.ambientOcclusionEnableCheckbox = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.ambientOcclusionDistanceTextBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.getMaterialProperties_button = new System.Windows.Forms.Button();
-            this.writeDebugCheckbox = new System.Windows.Forms.CheckBox();
             this.bumpScalarTextBox = new System.Windows.Forms.TextBox();
             this.glossinessScalarTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -86,8 +91,13 @@ namespace MaxManagedBridge
             // 
             // optionsGroup
             // 
+            this.optionsGroup.Controls.Add(this.disableMapFilteringCheckbox);
+            this.optionsGroup.Controls.Add(this.label5);
+            this.optionsGroup.Controls.Add(this.ambientOcclusionEnableCheckbox);
+            this.optionsGroup.Controls.Add(this.label4);
+            this.optionsGroup.Controls.Add(this.ambientOcclusionDistanceTextBox);
+            this.optionsGroup.Controls.Add(this.label3);
             this.optionsGroup.Controls.Add(this.getMaterialProperties_button);
-            this.optionsGroup.Controls.Add(this.writeDebugCheckbox);
             this.optionsGroup.Controls.Add(this.bumpScalarTextBox);
             this.optionsGroup.Controls.Add(this.glossinessScalarTextBox);
             this.optionsGroup.Controls.Add(this.label2);
@@ -100,10 +110,62 @@ namespace MaxManagedBridge
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Options";
             // 
+            // disableMapFilteringCheckbox
+            // 
+            this.disableMapFilteringCheckbox.AutoSize = true;
+            this.disableMapFilteringCheckbox.Location = new System.Drawing.Point(153, 103);
+            this.disableMapFilteringCheckbox.Name = "disableMapFilteringCheckbox";
+            this.disableMapFilteringCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.disableMapFilteringCheckbox.TabIndex = 16;
+            this.disableMapFilteringCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 103);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(105, 13);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "Disable Map Filtering";
+            // 
+            // ambientOcclusionEnableCheckbox
+            // 
+            this.ambientOcclusionEnableCheckbox.AutoSize = true;
+            this.ambientOcclusionEnableCheckbox.Location = new System.Drawing.Point(153, 126);
+            this.ambientOcclusionEnableCheckbox.Name = "ambientOcclusionEnableCheckbox";
+            this.ambientOcclusionEnableCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.ambientOcclusionEnableCheckbox.TabIndex = 14;
+            this.ambientOcclusionEnableCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(7, 126);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(131, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Ambient Occlusion Enable";
+            // 
+            // ambientOcclusionDistanceTextBox
+            // 
+            this.ambientOcclusionDistanceTextBox.Location = new System.Drawing.Point(153, 146);
+            this.ambientOcclusionDistanceTextBox.Name = "ambientOcclusionDistanceTextBox";
+            this.ambientOcclusionDistanceTextBox.Size = new System.Drawing.Size(67, 20);
+            this.ambientOcclusionDistanceTextBox.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 149);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(140, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Ambient Occlusion Distance";
+            // 
             // getMaterialProperties_button
             // 
             this.getMaterialProperties_button.ForeColor = System.Drawing.Color.Black;
-            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 129);
+            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 190);
             this.getMaterialProperties_button.Name = "getMaterialProperties_button";
             this.getMaterialProperties_button.Size = new System.Drawing.Size(140, 23);
             this.getMaterialProperties_button.TabIndex = 8;
@@ -111,28 +173,18 @@ namespace MaxManagedBridge
             this.getMaterialProperties_button.UseVisualStyleBackColor = true;
             this.getMaterialProperties_button.Click += new System.EventHandler(this.getMaterialProperties_button_Click);
             // 
-            // writeDebugCheckbox
-            // 
-            this.writeDebugCheckbox.AutoSize = true;
-            this.writeDebugCheckbox.Location = new System.Drawing.Point(10, 105);
-            this.writeDebugCheckbox.Name = "writeDebugCheckbox";
-            this.writeDebugCheckbox.Size = new System.Drawing.Size(107, 17);
-            this.writeDebugCheckbox.TabIndex = 7;
-            this.writeDebugCheckbox.Text = "Write Debug Log";
-            this.writeDebugCheckbox.UseVisualStyleBackColor = true;
-            // 
             // bumpScalarTextBox
             // 
-            this.bumpScalarTextBox.Location = new System.Drawing.Point(104, 71);
+            this.bumpScalarTextBox.Location = new System.Drawing.Point(153, 76);
             this.bumpScalarTextBox.Name = "bumpScalarTextBox";
-            this.bumpScalarTextBox.Size = new System.Drawing.Size(100, 20);
+            this.bumpScalarTextBox.Size = new System.Drawing.Size(67, 20);
             this.bumpScalarTextBox.TabIndex = 6;
             // 
             // glossinessScalarTextBox
             // 
-            this.glossinessScalarTextBox.Location = new System.Drawing.Point(104, 45);
+            this.glossinessScalarTextBox.Location = new System.Drawing.Point(153, 50);
             this.glossinessScalarTextBox.Name = "glossinessScalarTextBox";
-            this.glossinessScalarTextBox.Size = new System.Drawing.Size(100, 20);
+            this.glossinessScalarTextBox.Size = new System.Drawing.Size(67, 20);
             this.glossinessScalarTextBox.TabIndex = 5;
             // 
             // label2
@@ -195,7 +247,12 @@ namespace MaxManagedBridge
         private System.Windows.Forms.ComboBox materialSelectDropDown;
         private System.Windows.Forms.TextBox bumpScalarTextBox;
         private System.Windows.Forms.TextBox glossinessScalarTextBox;
-        private System.Windows.Forms.CheckBox writeDebugCheckbox;
         private System.Windows.Forms.Button getMaterialProperties_button;
+        private System.Windows.Forms.TextBox ambientOcclusionDistanceTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox ambientOcclusionEnableCheckbox;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox disableMapFilteringCheckbox;
+        private System.Windows.Forms.Label label5;
     }
 }

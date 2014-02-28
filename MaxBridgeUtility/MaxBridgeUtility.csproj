@@ -67,6 +67,12 @@
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
     <Compile Include="MaxImporterUtility\Descriptor.cs" />
+    <Compile Include="MaxImporterUtility\GUI\EditableMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MaxImporterUtility\GUI\EditableMessageBox.Designer.cs">
+      <DependentUpon>EditableMessageBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +93,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="MaxImporterUtility\GUI\EditableMessageBox.resx">
+      <DependentUpon>EditableMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MaxImporterUtility\GUI\UtilityMainForm.resx">
       <DependentUpon>UtilityMainForm.cs</DependentUpon>
     </EmbeddedResource>

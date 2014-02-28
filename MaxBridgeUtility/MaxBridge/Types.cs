@@ -116,6 +116,18 @@ namespace MaxManagedBridge
                 return fallback;
             return float.Parse(MaterialProperties[key]);
         }
+
+        public float GetFloatSafe(string[] keys, float fallback)
+        {
+            foreach (var key in keys)
+            {
+                if (MaterialProperties.ContainsKey(key))
+                {
+                    return float.Parse(MaterialProperties[key]);
+                }
+            }
+            return fallback;
+        }
     }
 
     /*
