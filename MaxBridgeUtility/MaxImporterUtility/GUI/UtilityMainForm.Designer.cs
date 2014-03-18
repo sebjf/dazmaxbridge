@@ -46,6 +46,7 @@ namespace MaxManagedBridge
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.materialSelectDropDown = new System.Windows.Forms.ComboBox();
+            this.rebuildMaterialsCheckbox = new System.Windows.Forms.CheckBox();
             this.optionsGroup.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -105,7 +106,7 @@ namespace MaxManagedBridge
             this.optionsGroup.Controls.Add(this.materialSelectDropDown);
             this.optionsGroup.Location = new System.Drawing.Point(12, 344);
             this.optionsGroup.Name = "optionsGroup";
-            this.optionsGroup.Size = new System.Drawing.Size(374, 232);
+            this.optionsGroup.Size = new System.Drawing.Size(377, 232);
             this.optionsGroup.TabIndex = 4;
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Options";
@@ -214,24 +215,36 @@ namespace MaxManagedBridge
             this.materialSelectDropDown.TabIndex = 0;
             this.materialSelectDropDown.SelectedIndexChanged += new System.EventHandler(this.materialSelectDropDown_SelectedIndexChanged);
             // 
+            // rebuildMaterialsCheckbox
+            // 
+            this.rebuildMaterialsCheckbox.AutoSize = true;
+            this.rebuildMaterialsCheckbox.Location = new System.Drawing.Point(13, 325);
+            this.rebuildMaterialsCheckbox.Name = "rebuildMaterialsCheckbox";
+            this.rebuildMaterialsCheckbox.Size = new System.Drawing.Size(117, 17);
+            this.rebuildMaterialsCheckbox.TabIndex = 5;
+            this.rebuildMaterialsCheckbox.Text = "Re-Import Materials";
+            this.rebuildMaterialsCheckbox.UseVisualStyleBackColor = true;
+            // 
             // UtilityMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(396, 588);
+            this.Controls.Add(this.rebuildMaterialsCheckbox);
             this.Controls.Add(this.optionsGroup);
             this.Controls.Add(this.updateButton);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.sceneListbox);
             this.Controls.Add(this.refreshButton);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(412, 626);
+            this.MaximumSize = new System.Drawing.Size(423, 626);
             this.MinimumSize = new System.Drawing.Size(412, 370);
             this.Name = "UtilityMainForm";
             this.Text = "Daz Studio 4 Bridge";
             this.optionsGroup.ResumeLayout(false);
             this.optionsGroup.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -254,5 +267,6 @@ namespace MaxManagedBridge
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox disableMapFilteringCheckbox;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox rebuildMaterialsCheckbox;
     }
 }

@@ -31,9 +31,12 @@ namespace MaxManagedBridge
     {
         protected IGlobal globalInterface = null;
 
+        public bool RebuildMaterials { get; set; }
+
         public MaxPlugin(IGlobal globalinterface)
         {
             this.globalInterface = globalinterface;
+            RebuildMaterials = false;
         }
 
         public IEnumerable<IINode> GetMappedNodes(string Name)
@@ -106,6 +109,11 @@ namespace MaxManagedBridge
                 UpdateProgress(0.2f, "Updating geometry...");
 
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
+
+                if (RebuildMaterials)
+                {
+                    m.Mtl = null;
+                }
 
                 if (m.Mtl == null)
                 {

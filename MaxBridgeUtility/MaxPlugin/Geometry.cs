@@ -59,29 +59,6 @@ namespace MaxManagedBridge
             return countChanged;
         }
 
-        unsafe struct MaxTVFace
-        {
-            public UInt32 v1;
-            public UInt32 v2;
-            public UInt32 v3;
-        }
-
-        /* so we can do the copy with one assignment */
-        unsafe struct Indices3 
-        {
-           public UInt32 v1;
-           public UInt32 v2;
-           public UInt32 v3;
-        }
-
-        unsafe struct MaxFace
-        {
-            public Indices3 v;
-            public UInt32 smGroup;
-            public UInt32 flags;
-
-        }
-
         unsafe public bool SetFaces(IMesh maxMesh, MyMesh myMesh)
         {
             bool countChanged = false;
@@ -99,26 +76,26 @@ namespace MaxManagedBridge
 
             IFace referenceFace = globalInterface.Face.Create();
             referenceFace.SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
-            MaxFace referenceMaxFace = *(MaxFace*)referenceFace.Handle.ToPointer();
+            Face referenceMaxFace = *(Face*)referenceFace.Handle.ToPointer();
             UInt32 referenceFlags = referenceMaxFace.flags;
 
             /* Create the faces that define the surface of the mesh */
 
-            MaxFace* faces = (MaxFace*)maxMesh.Faces[0].Handle.ToPointer();
-            MaxTVFace* tvfaces = (MaxTVFace*)maxMesh.TvFace[0].Handle.ToPointer();
+            Face* faces = (Face*)maxMesh.Faces[0].Handle.ToPointer();
+            TVFace* tvfaces = (TVFace*)maxMesh.TvFace[0].Handle.ToPointer();
 
             for (int i = 0; i < myMesh.TriangulatedFaces.Length; i++)
             {
-                Face myFace = myMesh.TriangulatedFaces[i];
+                MyFace myFace = myMesh.TriangulatedFaces[i];
 
                 faces[i].v.v1 = (UInt32)myFace.PositionVertex1;
                 faces[i].v.v2 = (UInt32)myFace.PositionVertex2;
                 faces[i].v.v3 = (UInt32)myFace.PositionVertex3;
                 faces[i].flags = (UInt32)((ushort)myFace.MaterialId << 16) | (ushort)referenceFlags;
 
-                tvfaces[i].v1 = (UInt32)myFace.TextureVertex1;
-                tvfaces[i].v2 = (UInt32)myFace.TextureVertex2;
-                tvfaces[i].v3 = (UInt32)myFace.TextureVertex3;
+                tvfaces[i].t1 = (UInt32)myFace.TextureVertex1;
+                tvfaces[i].t2 = (UInt32)myFace.TextureVertex2;
+                tvfaces[i].t3 = (UInt32)myFace.TextureVertex3;
 
             };
             

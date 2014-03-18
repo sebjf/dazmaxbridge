@@ -81,6 +81,8 @@
     </Compile>
     <Compile Include="MaxImporterUtility\GUI\ViewModels.cs" />
     <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
+    <Compile Include="MaxPlugin\Defaults.cs" />
+    <Compile Include="MaxPlugin\MaxTypes.cs" />
     <Compile Include="MaxPlugin\PropertyAccessors.cs" />
     <Compile Include="MaxPlugin\MaxSceneExploration.cs" />
     <Compile Include="MaxPlugin\Materials.cs" />

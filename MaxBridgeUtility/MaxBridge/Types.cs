@@ -152,7 +152,7 @@ namespace MaxManagedBridge
 
     /* Remember this comes from MessagePack in a raw byte array */
     [StructLayout(LayoutKind.Explicit)]
-    unsafe public struct Face
+    unsafe public struct MyFace
     {
         [FieldOffset(sizeof(int) * 0)]
         public int PositionVertex1;
@@ -234,9 +234,9 @@ namespace MaxManagedBridge
         [MessagePackMember(9)]
         public int SkeletonIndex;
 
-        /* The following properties are .NET only */
+        /* The following properties are on the receiver side only (not part of the message from Daz) */
 
-        public Face[] TriangulatedFaces = null;
+        public MyFace[] TriangulatedFaces = null;
 
         public int NumberOfMaterialSlots
         {

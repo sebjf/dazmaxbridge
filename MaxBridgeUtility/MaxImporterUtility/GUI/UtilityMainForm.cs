@@ -21,6 +21,8 @@ namespace MaxManagedBridge
             this.Utility = parent;
             this.Plugin = parent.Plugin;
 
+            rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RebuildMaterials"));
+
             //this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
             this.Plugin.ProgressCallback = Bridge_ProgressChanged;
 

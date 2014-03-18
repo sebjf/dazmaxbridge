@@ -15,17 +15,17 @@ namespace MaxManagedBridge
 
         #region Utilities
 
-        public Face[] BlockCast(byte[] source)
+        public MyFace[] BlockCast(byte[] source)
         {
-            int elements = source.Length / Marshal.SizeOf(typeof(Face));
-            Face[] dst = new Face[elements];
+            int elements = source.Length / Marshal.SizeOf(typeof(MyFace));
+            MyFace[] dst = new MyFace[elements];
             unsafe
             {
                 fixed (byte* pSrc = source)
                 {
                     for (int i = 0; i < dst.Length; i++)
                     {
-                        dst[i] = ((Face*)pSrc)[i];
+                        dst[i] = ((MyFace*)pSrc)[i];
                     }
                 }
             }
@@ -48,12 +48,12 @@ namespace MaxManagedBridge
                 return;
             }
 
-            Face[] quadFaces = BlockCast(myMesh.Faces);
+            MyFace[] quadFaces = BlockCast(myMesh.Faces);
 
-            List<Face> triangulatedFaces = new List<Face>();
-            foreach (Face f in quadFaces)
+            List<MyFace> triangulatedFaces = new List<MyFace>();
+            foreach (MyFace f in quadFaces)
             {
-                Face f1;
+                MyFace f1;
                 f1.PositionVertex1 = f.PositionVertex1;
                 f1.PositionVertex2 = f.PositionVertex2;
                 f1.PositionVertex3 = f.PositionVertex3;
@@ -68,7 +68,7 @@ namespace MaxManagedBridge
 
                 if (f.PositionVertex4 >= 0)
                 {
-                    Face f2;
+                    MyFace f2;
                     f2.PositionVertex1 = f.PositionVertex1;
                     f2.PositionVertex2 = f.PositionVertex3;
                     f2.PositionVertex3 = f.PositionVertex4;

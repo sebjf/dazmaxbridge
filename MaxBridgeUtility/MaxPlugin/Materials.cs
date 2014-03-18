@@ -13,7 +13,7 @@ namespace MaxManagedBridge
     {
         IMaxScriptMaterialProperties GetNewMaterial();
         string MaterialName { get; }
-        object BindingInfo { get; set; } //This is for use by the GUI
+        object BindingInfo { get; set; } //This is for use by the GUI, don't touch it
     }
 
     public partial class MaxPlugin : MaxBridge
@@ -103,7 +103,7 @@ namespace MaxManagedBridge
             /* All percentages should be between 0-1 and any conversions done in the script generation */
 
             maxMaterial.Name = material.MaterialName;
-            maxMaterial.Ambient = ConvertColour(material.GetColor("Ambient Color"));
+            maxMaterial.Ambient = Defaults.AmbientGammaCorrection ? ConvertColour(material.GetColor("Ambient Color")) : material.GetColor("Ambient Color");
             maxMaterial.AmbientMap = material.GetString("Ambient Color Map");
             maxMaterial.AmbientMapAmount = material.GetFloat("Ambient Strength");
             maxMaterial.BumpMap = material.GetString("Bump Strength Map");
@@ -255,11 +255,11 @@ namespace MaxManagedBridge
 
         public MaterialOptionsMentalRayArchAndDesign()
         {
-            MapFilteringDisable = true;
-            AOEnable = true;
-            AODistance = 200;
-            GlossScalar = 0.4f;
-            BumpScalar = 2.5f;
+            MapFilteringDisable = Defaults.MapFilteringDisable;
+            AOEnable = Defaults.MentalRay_AOEnable;
+            AODistance = Defaults.MentalRay_AODistance;
+            GlossScalar = Defaults.MentalRay_GlossScalar;
+            BumpScalar = Defaults.MentalRay_BumpScalar;
         }
     
         public IMaxScriptMaterialProperties GetNewMaterial()
@@ -288,12 +288,12 @@ namespace MaxManagedBridge
             Name = "mrArchDesignMaxScriptMaterial";
         }
 
-        public bool AOEnable = true;
-        public int  AORayDistance = 100;
-        public bool DisableFiltering = true;
-        public float GlossScalar = 0.4f;
-        public float BumpScalar = 2.5f;
-        public bool EnableHighlightsFGOnly = true;
+        public bool AOEnable = Defaults.MentalRay_AOEnable;
+        public int  AORayDistance = Defaults.MentalRay_AODistance;
+        public bool DisableFiltering = Defaults.MapFilteringDisable;
+        public float GlossScalar = Defaults.MentalRay_GlossScalar;
+        public float BumpScalar = Defaults.MentalRay_BumpScalar;
+        public bool EnableHighlightsFGOnly = Defaults.MentalRay_EnableHighlightsFGOnly;
 
         public override string MakeScript()
         {
@@ -453,9 +453,9 @@ namespace MaxManagedBridge
 
         public MaterialOptionsVRayMaterial()
         {
-            MapFilteringDisable = true;
-            GlossScalar = 0.4f;
-            BumpScalar = 2.5f;
+            MapFilteringDisable = Defaults.MapFilteringDisable;
+            GlossScalar = Defaults.VRay_GlossScalar;
+            BumpScalar = Defaults.VRay_BumpScalar;
         }
 
         public IMaxScriptMaterialProperties GetNewMaterial()
@@ -482,9 +482,9 @@ namespace MaxManagedBridge
             Name = "VRayMaxScriptMaterial";
         }
 
-        public bool DisableFiltering = true;
-        public float GlossScalar = 0.4f;
-        public float BumpScalar = 2.5f;
+        public bool DisableFiltering = Defaults.MapFilteringDisable;
+        public float GlossScalar = Defaults.VRay_GlossScalar;
+        public float BumpScalar = Defaults.VRay_BumpScalar;
 
         public override string MakeScript()
         {
@@ -625,9 +625,9 @@ namespace MaxManagedBridge
 
         public MaterialOptionsStandardMaterial()
         {
-            MapFilteringDisable = true;
-            GlossScalar = 0.4f;
-            BumpScalar = 2.5f;
+            MapFilteringDisable = Defaults.MapFilteringDisable;
+            GlossScalar = Defaults.Standard_GlossScalar;
+            BumpScalar = Defaults.Standard_BumpScalar;
         }
 
         public IMaxScriptMaterialProperties GetNewMaterial()
@@ -654,13 +654,13 @@ namespace MaxManagedBridge
             Name = "standardMaxScriptMaterial";
         }
 
-        public bool twoSided = true;
-        public bool adTextureLock = true;
-        public bool adLock = true;
-        public bool dsLock = true;
-        public bool DisableFiltering = true;
-        public float GlossScalar = 0.4f;
-        public float BumpScalar = 2.5f;
+        protected bool twoSided = true;
+        protected bool adTextureLock = true;
+        protected bool adLock = true;
+        protected bool dsLock = true;
+        public bool DisableFiltering = Defaults.MapFilteringDisable;
+        public float GlossScalar = Defaults.Standard_GlossScalar;
+        public float BumpScalar = Defaults.Standard_BumpScalar;
 
         public override string MakeScript()
         {
