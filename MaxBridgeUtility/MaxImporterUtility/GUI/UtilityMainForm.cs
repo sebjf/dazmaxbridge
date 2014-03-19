@@ -22,6 +22,7 @@ namespace MaxManagedBridge
             this.Plugin = parent.Plugin;
 
             rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RebuildMaterials"));
+            removeTransparentFacesCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RemoveTransparentFaces"));
 
             //this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
             this.Plugin.ProgressCallback = Bridge_ProgressChanged;

@@ -42,6 +42,22 @@ namespace MaxManagedBridge
 
         #region Mesh Processing
 
+        unsafe public void RemoveFacesByMaterialId(MyMesh myMesh, int materialId)
+        {
+            TriangulateFaces(myMesh);
+
+            List<MyFace> filteredFaces = new List<MyFace>(myMesh.TriangulatedFaces.Length);
+            foreach (MyFace f in myMesh.TriangulatedFaces)
+            {
+                if (f.MaterialId != materialId)
+                {
+                    filteredFaces.Add(f);
+                }
+            }
+
+            myMesh.TriangulatedFaces = filteredFaces.ToArray();
+        }
+
         unsafe public void TriangulateFaces(MyMesh myMesh)
         {
             if (myMesh.TriangulatedFaces != null){

@@ -11,7 +11,7 @@ namespace MaxManagedBridge
 {
     public interface IMaterialCreationOptions
     {
-        IMtl CreateMaterial(MaterialSource m);
+        IMtl CreateMaterial(MaterialWrapper m);
         string MaterialName { get; }
         object BindingInfo { get; set; } //This is for use by the GUI, don't touch it
     }
@@ -38,15 +38,15 @@ namespace MaxManagedBridge
 
         public IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
 
-        public IEnumerable<MaterialSource> GetMaterials(MyMesh myMesh)
+        public IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
         {
             foreach (var myMat in myMesh.Materials)
             {
-                yield return new MaterialSource(myMat);
+                yield return new MaterialWrapper(myMat);
             }
         }
 
-        public IMultiMtl CreateMultiMaterial(IList<MaterialSource> Materials)
+        public IMultiMtl CreateMultiMaterial(IList<MaterialWrapper> Materials)
         {
             int NumberOfMaterialSlots = Materials.Max(Material => Material.MaterialIndex);
 
@@ -104,9 +104,9 @@ namespace MaxManagedBridge
     /// The MaterialSource class provides an interface to the material described by a set of string properties from Daz, allowing it to be used in a stable form throughout and querying it for 
     /// information such as Opacity state
     /// </summary>
-    public class MaterialSource
+    public class MaterialWrapper
     {
-        public MaterialSource(Material material)
+        public MaterialWrapper(Material material)
         {
             this.source = material;
             this.MaterialName = source.MaterialName; //because we need to pass it by ref later on.
@@ -114,6 +114,12 @@ namespace MaxManagedBridge
         }
 
         protected Material source;
+
+
+        public bool IsTransparent   { get { return (opacityMapAmount == 0); } }
+        public bool Initialised     { get; protected set; }
+
+
 
         public string   MaterialName;
         public int      MaterialIndex  { get { return source.MaterialIndex; } }
@@ -143,6 +149,7 @@ namespace MaxManagedBridge
         public float    u_tiling = 1;
         public float    v_tiling = 1;
 
+
         public void Initialise()
         {
             ambient = Defaults.AmbientGammaCorrection ? ConvertColour(source.GetColorSafe("Ambient Color", ambient)) : source.GetColorSafe("Ambient Color", ambient);
@@ -161,6 +168,8 @@ namespace MaxManagedBridge
             u_tiling = source.GetFloatSafe("Horizontal Tiles", u_tiling);
             v_tiling = source.GetFloatSafe("Vertical Tiles", v_tiling);
             bumpMapAmount = ((source.GetFloatSafe(new string[] { "Positive Bump", "Bump Maximum" }, 0.1f) - source.GetFloatSafe(new string[] { "Negative Bump", "Bump Minimum" }, -0.1f)) * source.GetFloatSafe("Bump Strength", 1.0f));
+
+            Initialised = true;
         }
 
         #region Gamma Correction
@@ -249,14 +258,14 @@ namespace MaxManagedBridge
 
         public object BindingInfo { get; set; }
 
-        public IMtl CreateMaterial(MaterialSource m)
+        public IMtl CreateMaterial(MaterialWrapper m)
         {
             return GetFromScript(MakeScript(m));
         }
 
         public bool EnableHighlightsFGOnly = Defaults.MentalRay_EnableHighlightsFGOnly;
 
-        protected string MakeScript(MaterialSource m)
+        protected string MakeScript(MaterialWrapper m)
         {
             List<String> Commands = new List<string>();
 
@@ -419,7 +428,7 @@ namespace MaxManagedBridge
             BumpScalar = Defaults.VRay_BumpScalar;
         }
 
-        public IMtl CreateMaterial(MaterialSource m)
+        public IMtl CreateMaterial(MaterialWrapper m)
         {
             return GetFromScript(MakeScript(m));
         }
@@ -431,7 +440,7 @@ namespace MaxManagedBridge
 
         public object BindingInfo { get; set; }
 
-        protected string MakeScript(MaterialSource m)
+        protected string MakeScript(MaterialWrapper m)
         {
             List<String> Commands = new List<string>();
 
@@ -574,7 +583,7 @@ namespace MaxManagedBridge
             BumpScalar = Defaults.Standard_BumpScalar;
         }
 
-        public IMtl CreateMaterial(MaterialSource m)
+        public IMtl CreateMaterial(MaterialWrapper m)
         {
             return GetFromScript(MakeScript(m));
         }
@@ -591,7 +600,7 @@ namespace MaxManagedBridge
         protected bool adLock = true;
         protected bool dsLock = true;
 
-        protected string MakeScript(MaterialSource m)
+        protected string MakeScript(MaterialWrapper m)
         {
             List<String> Commands = new List<string>();
 

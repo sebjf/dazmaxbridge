@@ -34,6 +34,8 @@ namespace MaxManagedBridge
             this.updateButton = new System.Windows.Forms.Button();
             this.progressBar1 = new ProgressBarSample.CustomProgressBar();
             this.optionsGroup = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.removeTransparentFacesCheckbox = new System.Windows.Forms.CheckBox();
             this.disableMapFilteringCheckbox = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.ambientOcclusionEnableCheckbox = new System.Windows.Forms.CheckBox();
@@ -92,6 +94,8 @@ namespace MaxManagedBridge
             // 
             // optionsGroup
             // 
+            this.optionsGroup.Controls.Add(this.label6);
+            this.optionsGroup.Controls.Add(this.removeTransparentFacesCheckbox);
             this.optionsGroup.Controls.Add(this.disableMapFilteringCheckbox);
             this.optionsGroup.Controls.Add(this.label5);
             this.optionsGroup.Controls.Add(this.ambientOcclusionEnableCheckbox);
@@ -110,6 +114,24 @@ namespace MaxManagedBridge
             this.optionsGroup.TabIndex = 4;
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Options";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 173);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(139, 13);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Remove Transparent Faces";
+            // 
+            // removeTransparentFacesCheckbox
+            // 
+            this.removeTransparentFacesCheckbox.AutoSize = true;
+            this.removeTransparentFacesCheckbox.Location = new System.Drawing.Point(153, 173);
+            this.removeTransparentFacesCheckbox.Name = "removeTransparentFacesCheckbox";
+            this.removeTransparentFacesCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.removeTransparentFacesCheckbox.TabIndex = 17;
+            this.removeTransparentFacesCheckbox.UseVisualStyleBackColor = true;
             // 
             // disableMapFilteringCheckbox
             // 
@@ -166,7 +188,7 @@ namespace MaxManagedBridge
             // getMaterialProperties_button
             // 
             this.getMaterialProperties_button.ForeColor = System.Drawing.Color.Black;
-            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 190);
+            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 198);
             this.getMaterialProperties_button.Name = "getMaterialProperties_button";
             this.getMaterialProperties_button.Size = new System.Drawing.Size(140, 23);
             this.getMaterialProperties_button.TabIndex = 8;
@@ -268,5 +290,7 @@ namespace MaxManagedBridge
         private System.Windows.Forms.CheckBox disableMapFilteringCheckbox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox rebuildMaterialsCheckbox;
+        private System.Windows.Forms.CheckBox removeTransparentFacesCheckbox;
+        private System.Windows.Forms.Label label6;
     }
 }

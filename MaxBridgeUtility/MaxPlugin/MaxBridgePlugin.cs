@@ -32,11 +32,13 @@ namespace MaxManagedBridge
         protected IGlobal globalInterface = null;
 
         public bool RebuildMaterials { get; set; }
+        public bool RemoveTransparentFaces { get; set; }
 
         public MaxPlugin(IGlobal globalinterface)
         {
             this.globalInterface = globalinterface;
             RebuildMaterials = false;
+            RemoveTransparentFaces = true;
         }
 
         public IEnumerable<IINode> GetMappedNodes(string Name)
@@ -104,9 +106,19 @@ namespace MaxManagedBridge
                 mappedNodes.Add(CreateMeshNode(myMesh));
             }
 
+            IList<MaterialWrapper> Materials = GetMaterials(myMesh).ToList();
+
             foreach (var m in mappedNodes)
             {
                 UpdateProgress(0.2f, "Updating geometry...");
+
+                if (RemoveTransparentFaces)
+                {
+                    foreach (var transparentMaterial in Materials.Where(ms => ms.IsTransparent))
+                    {
+                        RemoveFacesByMaterialId(myMesh, transparentMaterial.MaterialIndex);
+                    }
+                }
 
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
 
@@ -119,7 +131,7 @@ namespace MaxManagedBridge
                 {
                     UpdateProgress(0.6f, "Updating materials...");
 
-                    m.Mtl = CreateMultiMaterial(GetMaterials(myMesh).ToList());
+                    m.Mtl = CreateMultiMaterial(Materials);
                 }
             }
 
