@@ -119,7 +119,7 @@ namespace MaxManagedBridge
                 {
                     UpdateProgress(0.6f, "Updating materials...");
 
-                    m.Mtl = CreateMaterial(myMesh);
+                    m.Mtl = CreateMultiMaterial(GetMaterials(myMesh).ToList());
                 }
             }
 

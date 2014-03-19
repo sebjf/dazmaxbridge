@@ -76,6 +76,12 @@ namespace MaxManagedBridge
         [MessagePackMember(3)]
         public MaxDictionary<string, string> MaterialProperties;
 
+        public Color GetColorSafe(string key, Color fallback)
+        {
+            var color = GetColor(key);
+            return color.HasValue ? color.Value : fallback;
+        }
+
         public Nullable<Color> GetColor(string key)
         {
             if (!MaterialProperties.ContainsKey(key))
@@ -237,11 +243,6 @@ namespace MaxManagedBridge
         /* The following properties are on the receiver side only (not part of the message from Daz) */
 
         public MyFace[] TriangulatedFaces = null;
-
-        public int NumberOfMaterialSlots
-        {
-            get { return Materials.Max(Material => Material.MaterialIndex) + 1; }
-        }
 
     }
 
