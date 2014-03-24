@@ -33,7 +33,15 @@ namespace MaxManagedBridge
 
             this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterials);
             this.materialSelectDropDown.DisplayMember = "MaterialName";
+            
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            /* The selection must be changed after the form loads completely, otherwise the bindings for the material options will be added but not evaluated until after it loads - that is - outside
+             * the try/catch statement which marks them as enabled or disabled. */
             this.materialSelectDropDown.SelectedIndex = 0;
+            base.OnLoad(e);
         }
 
         float GetValidatedUpdateFromTextbox(TextBox textbox, float original)
@@ -176,6 +184,7 @@ namespace MaxManagedBridge
             public void RemakeBinding()
             {
                 control.DataBindings.Clear();
+
                 if (enabled)
                 {
                     try
@@ -187,7 +196,14 @@ namespace MaxManagedBridge
                         enabled = false;
                     }
                 }
+
                 control.Enabled = enabled;
+
+                if (control.Enabled == false)
+                {
+                    if (control is TextBox) { control.ResetText(); }
+                    if (control is CheckBox) { (control as CheckBox).Checked = false; }
+                }
 
             }
         }

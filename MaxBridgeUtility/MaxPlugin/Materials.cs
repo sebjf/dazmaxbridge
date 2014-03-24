@@ -36,7 +36,7 @@ namespace MaxManagedBridge
             }
         }
 
-        public IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
+        public IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesignSkin(), new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
 
         public IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
         {
@@ -231,6 +231,24 @@ namespace MaxManagedBridge
             return anim;
         }
     }
+
+    public class MaterialOptionsMentalRayArchAndDesignSkin : MaxScriptMaterialGenerator, IMaterialCreationOptions
+    {
+        public IMtl CreateMaterial(MaterialWrapper m)
+        {
+            IMtlBase mtl = GlobalInterface.Instance.COREInterface7.GetMtlSlot(0);
+
+            return mtl as IMtl;
+        }
+
+        public string MaterialName
+        {
+            get { return "MentalRay Arch & Design with Skin support"; }
+        }
+
+        public object BindingInfo { get; set; }
+    }
+
 
     public class MaterialOptionsMentalRayArchAndDesign : MaxScriptMaterialGenerator, IMaterialCreationOptions
     {
