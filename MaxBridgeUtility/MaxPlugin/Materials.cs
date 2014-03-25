@@ -232,18 +232,42 @@ namespace MaxManagedBridge
         }
     }
 
-    public class MaterialOptionsMentalRayArchAndDesignSkin : MaxScriptMaterialGenerator, IMaterialCreationOptions
+    public class MaterialOptionsMentalRayArchAndDesignSkin : MaterialOptionsMentalRayArchAndDesign, IMaterialCreationOptions
     {
+        /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material in the sample slot 1 */
+
         public IMtl CreateMaterial(MaterialWrapper m)
         {
-            IMtlBase mtl = GlobalInterface.Instance.COREInterface7.GetMtlSlot(0);
+            /* The skin material appears grey in the viewport so use a shell material to display a simpler, textured mat while creating the scene, and only use the skin when it can be seen in the final render */
 
-            return mtl as IMtl;
+            IMtl shell = Autodesk.Max.GlobalInterface.Instance.COREInterface.CreateInstance(SClass_ID.Material, GlobalInterface.Instance.Class_ID.Create(597, 0)) as IMtl;
+
+            shell.Name = (m.MaterialName + "_Shell");
+            shell.FindPropertyByName("originalMaterial").SetValue(MakeArchDesignMtl(m));
+            shell.FindPropertyByName("bakedMaterial").SetValue(MakeSkinMtl(m));
+            shell.FindPropertyByName("viewportMtlIndex").SetValue(0);
+            shell.FindPropertyByName("renderMtlIndex").SetValue(1);
+
+            return shell;
         }
 
         public string MaterialName
         {
             get { return "MentalRay Arch & Design with Skin support"; }
+        }
+
+        protected IMtl MakeSkinMtl(MaterialWrapper m)
+        {
+            IMtlBase mtl = GlobalInterface.Instance.COREInterface7.GetMtlSlot(0);
+
+
+            return mtl as IMtl;
+
+        }
+
+        protected IMtl MakeArchDesignMtl(MaterialWrapper m)
+        {
+            return base.CreateMaterial(m);
         }
 
         public object BindingInfo { get; set; }
