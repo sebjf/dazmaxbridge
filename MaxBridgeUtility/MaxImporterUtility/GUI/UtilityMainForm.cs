@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
@@ -33,7 +34,15 @@ namespace MaxManagedBridge
 
             this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterials);
             this.materialSelectDropDown.DisplayMember = "MaterialName";
-            
+
+            this.materialTemplateDropDown.DisplayMember = "Name";
+            this.materialTemplateDropDown.DataSource = this.Plugin.Templates;
+            this.materialTemplateDropDown.SelectedIndexChanged += new EventHandler(materialTemplateDropDown_SelectedIndexChanged);
+        }
+
+        void materialTemplateDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.Plugin.TemplateMaterial = ((sender as ComboBox).SelectedItem as IIMtlBaseView).Mtl;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -235,6 +244,8 @@ namespace MaxManagedBridge
             {
                 binding.RemakeBinding();
             }
+
+            materialTemplateDropDown.Enabled = MaterialOptions.UsesTemplate;
         }
 
         private void getMaterialProperties_button_Click(object sender, EventArgs e)

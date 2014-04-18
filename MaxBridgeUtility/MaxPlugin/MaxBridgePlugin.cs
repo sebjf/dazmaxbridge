@@ -34,11 +34,17 @@ namespace MaxManagedBridge
         public bool RebuildMaterials { get; set; }
         public bool RemoveTransparentFaces { get; set; }
 
+        public MaterialLibraryView Templates { get; private set; }
+
+        //maxapi.h
+        protected const int VP_DONT_SIMPLIFY = 0x0002;
+
         public MaxPlugin(IGlobal globalinterface)
         {
             this.globalInterface = globalinterface;
             RebuildMaterials = false;
             RemoveTransparentFaces = true;
+            Templates = new MaterialLibraryView(Defaults.MaterialLibraryFilename);
         }
 
         public IEnumerable<IINode> GetMappedNodes(string Name)
@@ -79,6 +85,8 @@ namespace MaxManagedBridge
 
             globalInterface.COREInterface.EnableUndo(true);
             globalInterface.COREInterface.EnableSceneRedraw();
+
+            globalInterface.COREInterface10.RedrawViewportsNow(globalInterface.COREInterface.Time, VP_DONT_SIMPLIFY);
         }
 
         /* Ideally we would create selection sets for each character so that they can be easily included/excluded from things like lighting */

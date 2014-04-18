@@ -4,14 +4,28 @@ using System.Linq;
 using System.Text;
 using Autodesk.Max;
 
-/* The methods in this file are for setting properties of Max objects by name. This is intended to allow materials to be built without the 
- * generated MaxScript. They are not used anywhere currently but remain for reference in case we pursue building materials entirely within C# */
+/* The methods in this file are for setting properties of Max objects by name. Combined with methods such as CreateInstance() these can be used to instantiate and
+ * configure most any class in the SDK. These can be used to build materials, as the example below shows. Although, we use Maxscript because it is much easier to
+ * prototype and modify */
+
+/* Using the SDK to create a material instance, and configure its parameters: */
+/*
+            IMtl shell = Autodesk.Max.GlobalInterface.Instance.COREInterface.CreateInstance(SClass_ID.Material, GlobalInterface.Instance.Class_ID.Create(597, 0)) as IMtl;
+
+            shell.Name = (m.MaterialName + "_Shell");
+            shell.FindPropertyByName("originalMaterial").SetValue(MakeArchDesignMtl(m));
+            shell.FindPropertyByName("bakedMaterial").SetValue(MakeSkinMtl(m));
+            shell.FindPropertyByName("viewportMtlIndex").SetValue(0);
+            shell.FindPropertyByName("renderMtlIndex").SetValue(1);
+
+            return shell;
+ */ 
 
 namespace MaxManagedBridge
 {
     public static class MaxExtensions
     {
-        public static bool EqualsClassID(this IClass_ID classA, int a, int b)
+        public static bool EqualsClassID(this IClass_ID classA, uint a, uint b)
         {
             return ((classA.PartA == a) && (classA.PartB == b));
         }
@@ -111,7 +125,7 @@ namespace MaxManagedBridge
 
         public static IEnumerable<Parameter> EnumerateProperties(this IReferenceMaker obj)
         {
-            return EnumerateReferences(obj).DistinctBy(p => p.Name);
+            return EnumerateReferences(obj);
         }
 
         public static Parameter FindPropertyByName(this IReferenceMaker obj, string name)
@@ -127,20 +141,23 @@ namespace MaxManagedBridge
 
     public class Parameter
     {
-        public IIParamBlock2 ParamBlock;
+        private IIParamBlock2 ParamBlock;
+        private short Id;
+        private int TableId;
 
         public string Name;
         public string InternalName;
-
-        public short Id;
-        public int TableId;
         public ParamType2 Type;
+
+        public bool IsTableType { get; private set; }
 
         public Parameter(IIParamBlock2 blck, short idx, int tabid)
         {
             this.ParamBlock = blck;
             this.Name = blck.GetLocalName(idx, tabid);
             this.InternalName = blck.GetParamDef(idx).IntName;
+
+            this.IsTableType = Enum.GetName(typeof(ParamType2), blck.GetParameterType(idx)).Contains("Tab");
 
             this.Id = idx;
             this.TableId = tabid;
@@ -158,60 +175,38 @@ namespace MaxManagedBridge
             this.Type = blck.GetParameterType(alias.Id);
         }
 
-        public bool IsMapType
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case ParamType2.Texmap:
-                    case ParamType2.TexmapTab:
-                    case ParamType2.Bitmap:
-                    case ParamType2.BitmapTab:
 
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        }
-
-        public bool IsValueType
+        public bool SetValue(bool value, int tabIndex = 0)
         {
-            get { return !IsMapType; }
+            return ParamBlock.SetValue(Id, 0, value ? 1 : 0, tabIndex);
         }
-
-        public bool SetValue(bool value)
+        public bool SetValue(float value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value ? 1 : 0, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(float value)
+        public bool SetValue(int value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(int value)
+        public bool SetValue(ITexmap value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(ITexmap value)
+        public bool SetValue(IAColor value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(IAColor value)
+        public bool SetValue(IColor value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(IColor value)
+        public bool SetValue(string value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
-        public bool SetValue(string value)
+        public bool SetValue(IMtl value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
-        }
-        public bool SetValue(IMtl value)
-        {
-            return ParamBlock.SetValue(Id, 0, value, TableId);
+            return ParamBlock.SetValue(Id, 0, value, tabIndex);
         }
 
         public string GetString()
