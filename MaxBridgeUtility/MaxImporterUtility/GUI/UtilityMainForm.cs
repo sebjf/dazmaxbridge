@@ -38,10 +38,22 @@ namespace MaxManagedBridge
             this.materialTemplateDropDown.DisplayMember = "Name";
             this.materialTemplateDropDown.DataSource = this.Plugin.Templates;
             this.materialTemplateDropDown.SelectedIndexChanged += new EventHandler(materialTemplateDropDown_SelectedIndexChanged);
+            this.Plugin.Templates.ListChanged += new ListChangedEventHandler(Templates_ListChanged);
+
+        }
+
+        void Templates_ListChanged(object sender, ListChangedEventArgs e)
+        {
+           
         }
 
         void materialTemplateDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if ((sender as ComboBox).SelectedItem == null){
+                this.Plugin.TemplateMaterial = null;
+                return;
+            }
+
             this.Plugin.TemplateMaterial = ((sender as ComboBox).SelectedItem as IIMtlBaseView).Mtl;
         }
 

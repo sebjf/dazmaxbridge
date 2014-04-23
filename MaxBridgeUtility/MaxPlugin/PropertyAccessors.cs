@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Max;
+using Autodesk.Max.Wrappers;
 
 /* The methods in this file are for setting properties of Max objects by name. Combined with methods such as CreateInstance() these can be used to instantiate and
  * configure most any class in the SDK. These can be used to build materials, as the example below shows. Although, we use Maxscript because it is much easier to
@@ -29,6 +30,11 @@ namespace MaxManagedBridge
         {
             return ((classA.PartA == a) && (classA.PartB == b));
         }
+
+        public static bool EqualsClassID(this IClass_ID classA, IClass_ID classB)
+        {
+             return ((classA.PartA == classB.PartA) && (classA.PartB == classB.PartB));
+        }
     }
 
     public static class LinqExtensions
@@ -48,8 +54,43 @@ namespace MaxManagedBridge
         }
     }
 
+    class MethodType
+    {
+        public MethodType(IFPFunctionDef def)
+        {
+           
+        }
+    }
+
     public static class IReferenceMakerExtensions
     {
+        #region FpInterface Enumeration
+
+        public static void InvokeMethod(this IAnimatable obj, string name)
+        {
+            IClassDesc desc = GlobalInterface.Instance.ClassDirectory.Instance.FindClass(obj.SuperClassID, obj.ClassID);
+            for (int i = 0; i < desc.NumInterfaces; i++)
+            {
+                IFPInterface iface = desc.GetInterfaceAt(i);
+
+                List<IFPFunctionDef> defs = new List<IFPFunctionDef>();
+                for (int j = 0; j < iface.Desc.Functions.Count; j++)
+                {
+                    defs.Add(iface.Desc.Functions[(IntPtr)j]);
+                }
+
+                short fid = iface.FindFn(name);
+                IFPFunctionDef definition = iface.Desc.GetFnDef(fid);
+
+              
+
+                //var p = GlobalInterface.Instance.FPParams;
+                //iface.Invoke(fid,
+            }
+        }
+
+        #endregion
+
         #region Parameter Enumeration
 
         /* Based on http://forums.cgsociety.org/archive/index.php/t-1041239.html */
@@ -67,7 +108,7 @@ namespace MaxManagedBridge
                     continue; //if the paramtype is unknown, then just skip it
                 }
 
-                if (paramTypeName.Contains("Tab"))    //use subanimatables instead of tabs?
+                if (paramTypeName.Contains("Tab"))
                 {
                     tableLength = block.Count(i); //this throws an exception if it is called for an index that is not a table
                 }
@@ -84,53 +125,38 @@ namespace MaxManagedBridge
             }
         }
 
-        //check references! eq. to what maxscript uses to find all calsses
-        private static IEnumerable<Parameter> EnumerateReferences(IReferenceMaker obj, bool recursive = false)
+        private static IEnumerable<IReferenceTarget> GetClassInstances(IClass_ID classId, IReferenceMaker obj, bool recursive)
         {
             for (int i = 0; i < obj.NumRefs; i++)
             {
                 IReferenceTarget iref = obj.GetReference(i);
-
-                if (iref is IIParamBlock)
+                if (iref.ClassID.EqualsClassID(classId))
                 {
-                    //Until we can identify IParamBlock member names there is no point in adding them to the list
-                    //foreach (var v in EnumerateParamBlock((IIParamBlock)iref))
-                    //{
-                    //    yield return v;
-                    //}
-                    continue;
-                }
-                if (iref is IIParamBlock2)
-                {
-                    foreach (var v in EnumerateParamBlock((IIParamBlock2)iref))
-                    {
-                        yield return v;
-                    }
-                    continue;
-                }
-                if (recursive)
-                {
-                    if (iref is IReferenceMaker)
-                    {
-                        foreach (var v in EnumerateReferences(iref))
-                        {
-                            yield return v;
-                        }
-                        continue;
-                    }
+                    yield return iref;
                 }
             }
-
         }
 
-        public static IEnumerable<Parameter> EnumerateProperties(this IReferenceMaker obj)
+        //check references! eq. to what maxscript uses to find all calsses
+        private static IEnumerable<Parameter> EnumerateParamBlocks(IAnimatable obj)
         {
-            return EnumerateReferences(obj);
+            for (int i = 0; i < obj.NumParamBlocks; i++)
+            {
+                foreach (var v in EnumerateParamBlock(obj.GetParamBlock(i)))
+                {
+                    yield return v;
+                }
+            }
         }
 
-        public static Parameter FindPropertyByName(this IReferenceMaker obj, string name)
+        public static IEnumerable<Parameter> EnumerateProperties(this IAnimatable obj)
         {
-            return EnumerateReferences(obj).Where(p => (p.Name == name || p.InternalName == name)).FirstOrDefault();
+            return EnumerateParamBlocks(obj);
+        }
+
+        public static Parameter FindPropertyByName(this IAnimatable obj, string name)
+        {
+            return EnumerateParamBlocks(obj).Where(p => (p.Name == name || p.InternalName == name)).FirstOrDefault();
         }
 
         #endregion
@@ -175,6 +201,29 @@ namespace MaxManagedBridge
             this.Type = blck.GetParameterType(alias.Id);
         }
 
+        public Parameter FindPropertyByName(string name)
+        {
+            return GetReftarget().FindPropertyByName(name);
+        }
+
+        private bool SetNumericValue(float value, int tabindex = 0)
+        {
+            switch (this.Type)
+            {
+                case ParamType2.PcntFrac:
+                case ParamType2.PcntFracTab:
+                case ParamType2.Float:
+                case ParamType2.FloatTab:
+                    return ParamBlock.SetValue(Id, 0, (float)value, tabindex);
+                case ParamType2.Int:
+                case ParamType2.Int64:
+                case ParamType2.IntTab:
+                    return ParamBlock.SetValue(Id, 0, (int)value, tabindex);
+                default:
+                    Log.Add(string.Format("SetNumericValue() called on non-numeric property of type {0}", this.Type.ToString()));
+                    throw new Exception(string.Format("SetNumericValue() called on non-numeric property of type {0}", this.Type.ToString()));
+            }
+        }
 
         public bool SetValue(bool value, int tabIndex = 0)
         {
@@ -182,11 +231,11 @@ namespace MaxManagedBridge
         }
         public bool SetValue(float value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, tabIndex);
+            return SetNumericValue(value, tabIndex);
         }
         public bool SetValue(int value, int tabIndex = 0)
         {
-            return ParamBlock.SetValue(Id, 0, value, tabIndex);
+            return SetNumericValue(value, tabIndex);
         }
         public bool SetValue(ITexmap value, int tabIndex = 0)
         {
@@ -213,7 +262,6 @@ namespace MaxManagedBridge
         {
             return ParamBlock.GetStr(Id, 0, TableId);
         }
-
         public float GetFloat() //can also return integer types
         {
             switch (Type)
@@ -226,11 +274,15 @@ namespace MaxManagedBridge
                     return ParamBlock.GetFloat(Id, 0, TableId);
             }
         }
-
         public bool GetBool()
         {
             return (ParamBlock.GetInt(Id, 0, TableId) > 0);
         }
+        public IReferenceTarget GetReftarget()
+        {
+            return (ParamBlock.GetReferenceTarget(Id, 0, 0));
+        }
+
 
         public object GetValue()
         {

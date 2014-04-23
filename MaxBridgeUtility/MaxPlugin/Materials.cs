@@ -343,6 +343,44 @@ namespace MaxManagedBridge
             }
         }
 
+        protected IMtl CreateSkinMaterial2(MaterialWrapper m)
+        {
+            IMtlBase referenceMtl = m.Template;
+
+            if (referenceMtl == null)
+            {
+                referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
+            }
+
+            if (!referenceMtl.ClassID.EqualsClassID(2004030991, 2251076473))
+            {
+                referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
+            }
+
+            // composite #(640, 0)
+
+            ///    IMultiTex composite = intrface.CreateInstance(SClass_ID.Texmap, gi.Class_ID.Create(640, 0)) as IMultiTex;
+            ///    
+            IMultiTex composite = gi.NewDefaultCompositeTex;
+
+            composite.InvokeMethod("add");
+
+            List<Parameter> ps1 = composite.EnumerateProperties().ToList();
+
+            composite.SetNumSubTexmaps(2);
+
+            //gi.ClassDirectory.Instance.FindClass(composite.SuperClassID, composite.ClassID).NumInterfaces
+
+            List<Parameter> ps2 = composite.EnumerateProperties().ToList();
+
+            IMtlBase mtl = gi.CloneRefHierarchy(referenceMtl) as IMtlBase;
+            mtl.Name = m.MaterialName;
+
+            LoadMap(m, m.diffuseMap);
+
+            return mtl as IMtl;
+        }
+
         protected IMtl CreateSkinMaterial(MaterialWrapper m)
         {
             IMtlBase referenceMtl = m.Template;
@@ -357,7 +395,31 @@ namespace MaxManagedBridge
                 referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
             }
 
-            return GetFromScript(MakeScript(m, referenceMtl));
+            var script = MakeScript(m, referenceMtl);
+            Log.Add(string.Format("Running script: {0}", script));
+            return GetFromScript(script);
+        }
+
+
+
+        IBitmapTex LoadMap(MaterialWrapper m, string filename)
+        {
+            IBitmapTex bmp = gi.NewDefaultBitmapTex;
+
+            bmp.SetMapName(filename, false);
+
+            bmp.FindPropertyByName("coords").FindPropertyByName("u_tiling").SetValue(m.u_tiling);
+            bmp.FindPropertyByName("coords").FindPropertyByName("v_tiling").SetValue(m.v_tiling);
+
+            if (MapFilteringDisable)
+            {
+                bmp.FindPropertyByName("coords").FindPropertyByName("blur").SetValue(0.01f);
+                bmp.FindPropertyByName("filtering").SetValue(2);
+            }
+
+            List<Parameter> p = bmp.EnumerateProperties().ToList();
+
+            return bmp;
         }
 
         protected string MakeScript(MaterialWrapper m, IMtlBase referenceMtl)
@@ -368,22 +430,27 @@ namespace MaxManagedBridge
 
             Commands.Add(string.Format("mtl.name = \"{0}\"", m.MaterialName));
 
+            /*Build and apply bump map*/
+
             if (m.bumpMap != null)
             {
-                Commands.Add(string.Format("mtl.bump.Multiplier = {0}", (m.bumpMapAmount * BumpScalar)));
-                Commands.Add(string.Format("mtl.bump.Map = (bitmapTexture filename:\"{0}\")", m.bumpMap));
-                Commands.Add(string.Format("mtl.bump.Map.coords.u_tiling = {0}; mtl.bump.Map.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
+                Commands.Add(string.Format("bump_map = (bitmapTexture filename:\"{0}\")", m.bumpMap));
+                Commands.Add(string.Format("bump_map.coords.u_tiling = {0}; bump_map.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
 
-                if (MapFilteringDisable)
-                {
-                    Commands.Add(string.Format("mtl.bump.Map.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("mtl.bump.Map.filtering = 2;"));
+                if (MapFilteringDisable){
+                    Commands.Add(string.Format("bump_map.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("bump_map.filtering = 2;"));
                 }
+
+                Commands.Add(string.Format("mtl.bump.Map = bump_map", (m.bumpMapAmount * BumpScalar)));
+                Commands.Add(string.Format("mtl.bump.Multiplier = {0}", (m.bumpMapAmount * BumpScalar)));
             }
 
-            Commands.Add(string.Format("mtl.overall_color_shader = CompositeTextureMap()"));
-            Commands.Add(string.Format("mtl.overall_color_shader.add()"));
-            Commands.Add(string.Format("mtl.overall_color_shader.blendMode[2] = 2"));
+            /*Build diffuse map*/
+
+            Commands.Add(string.Format("diffuse_map = CompositeTextureMap()"));
+            Commands.Add(string.Format("diffuse_map.add()"));
+            Commands.Add(string.Format("diffuse_map.blendMode[2] = 2"));
 
             string addDiffuseMapCommand = "";
             if (m.diffuseMap != null)
@@ -391,16 +458,16 @@ namespace MaxManagedBridge
                 addDiffuseMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", m.diffuseMap);
             }
 
-            Commands.Add(string.Format("mtl.overall_color_shader.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, m.diffuse.R, m.diffuse.G, m.diffuse.B));
+            Commands.Add(string.Format("diffuse_map.mapList[1] = RGB_Multiply {0} color2:(color {1} {2} {3})", addDiffuseMapCommand, m.diffuse.R, m.diffuse.G, m.diffuse.B));
 
             if (m.diffuseMap != null)
             {
-                Commands.Add(string.Format("mtl.overall_color_shader.mapList[1].map1.coords.u_tiling = {0}; mtl.overall_color_shader.mapList[1].map1.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
+                Commands.Add(string.Format("diffuse_map.mapList[1].map1.coords.u_tiling = {0}; diffuse_map.mapList[1].map1.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
 
                 if (MapFilteringDisable)
                 {
-                    Commands.Add(string.Format("mtl.overall_color_shader.mapList[1].map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("mtl.overall_color_shader.mapList[1].map1.filtering = 2;"));
+                    Commands.Add(string.Format("diffuse_map.mapList[1].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("diffuse_map.mapList[1].map1.filtering = 2;"));
                 }
             }
 
@@ -410,23 +477,28 @@ namespace MaxManagedBridge
                 addAmbientMapCommand = string.Format("map1:(bitmapTexture filename:\"{0}\")", m.ambientMap);
             }
 
-            Commands.Add(string.Format("mtl.overall_color_shader.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, m.ambient.R * m.ambientMapAmount, m.ambient.G * m.ambientMapAmount, m.ambient.B * m.ambientMapAmount));
+            Commands.Add(string.Format("diffuse_map.mapList[2] = RGB_Multiply {0} color2:(color {1} {2} {3})", addAmbientMapCommand, m.ambient.R * m.ambientMapAmount, m.ambient.G * m.ambientMapAmount, m.ambient.B * m.ambientMapAmount));
 
             if (m.ambientMap != null)
             {
-                Commands.Add(string.Format("mtl.overall_color_shader.mapList[2].map1.coords.u_tiling = {0}; mtl.overall_color_shader.mapList[2].map1.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
+                Commands.Add(string.Format("diffuse_map.mapList[2].map1.coords.u_tiling = {0}; diffuse_map.mapList[2].map1.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
 
                 if (MapFilteringDisable)
                 {
-                    Commands.Add(string.Format("mtl.overall_color_shader.mapList[2].map1.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("mtl.overall_color_shader.mapList[2].map1.filtering = 2;"));
+                    Commands.Add(string.Format("diffuse_map.mapList[2].map1.coords.blur = 0.01;"));
+                    Commands.Add(string.Format("diffuse_map.mapList[2].map1.filtering = 2;"));
                 }
             }
 
-            Commands.Add("mtl.epi_sss_color_shader = mtl.overall_color_shader");
-            Commands.Add("mtl.diffuse_color_shader = mtl.overall_color_shader");
+            /*Apply diffuse map - if there is an RGB_Multiply called Diffuse, find it and set the map, otherwise leave it*/
 
-            Commands.Add("showTextureMap mtl mtl.overall_color_shader on");       //show the diffuse map in the viewport
+            Commands.Add("diffuse_map_connection = (for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"Diffuse\") collect (map_i))[1]");
+            Commands.Add("(if (diffuse_map_connection != undefined) then (diffuse_map_connection.map1 = diffuse_map   ))");
+
+            if (m.diffuseMap != null)
+            {
+                Commands.Add("(if (diffuse_map_connection != undefined) then (showTextureMap mtl diffuse_map.mapList[1].map1 on))"); //show the diffuse map in the viewport
+            }
 
             Commands.Add("(getHandleByAnim mtl) as String");
 
