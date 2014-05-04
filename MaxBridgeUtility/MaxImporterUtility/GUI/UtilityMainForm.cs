@@ -37,24 +37,7 @@ namespace MaxManagedBridge
 
             this.materialTemplateDropDown.DisplayMember = "Name";
             this.materialTemplateDropDown.DataSource = this.Plugin.Templates;
-            this.materialTemplateDropDown.SelectedIndexChanged += new EventHandler(materialTemplateDropDown_SelectedIndexChanged);
-            this.Plugin.Templates.ListChanged += new ListChangedEventHandler(Templates_ListChanged);
 
-        }
-
-        void Templates_ListChanged(object sender, ListChangedEventArgs e)
-        {
-           
-        }
-
-        void materialTemplateDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if ((sender as ComboBox).SelectedItem == null){
-                this.Plugin.TemplateMaterial = null;
-                return;
-            }
-
-            this.Plugin.TemplateMaterial = ((sender as ComboBox).SelectedItem as IIMtlBaseView).Mtl;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -224,6 +207,7 @@ namespace MaxManagedBridge
                 {
                     if (control is TextBox) { control.ResetText(); }
                     if (control is CheckBox) { (control as CheckBox).Checked = false; }
+                    if (control is ComboBox) { (control as ComboBox).SelectedIndex = 0; }
                 }
 
             }
@@ -238,7 +222,7 @@ namespace MaxManagedBridge
             /* We create and use the array of cached bindings in this function only so we can use hardcoded indices safely */
 
             if((MaterialOptions.BindingInfo as BindingCache[]) == null){
-                MaterialOptions.BindingInfo = new BindingCache[5];
+                MaterialOptions.BindingInfo = new BindingCache[6];
 
                 /* When this material is first selected, we attempt to bind all the possible UI controls. If the binding fails (because there is no appropriate property for that control)
                  * the binding is disabled in the BindingCache object from then on, and the control is disabled. This way, we only throw an exception once at the first use of the material. */
@@ -248,6 +232,7 @@ namespace MaxManagedBridge
                 (MaterialOptions.BindingInfo as BindingCache[])[2] = new BindingCache(disableMapFilteringCheckbox, new Binding("Checked", MaterialOptions, "MapFilteringDisable"));
                 (MaterialOptions.BindingInfo as BindingCache[])[3] = new BindingCache(ambientOcclusionEnableCheckbox, new Binding("Checked", MaterialOptions, "AOEnable"));
                 (MaterialOptions.BindingInfo as BindingCache[])[4] = new BindingCache(ambientOcclusionDistanceTextBox, new Binding("Text", MaterialOptions, "AODistance"));
+                (MaterialOptions.BindingInfo as BindingCache[])[5] = new BindingCache(materialTemplateDropDown, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate", true, DataSourceUpdateMode.OnPropertyChanged));
             }
 
             BindingCache[] bindingInfo = MaterialOptions.BindingInfo as BindingCache[];
@@ -256,8 +241,6 @@ namespace MaxManagedBridge
             {
                 binding.RemakeBinding();
             }
-
-            materialTemplateDropDown.Enabled = MaterialOptions.UsesTemplate;
         }
 
         private void getMaterialProperties_button_Click(object sender, EventArgs e)

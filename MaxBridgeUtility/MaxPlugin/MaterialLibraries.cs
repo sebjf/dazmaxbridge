@@ -26,6 +26,33 @@ namespace MaxManagedBridge
         }
     }
 
+    //public IMtlBase GetTemplateMaterial(MyMesh myMesh)
+    //{
+    //    IMtlBase template = TemplateMaterial;
+
+    //    if (FindTemplateByMeshName)
+    //    {
+    //        //search all the material libraries and sample slots for a matching name
+    //        foreach (var m in Templates)
+    //        {
+    //            if (m.Name == myMesh.Name)
+    //            {
+    //                return m.Mtl;
+    //            }
+    //        }
+
+    //        for (int i = 0; i < 24; i++)
+    //        {
+    //            if (globalInterface.COREInterface.GetMtlSlot(i).Name == myMesh.Name)
+    //            {
+    //                return globalInterface.COREInterface.GetMtlSlot(i);
+    //            }
+    //        }
+    //    }
+
+    //    return template;
+    //}
+
     public class SampleSlotView : IIMtlBaseView
     {
         public string Name

@@ -13,7 +13,6 @@ namespace MaxManagedBridge
     {
         IMtl CreateMaterial(MaterialWrapper m);
         string MaterialName { get; }
-        bool UsesTemplate { get; }
         object BindingInfo { get; set; } //This is for use by the GUI, don't touch it
     }
 
@@ -37,44 +36,14 @@ namespace MaxManagedBridge
             }
         }
 
-        public IMtlBase TemplateMaterial { get; set; }
-        public bool FindTemplateByMeshName { get; set; }
-
         public readonly IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesignSkin(), new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
 
         public IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
         {
             foreach (var myMat in myMesh.Materials)
             {
-                yield return new MaterialWrapper(myMat, GetTemplateMaterial(myMesh));
+                yield return new MaterialWrapper(myMat);
             }
-        }
-
-        public IMtlBase GetTemplateMaterial(MyMesh myMesh)
-        {
-            IMtlBase template = TemplateMaterial;
-
-            if (FindTemplateByMeshName)
-            {
-                //search all the material libraries and sample slots for a matching name
-                foreach (var m in Templates)
-                {
-                    if (m.Name == myMesh.Name)
-                    {
-                        return m.Mtl;
-                    }
-                }
-
-                for (int i = 0; i < 24; i++)
-                {
-                    if (globalInterface.COREInterface.GetMtlSlot(i).Name == myMesh.Name)
-                    {
-                        return globalInterface.COREInterface.GetMtlSlot(i);
-                    }
-                }
-            }
-
-            return template;
         }
 
         public IMultiMtl CreateMultiMaterial(IList<MaterialWrapper> Materials)
@@ -144,18 +113,14 @@ namespace MaxManagedBridge
     /// </summary>
     public class MaterialWrapper
     {
-        public MaterialWrapper(Material material, IMtlBase template)
+        public MaterialWrapper(Material material)
         {
             this.source = material;
             this.MaterialName = source.MaterialName; //because we need to pass it by ref later on.
-            this.Template = template;
             Initialise();
         }
 
         protected Material source;
-
-        //Can be null, if the material does not use a template
-        public IMtlBase Template;
 
         public bool IsTransparent { get { return (opacityMapAmount == 0); } }
         public bool Initialised { get; protected set; }
@@ -315,6 +280,8 @@ namespace MaxManagedBridge
         public bool MapFilteringDisable { get; set; }
         public float BumpScalar { get; set; }
 
+        public IIMtlBaseView MaterialTemplate { get; set; }
+
         public MaterialOptionsMentalRayArchAndDesignSkin()
         {
             MapFilteringDisable = Defaults.MapFilteringDisable;
@@ -324,11 +291,6 @@ namespace MaxManagedBridge
         new public string MaterialName
         {
             get { return "MentalRay Arch & Design with Skin support"; }
-        }
-
-        new public bool UsesTemplate
-        {
-            get { return true; }
         }
 
         new public IMtl CreateMaterial(MaterialWrapper m)
@@ -345,7 +307,7 @@ namespace MaxManagedBridge
 
         protected IMtl CreateSkinMaterial2(MaterialWrapper m)
         {
-            IMtlBase referenceMtl = m.Template;
+            IMtlBase referenceMtl = MaterialTemplate.Mtl;
 
             if (referenceMtl == null)
             {
@@ -383,7 +345,7 @@ namespace MaxManagedBridge
 
         protected IMtl CreateSkinMaterial(MaterialWrapper m)
         {
-            IMtlBase referenceMtl = m.Template;
+            IMtlBase referenceMtl = MaterialTemplate.Mtl;
 
             if (referenceMtl == null)
             {
@@ -536,11 +498,6 @@ namespace MaxManagedBridge
         public string MaterialName
         {
             get { return "MentalRay Arch & Design Material"; }
-        }
-
-        public bool UsesTemplate
-        {
-            get { return false; }
         }
 
         public object BindingInfo { get; set; }
@@ -725,11 +682,6 @@ namespace MaxManagedBridge
             get { return "VRay Material"; }
         }
 
-        public bool UsesTemplate
-        {
-            get { return false; }
-        }
-
         public object BindingInfo { get; set; }
 
         protected string MakeScript(MaterialWrapper m)
@@ -883,11 +835,6 @@ namespace MaxManagedBridge
         public string MaterialName
         {
             get { return "Autodesk 3DS Max Standard Material"; }
-        }
-
-        public bool UsesTemplate
-        {
-            get { return false; }
         }
 
         public object BindingInfo { get; set; }
