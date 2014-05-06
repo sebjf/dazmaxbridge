@@ -18,7 +18,7 @@ namespace MaxManagedBridge
         {
             get
             {
-                return GetChildNodesRecursive(globalInterface.COREInterface.RootNode);
+                return GetChildNodesRecursive(gi.COREInterface.RootNode);
             }
         }
 

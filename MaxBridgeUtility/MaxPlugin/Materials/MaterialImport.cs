@@ -48,7 +48,7 @@ namespace MaxManagedBridge
         {
             int NumberOfMaterialSlots = Materials.Max(Material => Material.MaterialIndex);
 
-            IMultiMtl maxMaterial = globalInterface.NewDefaultMultiMtl;
+            IMultiMtl maxMaterial = gi.NewDefaultMultiMtl;
             maxMaterial.SetNumSubMtls(NumberOfMaterialSlots);
 
             foreach (var myMat in Materials)

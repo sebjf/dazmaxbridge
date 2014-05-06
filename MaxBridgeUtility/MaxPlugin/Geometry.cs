@@ -74,7 +74,7 @@ namespace MaxManagedBridge
 
             /* Get the default flags value */
 
-            IFace referenceFace = globalInterface.Face.Create();
+            IFace referenceFace = gi.Face.Create();
             referenceFace.SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
             Face referenceMaxFace = *(Face*)referenceFace.Handle.ToPointer();
             UInt32 referenceFlags = referenceMaxFace.flags;

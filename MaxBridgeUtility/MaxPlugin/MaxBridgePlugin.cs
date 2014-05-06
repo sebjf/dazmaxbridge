@@ -9,7 +9,7 @@ namespace MaxManagedBridge
 {
     public partial class MaxPlugin : MaxBridge
     {
-        protected IGlobal globalInterface = null;
+        protected IGlobal gi = null;
 
         public bool RebuildMaterials { get; set; }
         public bool RemoveTransparentFaces { get; set; }
@@ -19,7 +19,7 @@ namespace MaxManagedBridge
 
         public MaxPlugin(IGlobal globalinterface)
         {
-            this.globalInterface = globalinterface;
+            this.gi = globalinterface;
             RebuildMaterials = false;
             RemoveTransparentFaces = true;
             Templates = new MaterialLibraryView(Defaults.MaterialLibraryFilename);
@@ -43,8 +43,8 @@ namespace MaxManagedBridge
         {
             Log.Add("[m2] Disabling undo and redraw");
 
-            globalInterface.COREInterface.DisableSceneRedraw();
-            globalInterface.COREInterface.EnableUndo(false);
+            gi.COREInterface.DisableSceneRedraw();
+            gi.COREInterface.EnableUndo(false);
 
             foreach (var m in myMeshes)
             {
@@ -55,10 +55,10 @@ namespace MaxManagedBridge
 
             Log.Add("[m4] Enabling undo and redraw");
 
-            globalInterface.COREInterface.EnableUndo(true);
-            globalInterface.COREInterface.EnableSceneRedraw();
+            gi.COREInterface.EnableUndo(true);
+            gi.COREInterface.EnableSceneRedraw();
 
-            globalInterface.COREInterface10.RedrawViewportsNow(globalInterface.COREInterface.Time, MaxFlags.VP_DONT_SIMPLIFY);
+            gi.COREInterface10.RedrawViewportsNow(gi.COREInterface.Time, MaxFlags.VP_DONT_SIMPLIFY);
         }
 
         /* Ideally we would create selection sets for each character so that they can be easily included/excluded from things like lighting */
@@ -120,11 +120,11 @@ namespace MaxManagedBridge
 
         protected IINode CreateMeshNode(MyMesh mesh)
         {
-            IMatrix3 identity = globalInterface.Matrix3.Create();
+            IMatrix3 identity = gi.Matrix3.Create();
             identity.IdentityMatrix();
 
-            ITriObject meshObject = globalInterface.CreateNewTriObject();
-            IINode myNode = globalInterface.COREInterface.CreateObjectNode(meshObject);
+            ITriObject meshObject = gi.CreateNewTriObject();
+            IINode myNode = gi.COREInterface.CreateObjectNode(meshObject);
             myNode.Name = mesh.Name;
 
             /* In this section we reset the transform of the node (as it may have been initialised with a rotation depending on what viewport was selected)
@@ -134,7 +134,7 @@ namespace MaxManagedBridge
 
             myNode.Rotate(0, 
                 identity,
-                globalInterface.AngAxis.Create(1.0f, 0.0f, 0.0f, (float)DegreeToRadian(-90.0f)), 
+                gi.AngAxis.Create(1.0f, 0.0f, 0.0f, (float)DegreeToRadian(-90.0f)), 
                 true, true, 
                 (int)PivotMode.PIV_OBJECT_ONLY, 
                 true);

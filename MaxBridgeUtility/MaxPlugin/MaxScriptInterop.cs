@@ -40,13 +40,13 @@ namespace MaxManagedBridge
 
         public IAnimatable Convert(System.Int64 handle)
         {
-            IAnimatable anim = globalInterface.Animatable.GetAnimByHandle((UIntPtr)handle);
+            IAnimatable anim = gi.Animatable.GetAnimByHandle((UIntPtr)handle);
             return anim;
         }
 
         public System.Int64 Convert(IAnimatable obj)
         {
-            return (System.Int64)globalInterface.Animatable.GetHandleByAnim(obj);
+            return (System.Int64)gi.Animatable.GetHandleByAnim(obj);
         }
 
         public string ExecuteMaxScript(string command)
