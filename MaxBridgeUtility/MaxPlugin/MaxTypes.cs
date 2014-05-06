@@ -2,9 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
+    /* http://code.google.com/p/snakengine/source/browse/trunk/OtherLibs/3dmax+sdk/2012/include/INodeTransformModes.h?r=5 */
+    enum PivotMode : int
+    {
+        PIV_NONE = 0,
+        PIV_PIVOT_ONLY = 1,
+        PIV_OBJECT_ONLY = 2,
+        PIV_HIERARCHY_ONLY = 3
+    }
+
+    /*http://docs.autodesk.com/3DSMAX/15/ENU/3ds-Max-SDK-Programmer-Guide/index.html?url=files/GUID-B41DC781-221E-4DE3-8AA1-EC3C2666FC5C.htm,topicNumber=d30e22562 */
+    public static class ClassIDs
+    {
+        public const uint XFORM_A = 622942244;
+        public const uint BitmapTexture_A = 576;
+        public const uint RGB_Multiply_A = 656;
+        public const uint StandardMaterial_A = 2;
+        public const uint MultiMaterial = 512;
+    }
+
+    public static class MaxFlags
+    {
+        //maxapi.h
+        public const int VP_DONT_SIMPLIFY = 0x0002;
+    }
+
+    public static class MaxExtensions
+    {
+        public static bool EqualsClassID(this IClass_ID classA, uint a, uint b)
+        {
+            return ((classA.PartA == a) && (classA.PartB == b));
+        }
+
+        public static bool EqualsClassID(this IClass_ID classA, IClass_ID classB)
+        {
+            return ((classA.PartA == classB.PartA) && (classA.PartB == classB.PartB));
+        }
+    }
+
     /* These definitions mirror the unmanaged types used within the 3ds max Mesh class - http://download.autodesk.com/global/docs/3dsmaxsdk2012/en_us/index.html */
 
     /* The Point3 type is used to store vertices and normals, the managed equivalent is IPoint3 

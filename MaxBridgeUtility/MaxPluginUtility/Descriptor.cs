@@ -13,13 +13,10 @@ namespace MaxManagedBridge
     /// </summary>
     public class MaxBridgeUtilityDescriptor : ClassDesc2
     {
-        IGlobal global;
         internal static IClass_ID classID;
 
         public MaxBridgeUtilityDescriptor(IGlobal global)
         {
-            this.global = global;
-
             // The two numbers used for class id have to be unique/random
             classID = global.Class_ID.Create(118920184, 157352180);
         }

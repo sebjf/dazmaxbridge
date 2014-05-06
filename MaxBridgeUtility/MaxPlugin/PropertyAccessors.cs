@@ -24,19 +24,6 @@ using Autodesk.Max.Wrappers;
 
 namespace MaxManagedBridge
 {
-    public static class MaxExtensions
-    {
-        public static bool EqualsClassID(this IClass_ID classA, uint a, uint b)
-        {
-            return ((classA.PartA == a) && (classA.PartB == b));
-        }
-
-        public static bool EqualsClassID(this IClass_ID classA, IClass_ID classB)
-        {
-             return ((classA.PartA == classB.PartA) && (classA.PartB == classB.PartB));
-        }
-    }
-
     public static class LinqExtensions
     {
         //http://stackoverflow.com/questions/489258/linq-distinct-on-a-particular-property

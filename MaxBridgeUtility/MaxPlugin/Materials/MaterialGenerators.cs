@@ -2,283 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Drawing;
 using Autodesk.Max;
-using System.Windows.Forms;
 
 namespace MaxManagedBridge
 {
-    public interface IMaterialCreationOptions
-    {
-        IMtl CreateMaterial(MaterialWrapper m);
-        string MaterialName { get; }
-        object BindingInfo { get; set; } //This is for use by the GUI, don't touch it
-    }
-
-    public partial class MaxPlugin : MaxBridge
-    {
-        protected IMaterialCreationOptions materialOptions = new MaterialOptionsMentalRayArchAndDesign();
-        public IMaterialCreationOptions MaterialOptions
-        {
-            set
-            {
-                if (value is IMaterialCreationOptions)
-                {
-                    materialOptions = value;
-                }
-                else
-                {
-                    string message = "MaterialOptions must be valid object implementing GetNewMaterial()";
-                    Log.Add(message);
-                    throw new ArgumentException(message);
-                }
-            }
-        }
-
-        public readonly IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesignSkin(), new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
-
-        public IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
-        {
-            foreach (var myMat in myMesh.Materials)
-            {
-                yield return new MaterialWrapper(myMat);
-            }
-        }
-
-        public IMultiMtl CreateMultiMaterial(IList<MaterialWrapper> Materials)
-        {
-            int NumberOfMaterialSlots = Materials.Max(Material => Material.MaterialIndex);
-
-            IMultiMtl maxMaterial = globalInterface.NewDefaultMultiMtl;
-            maxMaterial.SetNumSubMtls(NumberOfMaterialSlots);
-
-            foreach (var myMat in Materials)
-            {
-                maxMaterial.SetSubMtlAndName(myMat.MaterialIndex, materialOptions.CreateMaterial(myMat), ref myMat.MaterialName);
-            }
-
-            return maxMaterial;
-        }
-
-        public string PrintMaterialProperties(MyScene scene)
-        {
-            List<String> lines = new List<string>();
-            foreach (MyMesh m in scene.Items)
-            {
-                lines.Add("-------------------------------------------");
-                lines.Add("Mesh Name: " + m.Name);
-                lines.Add("-------------------------------------------");
-
-                foreach (var mat in m.Materials)
-                {
-                    lines.Add("        -------------------        ");
-                    lines.Add("Material Name: " + mat.MaterialName);
-                    lines.Add("Material Index: " + mat.MaterialIndex);
-                    lines.Add("Material Type: " + mat.MaterialType);
-                    lines.Add("        -------------------        ");
-
-                    foreach (KeyValuePair<string, string> kvp in mat.MaterialProperties)
-                    {
-                        lines.Add(kvp.Key + ": " + kvp.Value);
-                    }
-
-                    lines.Add("        -------------------        ");
-                }
-
-                lines.Add("END");
-            }
-
-            string final = "";
-            foreach (var s in lines)
-            {
-                final += (s + Environment.NewLine);
-            }
-
-            return final;
-        }
-
-    }
-
-    public enum DazMtlType
-    {
-        DazPlastic,
-        DazSkin,
-        Other
-    }
-
-    /// <summary>
-    /// The MaterialSource class provides an interface to the material described by a set of string properties from Daz, allowing it to be used in a stable form throughout and querying it for 
-    /// information such as Opacity state
-    /// </summary>
-    public class MaterialWrapper
-    {
-        public MaterialWrapper(Material material)
-        {
-            this.source = material;
-            this.MaterialName = source.MaterialName; //because we need to pass it by ref later on.
-            Initialise();
-        }
-
-        protected Material source;
-
-        public bool IsTransparent { get { return (opacityMapAmount == 0); } }
-        public bool Initialised { get; protected set; }
-
-
-
-        public string MaterialName;
-        public int MaterialIndex { get { return source.MaterialIndex; } }
-
-
-        public bool showInViewport = true;
-
-        public Color ambient = Color.Black;
-        public string ambientMap = null;
-        public float ambientMapAmount = 1.0f;
-
-        public string bumpMap = null;
-        public float bumpMapAmount = 1.0f;
-
-        public Color diffuse = Color.FromArgb(127, 127, 127);
-        public string diffuseMap = null;
-        public float diffuseMapAmount = 1.0f;
-
-        public string opacityMap = null;
-        public float opacityMapAmount = 1.0f;
-
-        public Color specular = Color.FromArgb(230, 230, 230);
-        public string specularMap = null;
-        public float specularLevel = 0.0f;
-        public float glossiness = 10.0f;
-
-        public float u_tiling = 1;
-        public float v_tiling = 1;
-
-        public DazMtlType type = DazMtlType.Other;
-
-        public void Initialise()
-        {
-            ambient = Defaults.AmbientGammaCorrection ? ConvertColour(source.GetColorSafe("Ambient Color", ambient)) : source.GetColorSafe("Ambient Color", ambient);
-            ambientMap = source.GetString("Ambient Color Map");
-            ambientMapAmount = source.GetFloatSafe("Ambient Strength", ambientMapAmount);
-            bumpMap = source.GetString("Bump Strength Map");
-            diffuseMap = source.GetString("Color Map");
-            diffuse = ConvertColour(source.GetColorSafe("Diffuse Color", diffuse));
-            diffuseMapAmount = source.GetFloatSafe("Diffuse Strength", diffuseMapAmount);
-            opacityMap = source.GetString("Opacity Map");
-            opacityMapAmount = source.GetFloatSafe("Opacity Strength", opacityMapAmount);
-            specular = ConvertColour(source.GetColorSafe("Specular Color", specular));
-            specularMap = source.GetString("Specular Color Map");
-            specularLevel = source.GetFloatSafe("Specular Strength", specularLevel);
-            glossiness = source.GetFloatSafe("Glossiness", glossiness);
-            u_tiling = source.GetFloatSafe("Horizontal Tiles", u_tiling);
-            v_tiling = source.GetFloatSafe("Vertical Tiles", v_tiling);
-            bumpMapAmount = ((source.GetFloatSafe(new string[] { "Positive Bump", "Bump Maximum" }, 0.1f) - source.GetFloatSafe(new string[] { "Negative Bump", "Bump Minimum" }, -0.1f)) * source.GetFloatSafe("Bump Strength", 1.0f));
-
-            type = FindType();
-
-            Initialised = true;
-        }
-
-        #region Material Type Identification
-
-        protected DazMtlType FindType()
-        {
-            switch (source.MaterialType)
-            {
-                case "DzDefaultMaterial":
-                    switch (source.GetString("Lighting Model"))
-                    {
-                        case "Plastic":
-                            return DazMtlType.DazPlastic;
-                        case "Skin":
-                            return DazMtlType.DazSkin;
-                    }
-                    break;
-            }
-            return DazMtlType.Other;
-        }
-
-        #endregion
-
-        #region Gamma Correction
-
-        public static Color ConvertColour(Color colour)
-        {
-            return Color.FromArgb(colour.A, CorrectGamma(colour.R), CorrectGamma(colour.G), CorrectGamma(colour.B));
-        }
-
-        public static Color? ConvertColour(Color? colour)
-        {
-            if (colour == null)
-                return null;
-
-            return ConvertColour(colour.Value);
-        }
-
-        /*This is far from ideal but since Daz doesn't follow a linear workflow we can assume the colour channels will never go above white*/
-
-        protected static byte CorrectGamma(byte v)
-        {
-            float c = (float)v;
-            return (byte)(Math.Pow(c / 255.0f, 2.2f) * 255.0f);
-        }
-
-        #endregion
-    }
-
-    public abstract class MaxSDKTool
-    {
-        public IInterface intrface { get { return GlobalInterface.Instance.COREInterface; } }
-        public IGlobal gi { get { return GlobalInterface.Instance; } }
-    }
-
-    public abstract class MaxScriptMaterialGenerator : MaxSDKTool
-    {
-        protected IMtl GetFromScript(string script)
-        {
-            try
-            {
-                string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(script);
-                handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
-                System.Int64 handle = System.Int64.Parse(handle_string);
-                IMtl nativeMtl = (Convert(handle) as IMtl);
-                if (nativeMtl == null)
-                {
-                    throw new Exception("Could not resolve string from MaxScript to handle of material object");
-                }
-                return nativeMtl;
-            }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show(
-                    "Copy the full script out of this window with Ctrl+C and run it in 3DS Max listener without the parenthesis to find the error.\n\n" + script,
-                    "Exception: Could not create mtl.",
-                    MessageBoxButtons.OK);
-            }
-
-            return null;
-        }
-
-        protected IAnimatable Convert(System.Int64 handle)
-        {
-            IAnimatable anim = gi.Animatable.GetAnimByHandle((UIntPtr)handle);
-            return anim;
-        }
-
-        protected UIntPtr Convert(IAnimatable anim)
-        {
-            return gi.Animatable.GetHandleByAnim(anim);
-        }
-    }
-
     public class MaterialOptionsMentalRayArchAndDesignSkin : MaterialOptionsMentalRayArchAndDesign, IMaterialCreationOptions
     {
-        /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material in the sample slot 1 */
-
-        public bool MapFilteringDisable { get; set; }
-        public float BumpScalar { get; set; }
+        /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
 
         public IIMtlBaseView MaterialTemplate { get; set; }
 
@@ -399,7 +130,8 @@ namespace MaxManagedBridge
                 Commands.Add(string.Format("bump_map = (bitmapTexture filename:\"{0}\")", m.bumpMap));
                 Commands.Add(string.Format("bump_map.coords.u_tiling = {0}; bump_map.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
 
-                if (MapFilteringDisable){
+                if (MapFilteringDisable)
+                {
                     Commands.Add(string.Format("bump_map.coords.blur = 0.01;"));
                     Commands.Add(string.Format("bump_map.filtering = 2;"));
                 }
@@ -471,8 +203,6 @@ namespace MaxManagedBridge
             }
             return "(" + script + ")"; //Note, remove these brackets to have max print the results of each command in the set when debugging.
         }
-
-        public object BindingInfo { get; set; }
     }
 
 
@@ -989,5 +719,4 @@ namespace MaxManagedBridge
 
         }
     }
-
 }

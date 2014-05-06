@@ -15,6 +15,12 @@ namespace MaxManagedBridge
 {
     //http://docs.autodesk.com/3DSMAX/16/ENU/3ds-Max-SDK-Programmer-Guide/index.html?url=files/GUID-5243C5F6-2835-430C-8E17-617700BC6D0D.htm,topicNumber=d30e28922
 
+    public interface IIMtlBaseView
+    {
+        string Name { get; }
+        IMtlBase Mtl { get; }
+    }
+
     public class IMtlBaseView : IIMtlBaseView
     {
         public string Name { get { return Mtl.Name; } }
@@ -53,6 +59,26 @@ namespace MaxManagedBridge
     //    return template;
     //}
 
+    public class NameMatchView : IIMtlBaseView
+    {
+        public string Name
+        {
+            get { return "Match Material by Model Name"; }
+        }
+
+        public NameMatchView(MaterialLibraryView lib)
+        {
+            this.library = lib;
+        }
+
+        public IMtlBase Mtl
+        {
+            get { throw new NotImplementedException(); } 
+        }
+
+        private MaterialLibraryView library;
+    }
+
     public class SampleSlotView : IIMtlBaseView
     {
         public string Name
@@ -71,12 +97,6 @@ namespace MaxManagedBridge
         {
             id = slotid;
         }
-    }
-
-    public interface IIMtlBaseView
-    {
-        string Name { get; }
-        IMtlBase Mtl { get; }
     }
 
     /* An interface to a material library, which the user can work with in the SME */
@@ -114,6 +134,8 @@ namespace MaxManagedBridge
                 }
             }
 
+            //Todo: seperate out material template wrapper functionality and actual material library wrapper functionality
+
             Add(new SampleSlotView(0));
             Add(new SampleSlotView(1));
             Add(new SampleSlotView(2));
@@ -135,7 +157,7 @@ namespace MaxManagedBridge
         protected void OnChanged(object source, FileSystemEventArgs e)
         {
             //Altering the bindinglist in ReloadLibrary() will attempt to access the drop down control, so we must ensure that it is called in the original 
-            //thread (found with Context.Current in the ctor) as OnChanged will be called by the thread that monitors the filesystem
+            //thread that created the control (found with Context.Current in the ctor), as OnChanged (this method) will be called by the thread that monitors the filesystem
             context.Send(ReloadLibraryCallback, null);
         }
 

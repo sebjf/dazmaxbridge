@@ -11,7 +11,7 @@ namespace MaxManagedBridge
 {
     public partial class MaxBridge
     {
-        public ClientManager DazClientManager = new ClientManager();
+        public readonly ClientManager DazClientManager = new ClientManager();
 
         #region Utilities
 

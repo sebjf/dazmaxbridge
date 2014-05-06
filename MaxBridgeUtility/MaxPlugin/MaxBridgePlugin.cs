@@ -7,26 +7,6 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
-
-    /* http://code.google.com/p/snakengine/source/browse/trunk/OtherLibs/3dmax+sdk/2012/include/INodeTransformModes.h?r=5 */
-    enum PivotMode : int
-    {
-         PIV_NONE             = 0,
-         PIV_PIVOT_ONLY       = 1,
-         PIV_OBJECT_ONLY      = 2,
-         PIV_HIERARCHY_ONLY   = 3
-    }
-
-    /*http://docs.autodesk.com/3DSMAX/15/ENU/3ds-Max-SDK-Programmer-Guide/index.html?url=files/GUID-B41DC781-221E-4DE3-8AA1-EC3C2666FC5C.htm,topicNumber=d30e22562 */
-    public static class ClassIDs
-    {
-        public const uint XFORM_A = 622942244;
-        public const uint BitmapTexture_A = 576;
-        public const uint RGB_Multiply_A = 656;
-        public const uint StandardMaterial_A = 2;
-        public const uint MultiMaterial = 512;
-    }
-
     public partial class MaxPlugin : MaxBridge
     {
         protected IGlobal globalInterface = null;
@@ -36,8 +16,6 @@ namespace MaxManagedBridge
 
         public MaterialLibraryView Templates { get; private set; }
 
-        //maxapi.h
-        protected const int VP_DONT_SIMPLIFY = 0x0002;
 
         public MaxPlugin(IGlobal globalinterface)
         {
@@ -45,12 +23,6 @@ namespace MaxManagedBridge
             RebuildMaterials = false;
             RemoveTransparentFaces = true;
             Templates = new MaterialLibraryView(Defaults.MaterialLibraryFilename);
-        }
-
-        public IEnumerable<IINode> GetMappedNodes(string Name)
-        {
-            //This is our mapping function for now -> iterate over every node in the scene and return those with the correct name!
-            return (SceneNodes.Where(n => (n.ObjectRef is ITriObject) && (n.Name == Name)));
         }
 
         public void UpdateMeshes(MyScene scene)
@@ -86,7 +58,7 @@ namespace MaxManagedBridge
             globalInterface.COREInterface.EnableUndo(true);
             globalInterface.COREInterface.EnableSceneRedraw();
 
-            globalInterface.COREInterface10.RedrawViewportsNow(globalInterface.COREInterface.Time, VP_DONT_SIMPLIFY);
+            globalInterface.COREInterface10.RedrawViewportsNow(globalInterface.COREInterface.Time, MaxFlags.VP_DONT_SIMPLIFY);
         }
 
         /* Ideally we would create selection sets for each character so that they can be easily included/excluded from things like lighting */
@@ -100,7 +72,7 @@ namespace MaxManagedBridge
         //    globalInterface.INamedSelectionSetManager.Instance.ReplaceNamedSelSet(
         //}
 
-        public void UpdateMeshData(MyMesh myMesh)
+        protected void UpdateMeshData(MyMesh myMesh)
         {
             UpdateProgress(0.0f, "Getting mapped items...");
 
@@ -146,7 +118,7 @@ namespace MaxManagedBridge
             UpdateProgress(1.0f, "Done.");
         }
 
-        public IINode CreateMeshNode(MyMesh mesh)
+        protected IINode CreateMeshNode(MyMesh mesh)
         {
             IMatrix3 identity = globalInterface.Matrix3.Create();
             identity.IdentityMatrix();
@@ -179,7 +151,7 @@ namespace MaxManagedBridge
             return myNode;
         }
 
-        public void UpdateProgress(float progress, string message)
+        protected void UpdateProgress(float progress, string message)
         {
             if (ProgressChanged != null)
             {

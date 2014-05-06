@@ -14,8 +14,6 @@ using System.Runtime.InteropServices;
 
 namespace MaxManagedBridge
 {
-
-
     unsafe public class SharedMemory
     {
         protected MemoryMappedFile memoryMappedFile;
@@ -224,7 +222,7 @@ namespace MaxManagedBridge
             /* We find that
              * MessagePackSerializer<T> c = MessagePackSerializer.Create<T>(); 
              * can cause Max to crash. Not sure why, but it may be a threading issue since it only occurs when the Max viewport is under high load.
-             * We prebuild the serialisers to avoid this issue, but it results in higher performance anyway so we may as well leave it. */
+             * We originally prebuilt the serialisers to avoid this issue, but it results in higher performance anyway so we may as well leave it. */
 
             unpackers[typeof(T)] = MessagePackSerializer.Create<T>();
         }

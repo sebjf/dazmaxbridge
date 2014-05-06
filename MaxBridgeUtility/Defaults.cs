@@ -21,4 +21,42 @@ namespace MaxManagedBridge
         public static float Standard_BumpScalar     = 1.0f;
         public static string MaterialLibraryFilename = "DazMaxBridge Templates.mat";
     }
+
+    public interface ICanPreserveState
+    {
+        
+    }
+
+    public class PersistantState
+    {
+        public static PersistantState Singleton
+        {
+            get
+            {
+                if (singleton == null)
+                {
+                    singleton = new PersistantState();
+                }
+                return singleton;
+            }
+        }
+        private static PersistantState singleton;
+
+        public void Register(ICanPreserveState obj)
+        {
+            objectsWithState.Add(obj);
+        }
+
+        protected List<ICanPreserveState> objectsWithState;
+
+        void LoadObjectStates()
+        {
+
+        }
+
+        void SaveObjectStates()
+        {
+
+        }
+    }
 }

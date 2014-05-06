@@ -62,31 +62,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\SceneClient.cs" />
-    <Compile Include="Logging\Logging.cs" />
+    <Compile Include="MaxBridge\SceneClient.cs" />
+    <Compile Include="Logging.cs" />
     <Compile Include="MaxBridge\MaxBridge.cs" />
     <Compile Include="MaxBridge\Types.cs" />
-    <Compile Include="MaxImporterUtility\Descriptor.cs" />
-    <Compile Include="MaxImporterUtility\GUI\EditableMessageBox.cs">
+    <Compile Include="MaxPluginUtility\Descriptor.cs" />
+    <Compile Include="MaxPluginUtility\GUI\EditableMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MaxImporterUtility\GUI\EditableMessageBox.Designer.cs">
+    <Compile Include="MaxPluginUtility\GUI\EditableMessageBox.Designer.cs">
       <DependentUpon>EditableMessageBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.cs">
+    <Compile Include="MaxPluginUtility\GUI\UtilityMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MaxImporterUtility\GUI\UtilityMainForm.Designer.cs">
+    <Compile Include="MaxPluginUtility\GUI\UtilityMainForm.Designer.cs">
       <DependentUpon>UtilityMainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MaxImporterUtility\GUI\ViewModels.cs" />
-    <Compile Include="MaxImporterUtility\MaxBridgeUtility.cs" />
-    <Compile Include="MaxPlugin\Defaults.cs" />
-    <Compile Include="MaxPlugin\MaterialLibraries.cs" />
+    <Compile Include="MaxPluginUtility\GUI\ViewModels.cs" />
+    <Compile Include="MaxPluginUtility\MaxBridgeUtility.cs" />
+    <Compile Include="Defaults.cs" />
+    <Compile Include="MaxPlugin\Materials\MaterialGenerators.cs" />
+    <Compile Include="MaxPlugin\Materials\MaterialLibraryView.cs" />
     <Compile Include="MaxPlugin\MaxTypes.cs" />
     <Compile Include="MaxPlugin\PropertyAccessors.cs" />
     <Compile Include="MaxPlugin\MaxSceneExploration.cs" />
-    <Compile Include="MaxPlugin\Materials.cs" />
+    <Compile Include="MaxPlugin\Materials\MaterialImport.cs" />
     <Compile Include="MaxPlugin\Geometry.cs" />
     <Compile Include="MaxPlugin\MaxBridgePlugin.cs" />
     <Compile Include="MaxPlugin\MaxScriptInterop.cs" />
@@ -96,10 +97,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MaxImporterUtility\GUI\EditableMessageBox.resx">
+    <EmbeddedResource Include="MaxPluginUtility\GUI\EditableMessageBox.resx">
       <DependentUpon>EditableMessageBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MaxImporterUtility\GUI\UtilityMainForm.resx">
+    <EmbeddedResource Include="MaxPluginUtility\GUI\UtilityMainForm.resx">
       <DependentUpon>UtilityMainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
