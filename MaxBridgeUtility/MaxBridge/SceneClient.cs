@@ -125,7 +125,7 @@ namespace MaxManagedBridge
 
         protected bool SendRequest(IEnumerable<string> commands)
         {
-            Log.Add("[m] (SendRequest()) Sending request to Daz...");
+            Log.Add("(SendRequest()) Sending request to Daz...", LogLevel.Debug);
 
             if (!Reconnect()){
                 return false;
@@ -137,7 +137,7 @@ namespace MaxManagedBridge
             }
             namedPipeWriter.Flush();
 
-            Log.Add("[m] (SendRequest()) Done.");
+            Log.Add("(SendRequest()) Done.", LogLevel.Debug);
 
             namedPipe.WaitForPipeDrain();
 
@@ -150,13 +150,13 @@ namespace MaxManagedBridge
                 return default(T);
             }
 
-            Log.Add("[m] Fetching deserialiser to unpack from stream...");
+            Log.Add("Fetching deserialiser to unpack from stream...", LogLevel.Debug);
 
             MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
 
             T item = c.Unpack(namedPipeReader.BaseStream);
 
-            Log.Add("[mb] (GetItemStream<T>()) Unpacked..returning scene update.");
+            Log.Add("(GetItemStream<T>()) Unpacked..returning scene update.", LogLevel.Debug);
             return item;
 
         }
@@ -167,19 +167,19 @@ namespace MaxManagedBridge
                 return default(T);
             }
 
-            Log.Add("[m] Fetching deserialiser to unpack from memory...");
+            Log.Add("Fetching deserialiser to unpack from memory...", LogLevel.Debug);
             MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
 
             string name = namedPipeReader.ReadLine();
 
-            Log.Add("[ma] (GetItemMemory<T>()) Opening shared memory...");
+            Log.Add("(GetItemMemory<T>()) Opening shared memory...", LogLevel.Debug);
             byte* ptr = sharedMemory.Open(name);
             byte[] array = new byte[sharedMemory.size];
             Marshal.Copy(new IntPtr(ptr), array, 0, sharedMemory.size);
 
             T item = c.UnpackSingleObject(array);
 
-            Log.Add("[ma] (GetItemMemory<T>()) Unpacked..returning scene update.");
+            Log.Add("(GetItemMemory<T>()) Unpacked..returning scene update.", LogLevel.Debug);
             return item;
 
         }
@@ -210,7 +210,7 @@ namespace MaxManagedBridge
 
         protected MessagePackSerialisers()
         {
-            Log.Add("[m] Building deserialisers...");
+            Log.Add("Building deserialisers...", LogLevel.Debug);
 
             CreateUnpacker<MyScene>();
             CreateUnpacker<string>();

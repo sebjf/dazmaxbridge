@@ -112,7 +112,7 @@ namespace MaxManagedBridge
             if (!ReloadLibrary())
             {
                 MessageBox.Show("Could not open material library. See log for more details");
-                Log.Add(string.Format("Failed to open material library {0}. If a populated material library is not available, default materials will be used as templates when creating advanced materials. Create and populate a library using the SME.", filename));
+                Log.Add(string.Format("Failed to open material library {0}. If a populated material library is not available, default materials will be used as templates when creating advanced materials. Create and populate a library using the SME.", filename), LogLevel.Error);
             }
         }
 

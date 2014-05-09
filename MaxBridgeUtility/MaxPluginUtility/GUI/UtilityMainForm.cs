@@ -32,7 +32,7 @@ namespace MaxManagedBridge
             sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
             sceneListbox.DisplayMember = "Label";
 
-            this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterials);
+            this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterialCreators);
             this.materialSelectDropDown.DisplayMember = "MaterialName";
 
             this.materialTemplateDropDown.DisplayMember = "Name";
@@ -109,7 +109,7 @@ namespace MaxManagedBridge
 
         private void refreshButton_Click(object sender, EventArgs e)
         {
-            Log.Add("[m] Refresh list clicked");
+            Log.Add("Refresh list clicked", LogLevel.Debug);
 
             scenesView.Clear();
             sceneListbox.Items.Clear();
@@ -149,7 +149,7 @@ namespace MaxManagedBridge
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            Log.Add("[m] (updateButton_Click()) Update meshes clicked");
+            Log.Add("(updateButton_Click()) Update meshes clicked", LogLevel.Debug);
 
             foreach (var update in GetSelectedItemsUpdates)
             {
@@ -215,9 +215,9 @@ namespace MaxManagedBridge
 
         private void materialSelectDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            IMaterialCreationOptions MaterialOptions = (sender as ComboBox).SelectedItem as IMaterialCreationOptions;
+            IMaterialCreator MaterialOptions = (sender as ComboBox).SelectedItem as IMaterialCreator;
 
-            Plugin.MaterialOptions = MaterialOptions;
+            Plugin.MaterialCreator = MaterialOptions;
 
             /* We create and use the array of cached bindings in this function only so we can use hardcoded indices safely */
 

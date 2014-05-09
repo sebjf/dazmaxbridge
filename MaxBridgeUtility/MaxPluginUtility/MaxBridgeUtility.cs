@@ -28,13 +28,13 @@ namespace MaxManagedBridge
         public MaxBridgeUtility()
         {
             Global = Autodesk.Max.GlobalInterface.Instance;
-            Log.logger = Global.COREInterface.Log;
+            Log.MaxLogger = Global.COREInterface.Log;
             Log.EnableLog = true;
-            Log.Add("[m] Starting DazMaxBridge.");
+            Log.Add("Starting DazMaxBridge.", LogLevel.Information);
 
             Plugin = new MaxPlugin(Global);
 
-            Log.Add("[m] Starting UI.");
+            Log.Add("Starting UI.", LogLevel.Debug);
 
             GUI = new UtilityMainForm(this);
             GUI.ShowModeless();

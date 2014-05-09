@@ -8,6 +8,13 @@ using System.Runtime.InteropServices;
 
 namespace MaxManagedBridge
 {
+    public enum LogLevel : int
+    {
+        All = 0,
+        Debug = 1,
+        Information = 2,
+        Error = 3
+    }
 
     public class Log
     {
@@ -19,7 +26,10 @@ namespace MaxManagedBridge
         private const uint SYSLOG_MR = 0x00020000;
 
         public static bool EnableLog { get; set; }
-        public static ILogSys logger { get; set; }
+        public static ILogSys MaxLogger { get; set; }
+
+        public static LogLevel LogLevel { get { return logLevel; } set { logLevel = value; } }
+        private static LogLevel logLevel = MaxManagedBridge.LogLevel.Information;
 
         [DllImport("Kernel32.dll")]
         private static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
@@ -27,18 +37,19 @@ namespace MaxManagedBridge
         [DllImport("Kernel32.dll")]
         private static extern bool QueryPerformanceFrequency(out long lpFrequency);
 
-        public static void Add(string message)
+        public static void Add(string message, LogLevel level)
         {
-            if (EnableLog && (logger != null))
+            if (EnableLog && (MaxLogger != null) && level >= LogLevel)
             {
-                logger.LogEntry(SYSLOG_INFO, false, "DazMaxBridge", message + "( " + GetElapsedTime() + "s)\n");
+                MaxLogger.LogEntry(SYSLOG_INFO, false, "DazMaxBridge", message + "( " + GetElapsedTime() + "s)\n");
             }
         }
+
 
         private static long lastTime = 0;
         private static long pcFrequency = 0;
 
-        public static float GetElapsedTime()
+        private static float GetElapsedTime()
         {
             if(pcFrequency == 0)
             {

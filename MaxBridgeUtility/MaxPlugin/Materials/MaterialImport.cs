@@ -7,7 +7,7 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
-    public interface IMaterialCreationOptions
+    public interface IMaterialCreator
     {
         IMtl CreateMaterial(MaterialWrapper m);
         string MaterialName { get; }
@@ -16,27 +16,27 @@ namespace MaxManagedBridge
 
     public partial class MaxPlugin : MaxBridge
     {
-        public readonly IMaterialCreationOptions[] AvailableMaterials = { new MaterialOptionsMentalRayArchAndDesignSkin(), new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
+        public readonly IMaterialCreator[] AvailableMaterialCreators = { new MaterialOptionsMentalRayArchAndDesignSkin(), new MaterialOptionsMentalRayArchAndDesign(), new MaterialOptionsVRayMaterial(), new MaterialOptionsStandardMaterial() };
 
-        protected IMaterialCreationOptions materialOptions = new MaterialOptionsMentalRayArchAndDesign();
-        public IMaterialCreationOptions MaterialOptions
+        protected IMaterialCreator materialCreator = new MaterialOptionsMentalRayArchAndDesign();
+        public IMaterialCreator MaterialCreator
         {
             set
             {
-                if (value is IMaterialCreationOptions)
+                if (value is IMaterialCreator)
                 {
-                    materialOptions = value;
+                    materialCreator = value;
                 }
                 else
                 {
-                    string message = "MaterialOptions must be valid object implementing GetNewMaterial()";
-                    Log.Add(message);
+                    string message = "MaterialOptions must be valid object implementing CreateMaterial(MaterialWrapper)";
+                    Log.Add(message, LogLevel.Error);
                     throw new ArgumentException(message);
                 }
             }
         }  
 
-        public IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
+        protected IEnumerable<MaterialWrapper> GetMaterials(MyMesh myMesh)
         {
             foreach (var myMat in myMesh.Materials)
             {
@@ -44,7 +44,7 @@ namespace MaxManagedBridge
             }
         }
 
-        public IMultiMtl CreateMultiMaterial(IList<MaterialWrapper> Materials)
+        protected IMultiMtl CreateMultiMaterial(IList<MaterialWrapper> Materials)
         {
             int NumberOfMaterialSlots = Materials.Max(Material => Material.MaterialIndex);
 
@@ -53,7 +53,7 @@ namespace MaxManagedBridge
 
             foreach (var myMat in Materials)
             {
-                maxMaterial.SetSubMtlAndName(myMat.MaterialIndex, materialOptions.CreateMaterial(myMat), ref myMat.MaterialName);
+                maxMaterial.SetSubMtlAndName(myMat.MaterialIndex, materialCreator.CreateMaterial(myMat), ref myMat.MaterialName);
             }
 
             return maxMaterial;
@@ -150,7 +150,7 @@ namespace MaxManagedBridge
         public Color specular = Color.FromArgb(230, 230, 230);
         public string specularMap = null;
         public float specularLevel = 0.0f;
-        public float glossiness = 10.0f;
+        public float glossiness = 0.5f;
 
         public float u_tiling = 1;
         public float v_tiling = 1;
@@ -226,5 +226,6 @@ namespace MaxManagedBridge
         }
 
         #endregion
+
     }
 }

@@ -207,7 +207,7 @@ namespace MaxManagedBridge
                 case ParamType2.IntTab:
                     return ParamBlock.SetValue(Id, 0, (int)value, tabindex);
                 default:
-                    Log.Add(string.Format("SetNumericValue() called on non-numeric property of type {0}", this.Type.ToString()));
+                    Log.Add(string.Format("SetNumericValue() called on non-numeric property of type {0}", this.Type.ToString()), LogLevel.Error);
                     throw new Exception(string.Format("SetNumericValue() called on non-numeric property of type {0}", this.Type.ToString()));
             }
         }
@@ -304,7 +304,7 @@ namespace MaxManagedBridge
 
                 default:
                     //throw new Exception("Don't know type for ParamType2: " + Type.ToString());
-                    Log.Add("Don't know how to get ParamType2: " + Type.ToString());
+                    Log.Add("Don't know how to get ParamType2: " + Type.ToString(), LogLevel.Error);
                     return null;
             }
         }
@@ -644,7 +644,7 @@ namespace MaxManagedBridge
 
                     default:
                         //throw new Exception("Don't know type for ParamType2: " + Type.ToString());
-                        Log.Add("Don't know how to get ParamType2: " + Type.ToString());
+                        Log.Add("Don't know how to get ParamType2: " + Type.ToString(), LogLevel.Error);
                         return null;
                 }
             }

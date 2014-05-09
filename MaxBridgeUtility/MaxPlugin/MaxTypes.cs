@@ -18,6 +18,8 @@ namespace MaxManagedBridge
     /*http://docs.autodesk.com/3DSMAX/15/ENU/3ds-Max-SDK-Programmer-Guide/index.html?url=files/GUID-B41DC781-221E-4DE3-8AA1-EC3C2666FC5C.htm,topicNumber=d30e22562 */
     public static class ClassIDs
     {
+        public const uint mr_SSS2_Skin_A = 2004030991;
+        public const uint mr_SSS2_Skin_B = 2251076473;
         public const uint XFORM_A = 622942244;
         public const uint BitmapTexture_A = 576;
         public const uint RGB_Multiply_A = 656;
@@ -45,6 +47,8 @@ namespace MaxManagedBridge
     }
 
     /* These definitions mirror the unmanaged types used within the 3ds max Mesh class - http://download.autodesk.com/global/docs/3dsmaxsdk2012/en_us/index.html */
+
+    #pragma warning disable 0649    //0649 is the 'member is never used' warning, which is of little help as these definitions must match existing unmanaged types.
 
     /* The Point3 type is used to store vertices and normals, the managed equivalent is IPoint3 
      * http://download.autodesk.com/global/docs/3dsmaxsdk2012/en_us/index.html */
@@ -84,4 +88,6 @@ namespace MaxManagedBridge
         public UInt32 flags;
 
     }
+
+    #pragma warning restore 0649
 }

@@ -7,13 +7,14 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
-    public class MaterialOptionsMentalRayArchAndDesignSkin : MaterialOptionsMentalRayArchAndDesign, IMaterialCreationOptions
+
+    public class MaterialOptionsMentalRayArchAndDesignSkinExperimental : MaterialOptionsMentalRayArchAndDesign, IMaterialCreator
     {
         /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
 
         public IIMtlBaseView MaterialTemplate { get; set; }
 
-        public MaterialOptionsMentalRayArchAndDesignSkin()
+        public MaterialOptionsMentalRayArchAndDesignSkinExperimental()
         {
             MapFilteringDisable = Defaults.MapFilteringDisable;
             BumpScalar = Defaults.MentalRaySkin_BumpScalar;
@@ -21,7 +22,7 @@ namespace MaxManagedBridge
 
         new public string MaterialName
         {
-            get { return "MentalRay Arch & Design with Skin support"; }
+            get { return "MentalRay Arch & Design with Skin Experimental"; }
         }
 
         new public IMtl CreateMaterial(MaterialWrapper m)
@@ -36,7 +37,7 @@ namespace MaxManagedBridge
             }
         }
 
-        protected IMtl CreateSkinMaterial2(MaterialWrapper m)
+        protected IMtl CreateSkinMaterial(MaterialWrapper m)
         {
             IMtlBase referenceMtl = MaterialTemplate.Mtl;
 
@@ -74,27 +75,6 @@ namespace MaxManagedBridge
             return mtl as IMtl;
         }
 
-        protected IMtl CreateSkinMaterial(MaterialWrapper m)
-        {
-            IMtlBase referenceMtl = MaterialTemplate.Mtl;
-
-            if (referenceMtl == null)
-            {
-                referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
-            }
-
-            if (!referenceMtl.ClassID.EqualsClassID(2004030991, 2251076473))
-            {
-                referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
-            }
-
-            var script = MakeScript(m, referenceMtl);
-            Log.Add(string.Format("Running script: {0}", script));
-            return GetFromScript(script);
-        }
-
-
-
         IBitmapTex LoadMap(MaterialWrapper m, string filename)
         {
             IBitmapTex bmp = gi.NewDefaultBitmapTex;
@@ -113,6 +93,49 @@ namespace MaxManagedBridge
             List<Parameter> p = bmp.EnumerateProperties().ToList();
 
             return bmp;
+        }
+    }
+
+    public class MaterialOptionsMentalRayArchAndDesignSkin : MaterialOptionsMentalRayArchAndDesign, IMaterialCreator
+    {
+        /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
+
+        public IIMtlBaseView MaterialTemplate { get; set; }
+
+        public MaterialOptionsMentalRayArchAndDesignSkin()
+        {
+            MapFilteringDisable = Defaults.MapFilteringDisable;
+            BumpScalar = Defaults.MentalRaySkin_BumpScalar;
+        }
+
+        new public string MaterialName
+        {
+            get { return "MentalRay Arch & Design with Skin support"; }
+        }
+
+        new public IMtl CreateMaterial(MaterialWrapper m)
+        {
+            switch (m.type)
+            {
+                case DazMtlType.DazSkin:
+                    return CreateSkinMaterial(m);
+                default:
+                    return base.CreateMaterial(m);
+            }
+        }
+
+        protected IMtl CreateSkinMaterial(MaterialWrapper m)
+        {
+            IMtlBase referenceMtl = MaterialTemplate.Mtl;
+
+            if (referenceMtl == null)
+            {
+                referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
+            }
+
+            var script = MakeScript(m, referenceMtl);
+            Log.Add(string.Format("Running script: {0}", script), LogLevel.Debug);
+            return GetFromScript(script);
         }
 
         protected string MakeScript(MaterialWrapper m, IMtlBase referenceMtl)
@@ -136,8 +159,8 @@ namespace MaxManagedBridge
                     Commands.Add(string.Format("bump_map.filtering = 2;"));
                 }
 
-                Commands.Add(string.Format("mtl.bump.Map = bump_map", (m.bumpMapAmount * BumpScalar)));
-                Commands.Add(string.Format("mtl.bump.Multiplier = {0}", (m.bumpMapAmount * BumpScalar)));
+//                Commands.Add(string.Format("mtl.bump.Map = bump_map", (m.bumpMapAmount * BumpScalar)));
+//                Commands.Add(string.Format("mtl.bump.Multiplier = {0}", (m.bumpMapAmount * BumpScalar)));
             }
 
             /*Build diffuse map*/
@@ -189,6 +212,9 @@ namespace MaxManagedBridge
             Commands.Add("diffuse_map_connection = (for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"Diffuse\") collect (map_i))[1]");
             Commands.Add("(if (diffuse_map_connection != undefined) then (diffuse_map_connection.map1 = diffuse_map   ))");
 
+            Commands.Add("bump_map_connection = (for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"Bump\") collect (map_i))[1]");
+            Commands.Add("(if (bump_map_connection != undefined) then (bump_map_connection.map1 = bump_map   ))");
+
             if (m.diffuseMap != null)
             {
                 Commands.Add("(if (diffuse_map_connection != undefined) then (showTextureMap mtl diffuse_map.mapList[1].map1 on))"); //show the diffuse map in the viewport
@@ -206,7 +232,7 @@ namespace MaxManagedBridge
     }
 
 
-    public class MaterialOptionsMentalRayArchAndDesign : MaxScriptMaterialGenerator, IMaterialCreationOptions
+    public class MaterialOptionsMentalRayArchAndDesign : MaxScriptMaterialGenerator, IMaterialCreator
     {
         /* Here are the options that should be exposed through the UI - they will be databound to controls on the form when this option is selected in the drop down list */
 
@@ -335,8 +361,10 @@ namespace MaxManagedBridge
                 }
             }
 
-            Commands.Add(string.Format("mtl.Reflectivity = {0}", m.specularLevel));
-            Commands.Add(string.Format("mtl.Reflection_Glossiness = {0}", m.glossiness * GlossScalar));
+            SpecularProperties specular = CorrectGlossiness(m.glossiness);
+
+            Commands.Add(string.Format("mtl.Reflectivity = {0}", specular.Reflectivity * m.specularLevel));
+            Commands.Add(string.Format("mtl.Reflection_Glossiness = {0}", specular.Glossiness));
 
             if (m.specularMap != null)
             {
@@ -387,9 +415,32 @@ namespace MaxManagedBridge
             }
             return "(" + script + ")"; //Note, remove these brackets to have max print the results of each command in the set when debugging.
         }
+
+        #region Specular Correction
+
+        /* This function was calibrated by manually adjusting mental ray Arch & Design material properties to match renders from Daz, which is why it is in
+         * MaxScriptMaterialGenerator. See the spreadsheet for the empirically matched values. */
+
+        protected struct SpecularProperties
+        {
+            public float Glossiness;
+            public float Reflectivity;
+        }
+
+        protected SpecularProperties CorrectGlossiness(float glossiness)
+        {
+            int index = glossiness > 0 ? ((int)(glossiness * 10)) / 10 : 0;
+            return new SpecularProperties() { Reflectivity = reflectivityValues[index], Glossiness = glossinessValues[index] };
+        }
+
+        protected float[] dazGlossinessValues = { 0.0f, 0.10f, 0.20f, 0.30f, 0.40f, 0.50f, 0.60f, 0.70f, 0.80f, 0.90f, 1.0f};
+        protected float[] reflectivityValues = { 1.0f, 0.9f, 0.6f, 0.5f, 0.3f, 0.3f, 0.2f, 0.2f, 0.1f, 0.05f, 0.01f };
+        protected float[] glossinessValues = { 0.1f, 0.2f, 0.3f, 0.4f, 0.45f, 0.45f, 0.5f, 0.6f, 0.7f, 0.9f, 1.0f };
+
+        #endregion
     }
 
-    public class MaterialOptionsVRayMaterial : MaxScriptMaterialGenerator, IMaterialCreationOptions
+    public class MaterialOptionsVRayMaterial : MaxScriptMaterialGenerator, IMaterialCreator
     {
         public bool MapFilteringDisable { get; set; }
         public float GlossScalar { get; set; }
@@ -544,7 +595,7 @@ namespace MaxManagedBridge
         }
     }
 
-    public class MaterialOptionsStandardMaterial : MaxScriptMaterialGenerator, IMaterialCreationOptions
+    public class MaterialOptionsStandardMaterial : MaxScriptMaterialGenerator, IMaterialCreator
     {
         public bool MapFilteringDisable { get; set; }
         public float GlossScalar { get; set; }
