@@ -239,7 +239,6 @@ namespace MaxManagedBridge
         public bool MapFilteringDisable { get; set; }
         public bool AOEnable { get; set; }
         public int AODistance { get; set; }
-        public float GlossScalar { get; set; }
         public float BumpScalar { get; set; }
 
         public MaterialOptionsMentalRayArchAndDesign()
@@ -247,7 +246,6 @@ namespace MaxManagedBridge
             MapFilteringDisable = Defaults.MapFilteringDisable;
             AOEnable = Defaults.MentalRay_AOEnable;
             AODistance = Defaults.MentalRay_AODistance;
-            GlossScalar = Defaults.MentalRay_GlossScalar;
             BumpScalar = Defaults.MentalRay_BumpScalar;
         }
 

@@ -106,8 +106,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "D:\Program Files\Autodesk\3ds Max 2014\bin\assemblies\"
-copy "$(TargetDir)MsgPack.*" "D:\Program Files\Autodesk\3ds Max 2014\bin\assemblies\"
+    <PostBuildEvent>copy "$(TargetDir)$(TargetName).*" "$(_3DSMaxInstallDirectory)bin\assemblies\"
+copy "$(TargetDir)MsgPack.*" "$(_3DSMaxInstallDirectory)bin\assemblies\"
 mkdir "$(SolutionDir)\Release\bin\assemblies\"
 copy "$(TargetDir)$(TargetName).*" "$(SolutionDir)\Release\bin\assemblies\"
 copy "$(TargetDir)MsgPack.*" "$(SolutionDir)\Release\bin\assemblies\"</PostBuildEvent>

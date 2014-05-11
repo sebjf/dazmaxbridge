@@ -56,6 +56,41 @@ namespace MaxManagedBridge
 
     }
 
+    /*
+        Welcome to MAXScript.
+
+        c = dotNetObject "MaxManagedBridge.MXSInterface"
+        dotNetObject:MaxManagedBridge.MXSInterface
+
+        m = c.GetPlugin()
+        dotNetObject:MaxManagedBridge.MaxPlugin
+
+        showproperties m
+          .MaterialCreator : <MaxManagedBridge.IMaterialCreator>, write-only
+          .RebuildMaterials : <System.Boolean>
+          .RemoveTransparentFaces : <System.Boolean>
+          .SceneNodes : <System.Collections.Generic.IEnumerable`1[Autodesk.Max.IINode]>, read-only
+          .Templates : <MaxManagedBridge.MaterialLibraryView>
+          .AvailableMaterialCreators : <MaxManagedBridge.IMaterialCreator[]>, read-only
+          .DazClientManager : <MaxManagedBridge.ClientManager>, read-only
+          .ProgressCallback : <MaxManagedBridge.MaxPlugin+ProgressUpdateHandler>
+        true
+    */
+
+    public class MXSInterface
+    {
+        public static MaxPlugin plugin;
+        public MaxPlugin GetPlugin()
+        {
+            return plugin;
+        }
+
+        public void PutPlugin(object o)
+        {
+            System.Console.Write(o);
+        }
+    }
+
     public abstract class MaxSDKTool
     {
         public IInterface intrface { get { return GlobalInterface.Instance.COREInterface; } }
