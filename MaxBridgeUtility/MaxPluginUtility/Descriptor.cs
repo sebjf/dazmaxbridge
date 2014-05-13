@@ -13,7 +13,7 @@ namespace MaxManagedBridge
     /// </summary>
     public class MaxBridgeUtilityDescriptor : ClassDesc2
     {
-        internal static IClass_ID classID;
+        protected static IClass_ID classID;
 
         public MaxBridgeUtilityDescriptor(IGlobal global)
         {
@@ -36,9 +36,14 @@ namespace MaxManagedBridge
             get { return "Daz Bridge Utility"; }
         }
 
+        /* Create may be called any number of times, such as when the utilities panel goes in and out of focus, so we use a
+         * singleton to avoid multiple instances of the form. (this is the correct way to do it according to Autodesk docs.) 
+         * For convenience, we use the Singleton maintained by MXSInterface, which allows the plugin to be started from here
+         * or MaxScript and for the same instance always to be shared. */
         public override object Create(bool loading)
         {
-            return new MaxBridgeUtility();
+            MXSInterface.Singleton.ShowForm();
+            return MXSInterface.Singleton;
         }
 
         public override bool IsPublic

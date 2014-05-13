@@ -79,13 +79,25 @@ namespace MaxManagedBridge
 
     public class MXSInterface
     {
-        public static MaxPlugin plugin;
-        public MaxPlugin GetPlugin()
+        private static MaxBridgeUtility _singleton;
+        internal static MaxBridgeUtility Singleton 
         {
-            return plugin;
+            get
+            {
+                if (_singleton == null)
+                {
+                    _singleton = new MaxBridgeUtility();
+                }
+                return _singleton;
+            }
         }
 
-        public void PutPlugin(object o)
+        public MaxPlugin GetPlugin()
+        {
+            return Singleton.Plugin;
+        }
+
+        public void PutObject(object o)
         {
             System.Console.Write(o);
         }

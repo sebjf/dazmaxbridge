@@ -23,8 +23,6 @@ namespace MaxManagedBridge
             RebuildMaterials = false;
             RemoveTransparentFaces = true;
             Templates = new MaterialLibraryView(Defaults.MaterialLibraryFilename);
-
-            MXSInterface.plugin = this;
         }
 
         public void UpdateMeshes(MyScene scene)

@@ -22,6 +22,8 @@ namespace MaxManagedBridge
             this.Utility = parent;
             this.Plugin = parent.Plugin;
 
+            this.FormClosing += new FormClosingEventHandler(UtilityMainForm_FormClosing);
+
             rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RebuildMaterials"));
             removeTransparentFacesCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RemoveTransparentFaces"));
 
@@ -38,6 +40,15 @@ namespace MaxManagedBridge
             this.materialTemplateDropDown.DisplayMember = "Name";
             this.materialTemplateDropDown.DataSource = this.Plugin.Templates;
 
+        }
+
+        void UtilityMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                Hide();
+                e.Cancel = true;
+            }
         }
 
         protected override void OnLoad(EventArgs e)

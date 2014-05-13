@@ -37,7 +37,14 @@ namespace MaxManagedBridge
             Log.Add("Starting UI.", LogLevel.Debug);
 
             GUI = new UtilityMainForm(this);
-            GUI.ShowModeless();
+        }
+
+        public void ShowForm()
+        {
+            if (!GUI.Visible)
+            {
+                GUI.ShowModeless();
+            }
         }
 
         protected IInterface Interface;
@@ -45,7 +52,7 @@ namespace MaxManagedBridge
         protected IGlobal Global;
 
         protected UtilityMainForm GUI;
-        public    MaxPlugin Plugin; 
+        internal  MaxPlugin Plugin; 
 
         public override void BeginEditParams(IInterface ip, IIUtil iu)
         {
