@@ -18,65 +18,21 @@ namespace MaxManagedBridge
     public interface IIMtlBaseView
     {
         string Name { get; }
-        IMtlBase Mtl { get; }
+        IMtlBase GetMaterial(MaterialWrapper m);
     }
 
     public class IMtlBaseView : IIMtlBaseView
     {
-        public string Name { get { return Mtl.Name; } }
-        public IMtlBase Mtl { get; private set; }
+        private IMtlBase mtl;
 
-        public IMtlBaseView(IMtlBase mtl)
+        public string Name { get { return mtl.Name; } }
+        public IMtlBase GetMaterial(MaterialWrapper m) { return mtl; }
+
+        public IMtlBaseView(IMtlBase material)
         {
-            Mtl = mtl;
+            mtl = material;
         }
-    }
-
-    //public IMtlBase GetTemplateMaterial(MyMesh myMesh)
-    //{
-    //    IMtlBase template = TemplateMaterial;
-
-    //    if (FindTemplateByMeshName)
-    //    {
-    //        //search all the material libraries and sample slots for a matching name
-    //        foreach (var m in Templates)
-    //        {
-    //            if (m.Name == myMesh.Name)
-    //            {
-    //                return m.Mtl;
-    //            }
-    //        }
-
-    //        for (int i = 0; i < 24; i++)
-    //        {
-    //            if (globalInterface.COREInterface.GetMtlSlot(i).Name == myMesh.Name)
-    //            {
-    //                return globalInterface.COREInterface.GetMtlSlot(i);
-    //            }
-    //        }
-    //    }
-
-    //    return template;
-    //}
-
-    public class NameMatchView : IIMtlBaseView
-    {
-        public string Name
-        {
-            get { return "Match Material by Model Name"; }
-        }
-
-        public NameMatchView(MaterialLibraryView lib)
-        {
-            this.library = lib;
-        }
-
-        public IMtlBase Mtl
-        {
-            get { throw new NotImplementedException(); } 
-        }
-
-        private MaterialLibraryView library;
+  
     }
 
     public class SampleSlotView : IIMtlBaseView
@@ -86,9 +42,9 @@ namespace MaxManagedBridge
             get { return string.Format("Sample Slot {0}", id); }
         }
 
-        public IMtlBase Mtl
+        public IMtlBase GetMaterial(MaterialWrapper m)
         {
-            get { return GlobalInterface.Instance.COREInterface.GetMtlSlot(id); }
+            return GlobalInterface.Instance.COREInterface.GetMtlSlot(id);
         }
 
         private int id;
@@ -99,6 +55,54 @@ namespace MaxManagedBridge
         }
     }
 
+    public class NameMatchView : IIMtlBaseView
+    {
+        private MaterialLibraryView library;
+
+        public string Name
+        {
+            get { return "Find by Name & Lighting Model"; }
+        }
+
+        public NameMatchView(MaterialLibraryView lib)
+        {
+            this.library = lib;
+        }
+
+        public IMtlBase GetMaterial(MaterialWrapper m)
+        {
+            /* Finds a material in the library passed to the constructor, as a combination of material name and lighting model. 
+             * Will search this library, and all sample slots. Sample slots will take priority. */
+
+            string template_name = m.source_mesh.CharacterName + " " + m.lightingModel.ToString();
+
+            for(int i = 0; i < 24; i++){
+                IMtlBase mtl = GlobalInterface.Instance.COREInterface.GetMtlSlot(i);
+                if (mtl.Name.StartsWith(template_name))
+                {
+                    return mtl;
+                }
+            }
+
+            for (int i = 0; i < library.Count; i++)
+            {
+                IIMtlBaseView v = library[i];
+                if (v is IMtlBaseView)
+                {
+                    IMtlBase mtl = library[i].GetMaterial(m);
+                    if (mtl.Name.StartsWith(template_name))
+                    {
+                        return mtl;
+                    }
+                }
+            }
+
+            return GlobalInterface.Instance.COREInterface.GetMtlSlot(0);
+        }
+    }
+
+
+
     /* An interface to a material library, which the user can work with in the SME */
     public class MaterialLibraryView : BindingList<IIMtlBaseView>
     {
@@ -106,6 +110,8 @@ namespace MaxManagedBridge
 
         public MaterialLibraryView(string name)
         {
+            NameMatchMtlView = new NameMatchView(this);
+
             context = SynchronizationContext.Current;
             filename = Path.Combine(GlobalInterface.Instance.COREInterface.GetDir(APP_MATLIB_DIR), name);
             CreateFilesystemWatch(filename);
@@ -122,6 +128,8 @@ namespace MaxManagedBridge
         protected bool ReloadLibrary()
         {
             ClearItems();
+
+            Add(NameMatchMtlView);
 
             var lib = GlobalInterface.Instance.MtlBaseLib.Create();
             bool success = GlobalInterface.Instance.COREInterface.LoadMaterialLib(filename, lib) != 0;
@@ -142,6 +150,8 @@ namespace MaxManagedBridge
 
             return success;
         }
+
+        public IIMtlBaseView NameMatchMtlView { get; private set; }
 
         // http://stackoverflow.com/questions/721714/notification-when-a-file-changes
 

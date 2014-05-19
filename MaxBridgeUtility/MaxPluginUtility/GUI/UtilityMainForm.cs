@@ -13,32 +13,43 @@ namespace MaxManagedBridge
 {
     public partial class UtilityMainForm : MaxCustomControls.MaxForm
     {
+        protected MaxBridgeUtility Utility;
+        protected MaxPlugin Plugin;
+
+        protected List<MySceneViewModel> scenesView = new List<MySceneViewModel>();
+
         public UtilityMainForm(MaxBridgeUtility parent)
         {
             InitializeComponent();
 
             defaultSize = this.Size;
 
-            this.Utility = parent;
-            this.Plugin = parent.Plugin;
+            Utility = parent;
+            Plugin = parent.Plugin;
 
-            this.FormClosing += new FormClosingEventHandler(UtilityMainForm_FormClosing);
+            FormClosing += new FormClosingEventHandler(UtilityMainForm_FormClosing);
 
-            rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RebuildMaterials"));
-            removeTransparentFacesCheckbox.DataBindings.Add(new Binding("Checked", this.Plugin, "RemoveTransparentFaces"));
+            rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", Plugin, "RebuildMaterials"));
+            removeTransparentFacesCheckbox.DataBindings.Add(new Binding("Checked", Plugin, "RemoveTransparentFaces"));
 
             //this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
-            this.Plugin.ProgressCallback = Bridge_ProgressChanged;
+            Plugin.ProgressCallback = Bridge_ProgressChanged;
 
-            this.Click += new EventHandler(UtilityMainForm_Click);
+            Click += new EventHandler(UtilityMainForm_Click);
             sceneListbox.SelectedValueChanged += new EventHandler(sceneListbox_SelectedValueChanged);
             sceneListbox.DisplayMember = "Label";
 
-            this.materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterialCreators);
-            this.materialSelectDropDown.DisplayMember = "MaterialName";
+            materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterialCreators);
+            materialSelectDropDown.DisplayMember = "MaterialName";
 
-            this.materialTemplateDropDown.DisplayMember = "Name";
-            this.materialTemplateDropDown.DataSource = this.Plugin.Templates;
+            materialTemplateDropDown.DisplayMember = "Name";
+            materialTemplateDropDown.DataSource = new BindingSource(Plugin.Templates, null);
+
+            materialTemplateDropDown2.DisplayMember = "Name";
+            materialTemplateDropDown2.DataSource = new BindingSource(Plugin.Templates, null);
+
+            materialTemplateDropDown3.DisplayMember = "Name";
+            materialTemplateDropDown3.DataSource = new BindingSource(Plugin.Templates, null);
 
         }
 
@@ -113,10 +124,7 @@ namespace MaxManagedBridge
             progressBar1.Refresh();
         }
 
-        protected MaxBridgeUtility Utility;
-        protected MaxPlugin Plugin;
 
-        protected List<MySceneViewModel> scenesView = new List<MySceneViewModel>();
 
         private void refreshButton_Click(object sender, EventArgs e)
         {
@@ -168,21 +176,6 @@ namespace MaxManagedBridge
             }
         }
 
-        private bool optionsVisible = false;
-
-        private void optionsButton_Click(object sender, EventArgs e)
-        {
-            if (optionsVisible)
-            {
-                this.Size = defaultSize;
-            }
-            else
-            {
-                this.Size = new Size(600, defaultSize.Height);
-            }
-            optionsVisible = !optionsVisible;
-        }
-
         private class BindingCache
         {
             public BindingCache(Control control, Binding binding)
@@ -214,6 +207,14 @@ namespace MaxManagedBridge
 
                 control.Enabled = enabled;
 
+                if (control.Enabled)
+                {
+                    if (control is ComboBox) 
+                    {
+                        binding.WriteValue();
+                    }
+                }
+
                 if (control.Enabled == false)
                 {
                     if (control is TextBox) { control.ResetText(); }
@@ -233,7 +234,7 @@ namespace MaxManagedBridge
             /* We create and use the array of cached bindings in this function only so we can use hardcoded indices safely */
 
             if((MaterialOptions.BindingInfo as BindingCache[]) == null){
-                MaterialOptions.BindingInfo = new BindingCache[6];
+                MaterialOptions.BindingInfo = new BindingCache[8];
 
                 /* When this material is first selected, we attempt to bind all the possible UI controls. If the binding fails (because there is no appropriate property for that control)
                  * the binding is disabled in the BindingCache object from then on, and the control is disabled. This way, we only throw an exception once at the first use of the material. */
@@ -244,6 +245,9 @@ namespace MaxManagedBridge
                 (MaterialOptions.BindingInfo as BindingCache[])[3] = new BindingCache(ambientOcclusionEnableCheckbox, new Binding("Checked", MaterialOptions, "AOEnable"));
                 (MaterialOptions.BindingInfo as BindingCache[])[4] = new BindingCache(ambientOcclusionDistanceTextBox, new Binding("Text", MaterialOptions, "AODistance"));
                 (MaterialOptions.BindingInfo as BindingCache[])[5] = new BindingCache(materialTemplateDropDown, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate", true, DataSourceUpdateMode.OnPropertyChanged));
+                (MaterialOptions.BindingInfo as BindingCache[])[6] = new BindingCache(materialTemplateDropDown2, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate2", true, DataSourceUpdateMode.OnPropertyChanged));
+                (MaterialOptions.BindingInfo as BindingCache[])[7] = new BindingCache(materialTemplateDropDown3, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate3", true, DataSourceUpdateMode.OnPropertyChanged));
+
             }
 
             BindingCache[] bindingInfo = MaterialOptions.BindingInfo as BindingCache[];
@@ -266,6 +270,7 @@ namespace MaxManagedBridge
             EditableMessageBox messagebox = new EditableMessageBox(materialContents, "Material Properties in Update from Daz");
             messagebox.Show();
         }
+
 
     }
 }

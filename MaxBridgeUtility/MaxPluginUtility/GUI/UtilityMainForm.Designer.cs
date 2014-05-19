@@ -33,6 +33,10 @@ namespace MaxManagedBridge
             this.sceneListbox = new System.Windows.Forms.ListBox();
             this.updateButton = new System.Windows.Forms.Button();
             this.optionsGroup = new System.Windows.Forms.GroupBox();
+            this.materialTemplateDropDown3 = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.materialTemplateDropDown2 = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.materialTemplateDropDown = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -87,6 +91,10 @@ namespace MaxManagedBridge
             // 
             // optionsGroup
             // 
+            this.optionsGroup.Controls.Add(this.materialTemplateDropDown3);
+            this.optionsGroup.Controls.Add(this.label9);
+            this.optionsGroup.Controls.Add(this.materialTemplateDropDown2);
+            this.optionsGroup.Controls.Add(this.label8);
             this.optionsGroup.Controls.Add(this.label7);
             this.optionsGroup.Controls.Add(this.materialTemplateDropDown);
             this.optionsGroup.Controls.Add(this.label6);
@@ -105,19 +113,55 @@ namespace MaxManagedBridge
             this.optionsGroup.Controls.Add(this.materialSelectDropDown);
             this.optionsGroup.Location = new System.Drawing.Point(12, 344);
             this.optionsGroup.Name = "optionsGroup";
-            this.optionsGroup.Size = new System.Drawing.Size(377, 265);
+            this.optionsGroup.Size = new System.Drawing.Size(377, 317);
             this.optionsGroup.TabIndex = 4;
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Options";
+            // 
+            // materialTemplateDropDown3
+            // 
+            this.materialTemplateDropDown3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.materialTemplateDropDown3.FormattingEnabled = true;
+            this.materialTemplateDropDown3.Location = new System.Drawing.Point(153, 247);
+            this.materialTemplateDropDown3.Name = "materialTemplateDropDown3";
+            this.materialTemplateDropDown3.Size = new System.Drawing.Size(215, 21);
+            this.materialTemplateDropDown3.TabIndex = 24;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 250);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(162, 13);
+            this.label9.TabIndex = 23;
+            this.label9.Text = "Material Template [GlossyPlastic]";
+            // 
+            // materialTemplateDropDown2
+            // 
+            this.materialTemplateDropDown2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.materialTemplateDropDown2.FormattingEnabled = true;
+            this.materialTemplateDropDown2.Location = new System.Drawing.Point(153, 220);
+            this.materialTemplateDropDown2.Name = "materialTemplateDropDown2";
+            this.materialTemplateDropDown2.Size = new System.Drawing.Size(215, 21);
+            this.materialTemplateDropDown2.TabIndex = 22;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(7, 223);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(127, 13);
+            this.label8.TabIndex = 21;
+            this.label8.Text = "Material Template [Matte]";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(7, 196);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(91, 13);
+            this.label7.Size = new System.Drawing.Size(121, 13);
             this.label7.TabIndex = 20;
-            this.label7.Text = "Material Template";
+            this.label7.Text = "Material Template [Skin]";
             // 
             // materialTemplateDropDown
             // 
@@ -201,7 +245,7 @@ namespace MaxManagedBridge
             // getMaterialProperties_button
             // 
             this.getMaterialProperties_button.ForeColor = System.Drawing.Color.Black;
-            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 236);
+            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 288);
             this.getMaterialProperties_button.Name = "getMaterialProperties_button";
             this.getMaterialProperties_button.Size = new System.Drawing.Size(140, 23);
             this.getMaterialProperties_button.TabIndex = 8;
@@ -274,7 +318,7 @@ namespace MaxManagedBridge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(406, 621);
+            this.ClientSize = new System.Drawing.Size(406, 689);
             this.Controls.Add(this.rebuildMaterialsCheckbox);
             this.Controls.Add(this.optionsGroup);
             this.Controls.Add(this.updateButton);
@@ -317,5 +361,9 @@ namespace MaxManagedBridge
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox materialTemplateDropDown;
+        private System.Windows.Forms.ComboBox materialTemplateDropDown2;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox materialTemplateDropDown3;
+        private System.Windows.Forms.Label label9;
     }
 }

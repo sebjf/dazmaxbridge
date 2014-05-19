@@ -98,10 +98,14 @@ namespace MaxManagedBridge
 
     }
 
-    public enum DazMtlType
+    public enum DzLightingModel
     {
-        DazPlastic,
-        DazSkin,
+        Plastic,
+        Metallic,
+        Skin,
+        GlossyPlastic,
+        Matte,
+        GlossyMetallic,
         Other
     }
 
@@ -155,7 +159,7 @@ namespace MaxManagedBridge
         public float u_tiling = 1;
         public float v_tiling = 1;
 
-        public DazMtlType type = DazMtlType.Other;
+        public DzLightingModel lightingModel = DzLightingModel.Other;
 
         public void Initialise()
         {
@@ -176,14 +180,14 @@ namespace MaxManagedBridge
             v_tiling = source_material.GetFloatSafe("Vertical Tiles", v_tiling);
             bumpMapAmount = ((source_material.GetFloatSafe(new string[] { "Positive Bump", "Bump Maximum" }, 0.1f) - source_material.GetFloatSafe(new string[] { "Negative Bump", "Bump Minimum" }, -0.1f)) * source_material.GetFloatSafe("Bump Strength", 1.0f));
 
-            type = FindType();
+            lightingModel = FindType();
 
             Initialised = true;
         }
 
         #region Material Type Identification
 
-        protected DazMtlType FindType()
+        protected DzLightingModel FindType()
         {
             switch (source_material.MaterialType)
             {
@@ -191,13 +195,21 @@ namespace MaxManagedBridge
                     switch (source_material.GetString("Lighting Model"))
                     {
                         case "Plastic":
-                            return DazMtlType.DazPlastic;
+                            return DzLightingModel.Plastic;
                         case "Skin":
-                            return DazMtlType.DazSkin;
+                            return DzLightingModel.Skin;
+                        case "Matte":
+                            return DzLightingModel.Matte;
+                        case "Glossy (Plastic)":
+                            return DzLightingModel.GlossyPlastic;
+                        case "Glossy (Metallic)":
+                            return DzLightingModel.GlossyMetallic;
+                        case "Metallic":
+                            return DzLightingModel.Metallic;
                     }
                     break;
             }
-            return DazMtlType.Other;
+            return DzLightingModel.Other;
         }
 
         #endregion

@@ -244,6 +244,17 @@ namespace MaxManagedBridge
 
         public MyFace[] TriangulatedFaces = null;
 
+        public string CharacterName {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(ParentName))
+                {
+                    return Name;
+                }
+                return ParentName;
+            }
+        }
+
     }
 
     /*

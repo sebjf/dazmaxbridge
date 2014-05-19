@@ -27,9 +27,9 @@ namespace MaxManagedBridge
 
         new public IMtl CreateMaterial(MaterialWrapper m)
         {
-            switch (m.type)
+            switch (m.lightingModel)
             {
-                case DazMtlType.DazSkin:
+                case DzLightingModel.Skin:
                     return CreateSkinMaterial(m);
                 default:
                     return base.CreateMaterial(m);
@@ -39,7 +39,7 @@ namespace MaxManagedBridge
 
         protected IMtl CreateSkinMaterial(MaterialWrapper m)
         {
-            IMtlBase referenceMtl = MaterialTemplate.Mtl;
+            IMtlBase referenceMtl = MaterialTemplate.GetMaterial(m);
 
             if (referenceMtl == null)
             {
@@ -101,6 +101,8 @@ namespace MaxManagedBridge
         /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
 
         public IIMtlBaseView MaterialTemplate { get; set; }
+        public IIMtlBaseView MaterialTemplate2 { get; set; }
+        public IIMtlBaseView MaterialTemplate3 { get; set; }
 
         public MaterialOptionsMentalRayArchAndDesignSkin()
         {
@@ -115,19 +117,21 @@ namespace MaxManagedBridge
 
         new public IMtl CreateMaterial(MaterialWrapper m)
         {
-            switch (m.type)
+            switch (m.lightingModel)
             {
-                case DazMtlType.DazSkin:
-                    return CreateSkinMaterial(m);
+                case DzLightingModel.Skin:
+                    return CreateSkinMaterial(m, MaterialTemplate.GetMaterial(m));
+                case DzLightingModel.Matte:
+                    return CreateSkinMaterial(m, MaterialTemplate2.GetMaterial(m));
+                case DzLightingModel.GlossyPlastic:
+                    return CreateSkinMaterial(m, MaterialTemplate3.GetMaterial(m));
                 default:
                     return base.CreateMaterial(m);
             }
         }
 
-        protected IMtl CreateSkinMaterial(MaterialWrapper m)
+        protected IMtl CreateSkinMaterial(MaterialWrapper m, IMtlBase referenceMtl)
         {
-            IMtlBase referenceMtl = MaterialTemplate.Mtl;
-
             if (referenceMtl == null)
             {
                 referenceMtl = intrface.CreateInstance(SClass_ID.Material, gi.Class_ID.Create(2004030991, 2251076473)) as IMtlBase;
@@ -138,6 +142,27 @@ namespace MaxManagedBridge
             return GetFromScript(script);
         }
 
+        private List<String> LoadMap(string mapName, string filename, MaterialWrapper m)
+        {
+            List<String> Commands = new List<string>();
+
+            Commands.Add(string.Format("{0} = (bitmapTexture filename:\"{1}\")", mapName, filename));
+            Commands.Add(string.Format("{0}.coords.u_tiling = {1}; {0}.coords.v_tiling = {2};", mapName, m.u_tiling, m.v_tiling));
+
+            if (MapFilteringDisable)
+            {
+                Commands.Add(string.Format("{0}.coords.blur = 0.01;", mapName));
+                Commands.Add(string.Format("{0}.filtering = 2;", mapName));
+            }
+
+            return Commands;
+        }
+
+        private string RGBMultiplyMapAssignment(string nodeName, string mapExpression)
+        {
+            return string.Format("(for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"{0}\") do (map_i.map1 = {1}))", nodeName, mapExpression);
+        }
+
         protected string MakeScript(MaterialWrapper m, IMtlBase referenceMtl)
         {
             List<String> Commands = new List<string>();
@@ -145,23 +170,6 @@ namespace MaxManagedBridge
             Commands.Add(string.Format("mtl = copy (getAnimByHandle {0})", Convert(referenceMtl)));
 
             Commands.Add(string.Format("mtl.name = \"{0}\"", m.MaterialName));
-
-            /*Build and apply bump map*/
-
-            if (m.bumpMap != null)
-            {
-                Commands.Add(string.Format("bump_map = (bitmapTexture filename:\"{0}\")", m.bumpMap));
-                Commands.Add(string.Format("bump_map.coords.u_tiling = {0}; bump_map.coords.v_tiling = {1};", m.u_tiling, m.v_tiling));
-
-                if (MapFilteringDisable)
-                {
-                    Commands.Add(string.Format("bump_map.coords.blur = 0.01;"));
-                    Commands.Add(string.Format("bump_map.filtering = 2;"));
-                }
-
-//                Commands.Add(string.Format("mtl.bump.Map = bump_map", (m.bumpMapAmount * BumpScalar)));
-//                Commands.Add(string.Format("mtl.bump.Multiplier = {0}", (m.bumpMapAmount * BumpScalar)));
-            }
 
             /*Build diffuse map*/
 
@@ -207,17 +215,35 @@ namespace MaxManagedBridge
                 }
             }
 
+            Commands.Add(string.Format("diffuse_map.mask[2] = diffuse_map.mapList[1]"));
+
             /*Apply diffuse map - if there is an RGB_Multiply called Diffuse, find it and set the map, otherwise leave it*/
 
-            Commands.Add("diffuse_map_connection = (for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"Diffuse\") collect (map_i))[1]");
-            Commands.Add("(if (diffuse_map_connection != undefined) then (diffuse_map_connection.map1 = diffuse_map   ))");
-
-            Commands.Add("bump_map_connection = (for map_i in (getclassinstances RGB_Multiply target:mtl) where (map_i.name == \"Bump\") collect (map_i))[1]");
-            Commands.Add("(if (bump_map_connection != undefined) then (bump_map_connection.map1 = bump_map   ))");
+            Commands.Add(RGBMultiplyMapAssignment("Diffuse", "diffuse_map"));
 
             if (m.diffuseMap != null)
             {
-                Commands.Add("(if (diffuse_map_connection != undefined) then (showTextureMap mtl diffuse_map.mapList[1].map1 on))"); //show the diffuse map in the viewport
+                Commands.Add("(if (diffuse_map.mapList[1].map1 != undefined) then (showTextureMap mtl diffuse_map.mapList[1].map1 on))"); //show the diffuse map in the viewport
+            }
+
+            /* Add the other maps if they are present */
+
+            if (m.bumpMap != null)
+            {
+                Commands.AddRange(LoadMap("bump_map", m.bumpMap, m));
+                Commands.Add(RGBMultiplyMapAssignment("Bump", "bump_map"));
+            }
+
+            if (m.opacityMap != null)
+            {
+                Commands.AddRange(LoadMap("opacity_map", m.opacityMap, m));
+                Commands.Add(RGBMultiplyMapAssignment("Opacity", "opacity_map"));
+            }
+
+            if (m.specularMap != null)
+            {
+                Commands.AddRange(LoadMap("specular_map", m.specularMap, m));
+                Commands.Add(RGBMultiplyMapAssignment("Specular", "specular_map"));
             }
 
             Commands.Add("(getHandleByAnim mtl) as String");
@@ -229,8 +255,9 @@ namespace MaxManagedBridge
             }
             return "(" + script + ")"; //Note, remove these brackets to have max print the results of each command in the set when debugging.
         }
-    }
 
+
+    }
 
     public class MaterialOptionsMentalRayArchAndDesign : MaxScriptMaterialGenerator, IMaterialCreator
     {
