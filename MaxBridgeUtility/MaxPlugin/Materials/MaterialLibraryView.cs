@@ -115,6 +115,10 @@ namespace MaxManagedBridge
             context = SynchronizationContext.Current;
             filename = Path.Combine(GlobalInterface.Instance.COREInterface.GetDir(APP_MATLIB_DIR), name);
             CreateFilesystemWatch(filename);
+
+            file_retry_timer.Interval = 100;
+            file_retry_timer.Tick += new EventHandler(TimerCallback);
+
             if (!ReloadLibrary())
             {
                 MessageBox.Show("Could not open material library. See log for more details");
@@ -125,30 +129,55 @@ namespace MaxManagedBridge
         protected SynchronizationContext context;
         protected string filename;
 
+        protected System.Windows.Forms.Timer file_retry_timer = new System.Windows.Forms.Timer();
+        protected int retry_count = 0;
+        protected const int max_retries = 10;
+
+        protected void TimerCallback(object o, EventArgs args)
+        {
+            file_retry_timer.Stop();
+            if (retry_count > max_retries)
+            {
+                retry_count = 0;
+                return;
+            }
+            retry_count++;
+            ReloadLibraryCallback(null);
+        }
+
         protected bool ReloadLibrary()
         {
-            ClearItems();
-
-            Add(NameMatchMtlView);
-
-            var lib = GlobalInterface.Instance.MtlBaseLib.Create();
-            bool success = GlobalInterface.Instance.COREInterface.LoadMaterialLib(filename, lib) != 0;
-
-            if (success)
+            try
             {
-                for (int i = 0; i < lib.Count; i++)
+                var lib = GlobalInterface.Instance.MtlBaseLib.Create();
+                bool success = GlobalInterface.Instance.COREInterface.LoadMaterialLib(filename, lib) != 0;
+
+                ClearItems();
+
+                Add(NameMatchMtlView);
+
+                if (success)
                 {
-                    Add(new IMtlBaseView(lib[(IntPtr)i]));
+                    for (int i = 0; i < lib.Count; i++)
+                    {
+                        Add(new IMtlBaseView(lib[(IntPtr)i]));
+                    }
                 }
+
+                //Todo: seperate out material template wrapper functionality and actual material library wrapper functionality
+
+                Add(new SampleSlotView(0));
+                Add(new SampleSlotView(1));
+                Add(new SampleSlotView(2));
+
+                return success;
+            }
+            catch
+            {
+                file_retry_timer.Start();
+                return false; //this is if LoadMaterialLib fails. may do so if it tries to load the material library while max is still writing to it. in that case wait a few ms and retry.
             }
 
-            //Todo: seperate out material template wrapper functionality and actual material library wrapper functionality
-
-            Add(new SampleSlotView(0));
-            Add(new SampleSlotView(1));
-            Add(new SampleSlotView(2));
-
-            return success;
         }
 
         public IIMtlBaseView NameMatchMtlView { get; private set; }
