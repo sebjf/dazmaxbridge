@@ -27,6 +27,10 @@
 #include "DazMaxExporter.h"
 #include "SceneServer.h"
 
+#ifdef _DEBUG
+	#error Building against the Qt libs provided by Daz in Debug Mode can cause linker errors. Switch to Release if this happens.
+#endif
+
 /*****************************
    Plugin Definition
 *****************************/

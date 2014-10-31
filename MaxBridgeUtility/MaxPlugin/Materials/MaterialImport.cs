@@ -11,7 +11,7 @@ namespace MaxManagedBridge
     {
         IMtl CreateMaterial(MaterialWrapper m);
         string MaterialName { get; }
-        object BindingInfo { get; set; } //This is for use by the GUI, don't touch it
+        object GuiControlCache { get; set; } //This is for use by the GUI, don't touch it
     }
 
     public partial class MaxPlugin : MaxBridge

@@ -11,20 +11,9 @@ namespace MaxBridgeLibTest
     {
         static void Main(string[] args)
         {
-            MaxBridge p = new MaxBridge();
+            MaxBridgeUtility p = new MaxBridgeUtility();
 
-            p.DazClientManager.FindAllInstances();
-
-           
-
-            string s = p.DazClientManager.Instances.First().DazInstanceName;
-
-           
-
-            List<string> list = new List<string>();
-            //list.Add("Genesis");
-
-            MyScene fs = p.DazClientManager.Instances[0].GetScene(list);
+            p.ShowForm();
 
         }
 

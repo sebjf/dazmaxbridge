@@ -69,5 +69,7 @@ namespace MaxManagedBridge
         {
             base.Dispose();
         }
+
+         
     }
 }

@@ -7,11 +7,11 @@ using Autodesk.Max;
 
 namespace MaxManagedBridge
 {
-
     public class MaterialOptionsMentalRayArchAndDesignSkinExperimental : MaterialOptionsMentalRayArchAndDesign, IMaterialCreator
     {
         /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
 
+        [GuiProperty("Material Template", GuiPropertyAttribute.ControlTypeEnum.MaterialTemplateDropdown)]
         public IIMtlBaseView MaterialTemplate { get; set; }
 
         public MaterialOptionsMentalRayArchAndDesignSkinExperimental()
@@ -100,8 +100,13 @@ namespace MaxManagedBridge
     {
         /* This experimental material will identify skin materials and create an SSS2 Skin from them, based on a template material */
 
+        [GuiProperty("Material Template [Skin]", GuiPropertyAttribute.ControlTypeEnum.MaterialTemplateDropdown)]
         public IIMtlBaseView MaterialTemplate { get; set; }
+
+        [GuiProperty("Material Template [Matte]", GuiPropertyAttribute.ControlTypeEnum.MaterialTemplateDropdown)]
         public IIMtlBaseView MaterialTemplate2 { get; set; }
+
+        [GuiProperty("Material Template [Glossy]", GuiPropertyAttribute.ControlTypeEnum.MaterialTemplateDropdown)]
         public IIMtlBaseView MaterialTemplate3 { get; set; }
 
         public MaterialOptionsMentalRayArchAndDesignSkin()
@@ -263,9 +268,16 @@ namespace MaxManagedBridge
     {
         /* Here are the options that should be exposed through the UI - they will be databound to controls on the form when this option is selected in the drop down list */
 
+        [GuiProperty("Disable Map Filtering", GuiPropertyAttribute.ControlTypeEnum.Checkbox)]
         public bool MapFilteringDisable { get; set; }
+
+        [GuiProperty("Ambient Occlusion Enable", GuiPropertyAttribute.ControlTypeEnum.Checkbox)]
         public bool AOEnable { get; set; }
+
+        [GuiProperty("Ambient Occlusion Distance", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public int AODistance { get; set; }
+
+        [GuiProperty("Bump Scalar", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public float BumpScalar { get; set; }
 
         public MaterialOptionsMentalRayArchAndDesign()
@@ -281,7 +293,7 @@ namespace MaxManagedBridge
             get { return "MentalRay Arch & Design Material"; }
         }
 
-        public object BindingInfo { get; set; }
+        public object GuiControlCache { get; set; }
 
         public IMtl CreateMaterial(MaterialWrapper m)
         {
@@ -467,8 +479,13 @@ namespace MaxManagedBridge
 
     public class MaterialOptionsVRayMaterial : MaxScriptMaterialGenerator, IMaterialCreator
     {
+        [GuiProperty("Disable Map Filtering", GuiPropertyAttribute.ControlTypeEnum.Checkbox)]
         public bool MapFilteringDisable { get; set; }
+
+        [GuiProperty("Gloss Scalar", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public float GlossScalar { get; set; }
+
+        [GuiProperty("Bump Scalar", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public float BumpScalar { get; set; }
 
         public MaterialOptionsVRayMaterial()
@@ -488,7 +505,7 @@ namespace MaxManagedBridge
             get { return "VRay Material"; }
         }
 
-        public object BindingInfo { get; set; }
+        public object GuiControlCache { get; set; }
 
         protected string MakeScript(MaterialWrapper m)
         {
@@ -622,8 +639,13 @@ namespace MaxManagedBridge
 
     public class MaterialOptionsStandardMaterial : MaxScriptMaterialGenerator, IMaterialCreator
     {
+        [GuiProperty("Disable Map Filtering", GuiPropertyAttribute.ControlTypeEnum.Checkbox)]
         public bool MapFilteringDisable { get; set; }
+
+        [GuiProperty("Gloss Scalar", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public float GlossScalar { get; set; }
+
+        [GuiProperty("Bump Scalar", GuiPropertyAttribute.ControlTypeEnum.Textbox)]
         public float BumpScalar { get; set; }
 
         public MaterialOptionsStandardMaterial()
@@ -643,7 +665,7 @@ namespace MaxManagedBridge
             get { return "Autodesk 3DS Max Standard Material"; }
         }
 
-        public object BindingInfo { get; set; }
+        public object GuiControlCache { get; set; }
 
         protected bool twoSided = true;
         protected bool adTextureLock = true;

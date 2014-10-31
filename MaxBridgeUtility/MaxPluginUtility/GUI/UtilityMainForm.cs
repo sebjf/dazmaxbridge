@@ -13,18 +13,13 @@ namespace MaxManagedBridge
 {
     public partial class UtilityMainForm : MaxCustomControls.MaxForm
     {
-        protected MaxBridgeUtility Utility;
         protected MaxPlugin Plugin;
-
         protected List<MySceneViewModel> scenesView = new List<MySceneViewModel>();
 
         public UtilityMainForm(MaxBridgeUtility parent)
         {
             InitializeComponent();
 
-            defaultSize = this.Size;
-
-            Utility = parent;
             Plugin = parent.Plugin;
 
             FormClosing += new FormClosingEventHandler(UtilityMainForm_FormClosing);
@@ -32,7 +27,6 @@ namespace MaxManagedBridge
             rebuildMaterialsCheckbox.DataBindings.Add(new Binding("Checked", Plugin, "RebuildMaterials"));
             removeTransparentFacesCheckbox.DataBindings.Add(new Binding("Checked", Plugin, "RemoveTransparentFaces"));
 
-            //this.Plugin.ProgressChanged += new MaxPlugin.ProgressUpdateHandler(Bridge_ProgressChanged);
             Plugin.ProgressCallback = Bridge_ProgressChanged;
 
             Click += new EventHandler(UtilityMainForm_Click);
@@ -42,14 +36,7 @@ namespace MaxManagedBridge
             materialSelectDropDown.Items.AddRange(Plugin.AvailableMaterialCreators);
             materialSelectDropDown.DisplayMember = "MaterialName";
 
-            materialTemplateDropDown.DisplayMember = "Name";
-            materialTemplateDropDown.DataSource = new BindingSource(Plugin.Templates, null);
-
-            materialTemplateDropDown2.DisplayMember = "Name";
-            materialTemplateDropDown2.DataSource = new BindingSource(Plugin.Templates, null);
-
-            materialTemplateDropDown3.DisplayMember = "Name";
-            materialTemplateDropDown3.DataSource = new BindingSource(Plugin.Templates, null);
+            materialSelectDropDown.SelectedIndex = 0;
 
         }
 
@@ -61,28 +48,6 @@ namespace MaxManagedBridge
                 e.Cancel = true;
             }
         }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            /* The selection must be changed after the form loads completely, otherwise the bindings for the material options will be added but not evaluated until after it loads - that is - outside
-             * the try/catch statement which marks them as enabled or disabled. */
-            this.materialSelectDropDown.SelectedIndex = 0;
-            base.OnLoad(e);
-        }
-
-        float GetValidatedUpdateFromTextbox(TextBox textbox, float original)
-        {
-            float value;
-            if (!float.TryParse(textbox.Text, out value))
-            {
-                value = original;
-            }
-
-            textbox.Text = value.ToString();
-            return value;
-        }
-
-        private Size defaultSize;
 
         void sceneListbox_SelectedValueChanged(object sender, EventArgs e)
         {
@@ -123,8 +88,6 @@ namespace MaxManagedBridge
             progressBar1.CustomText = message;
             progressBar1.Refresh();
         }
-
-
 
         private void refreshButton_Click(object sender, EventArgs e)
         {
@@ -176,86 +139,96 @@ namespace MaxManagedBridge
             }
         }
 
-        private class BindingCache
+        class ControlCache
         {
-            public BindingCache(Control control, Binding binding)
+            public TableLayoutPanel controlsTable;
+        }
+
+        private void createControlsForMaterialCreator(IMaterialCreator creator)
+        {
+            if (creator.GuiControlCache is ControlCache)
             {
-                this.control = control;
-                this.binding = binding;
-                this.enabled = true;
+                return;
             }
 
-            private Binding binding;
-            private bool enabled;
-            private Control control;
+            var properties = creator.GetType().GetProperties().Where( property => property.IsDefined(typeof(GuiPropertyAttribute), true) ).ToList();
 
-            public void RemakeBinding()
+            // http://stackoverflow.com/questions/721669/winforms-variable-number-of-dynamic-textbox-controls
+            // http://stackoverflow.com/questions/1142873/winforms-tablelayoutpanel-adding-rows-programatically
+
+            TableLayoutPanel panel = new TableLayoutPanel();
+            panel.Dock = DockStyle.Fill;
+            panel.AutoScroll = true;
+            panel.AutoScrollMargin = new Size(1, 1);
+            panel.AutoScrollMinSize = new Size(1, 1);
+
+            panel.ColumnCount = 2;
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170));
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
+            panel.RowCount = properties.Count + 1;
+
+            for(int i = 0; i < properties.Count; i++)
             {
-                control.DataBindings.Clear();
+                GuiPropertyAttribute attribute = properties[i].GetCustomAttributes(typeof(GuiPropertyAttribute), true).FirstOrDefault() as GuiPropertyAttribute;
+                string dataMember = properties[i].Name;
 
-                if (enabled)
+                panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 25));
+
+                Label label = new Label();
+                label.Text = attribute.DisplayName;
+                label.Margin = new Padding(0);
+                label.Dock = DockStyle.Fill;
+                label.TextAlign = ContentAlignment.MiddleLeft;
+                panel.Controls.Add(label, 0, i);
+
+                switch (attribute.ControlType)
                 {
-                    try
-                    {
-                        control.DataBindings.Add(binding);
-                    }
-                    catch
-                    {
-                        enabled = false;
-                    }
+                    case GuiPropertyAttribute.ControlTypeEnum.Textbox:
+                        TextBox textbox = new TextBox();
+                        textbox.Margin = new Padding(0);
+                        textbox.Dock = DockStyle.Fill;
+                        textbox.DataBindings.Add(new Binding("Text", creator, dataMember));
+                        panel.Controls.Add(textbox, 1, i);
+                        break;
+
+                    case GuiPropertyAttribute.ControlTypeEnum.Checkbox:
+                        CheckBox checkbox = new CheckBox();
+                        checkbox.Margin = new Padding(0);
+                        checkbox.Dock = DockStyle.Fill;
+                        checkbox.DataBindings.Add(new Binding("Checked", creator, dataMember));
+                        panel.Controls.Add(checkbox, 1, i);
+                        break;
+
+                    case GuiPropertyAttribute.ControlTypeEnum.MaterialTemplateDropdown:
+                        ComboBox combobox = new ComboBox();
+                        combobox.DisplayMember = "Name";
+                        combobox.DataSource = new BindingSource(Plugin.Templates, null);
+                        combobox.DropDownStyle = ComboBoxStyle.DropDownList;
+                        combobox.Dock = DockStyle.Fill;
+                        combobox.Margin = new Padding(0);
+                        combobox.DataBindings.Add(new Binding("SelectedItem", creator, dataMember, true, DataSourceUpdateMode.OnPropertyChanged));
+                        panel.Controls.Add(combobox, 1, i);
+                        break;
                 }
-
-                control.Enabled = enabled;
-
-                if (control.Enabled)
-                {
-                    if (control is ComboBox) 
-                    {
-                        binding.WriteValue();
-                    }
-                }
-
-                if (control.Enabled == false)
-                {
-                    if (control is TextBox) { control.ResetText(); }
-                    if (control is CheckBox) { (control as CheckBox).Checked = false; }
-                    if (control is ComboBox) { (control as ComboBox).SelectedIndex = 0; }
-                }
-
             }
+
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+            creator.GuiControlCache = new ControlCache() { controlsTable = panel };
+
         }
 
         private void materialSelectDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            IMaterialCreator MaterialOptions = (sender as ComboBox).SelectedItem as IMaterialCreator;
+            IMaterialCreator materialCreator = (sender as ComboBox).SelectedItem as IMaterialCreator;
 
-            Plugin.MaterialCreator = MaterialOptions;
-
-            /* We create and use the array of cached bindings in this function only so we can use hardcoded indices safely */
-
-            if((MaterialOptions.BindingInfo as BindingCache[]) == null){
-                MaterialOptions.BindingInfo = new BindingCache[8];
-
-                /* When this material is first selected, we attempt to bind all the possible UI controls. If the binding fails (because there is no appropriate property for that control)
-                 * the binding is disabled in the BindingCache object from then on, and the control is disabled. This way, we only throw an exception once at the first use of the material. */
-
-                (MaterialOptions.BindingInfo as BindingCache[])[0] = new BindingCache(glossinessScalarTextBox, new Binding("Text", MaterialOptions, "GlossScalar"));
-                (MaterialOptions.BindingInfo as BindingCache[])[1] = new BindingCache(bumpScalarTextBox, new Binding("Text", MaterialOptions, "BumpScalar"));
-                (MaterialOptions.BindingInfo as BindingCache[])[2] = new BindingCache(disableMapFilteringCheckbox, new Binding("Checked", MaterialOptions, "MapFilteringDisable"));
-                (MaterialOptions.BindingInfo as BindingCache[])[3] = new BindingCache(ambientOcclusionEnableCheckbox, new Binding("Checked", MaterialOptions, "AOEnable"));
-                (MaterialOptions.BindingInfo as BindingCache[])[4] = new BindingCache(ambientOcclusionDistanceTextBox, new Binding("Text", MaterialOptions, "AODistance"));
-                (MaterialOptions.BindingInfo as BindingCache[])[5] = new BindingCache(materialTemplateDropDown, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate", true, DataSourceUpdateMode.OnPropertyChanged));
-                (MaterialOptions.BindingInfo as BindingCache[])[6] = new BindingCache(materialTemplateDropDown2, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate2", true, DataSourceUpdateMode.OnPropertyChanged));
-                (MaterialOptions.BindingInfo as BindingCache[])[7] = new BindingCache(materialTemplateDropDown3, new Binding("SelectedItem", MaterialOptions, "MaterialTemplate3", true, DataSourceUpdateMode.OnPropertyChanged));
-
-            }
-
-            BindingCache[] bindingInfo = MaterialOptions.BindingInfo as BindingCache[];
-
-            foreach (BindingCache binding in bindingInfo)
-            {
-                binding.RemakeBinding();
-            }
+            Plugin.MaterialCreator = materialCreator;
+               
+            createControlsForMaterialCreator(materialCreator);
+       
+            materialControlsPanel.Controls.Clear();
+            materialControlsPanel.Controls.Add((materialCreator.GuiControlCache as ControlCache).controlsTable);
         }
 
         private void getMaterialProperties_button_Click(object sender, EventArgs e)
@@ -270,7 +243,6 @@ namespace MaxManagedBridge
             EditableMessageBox messagebox = new EditableMessageBox(materialContents, "Material Properties in Update from Daz");
             messagebox.Show();
         }
-
 
     }
 }

@@ -83,6 +83,7 @@
     <Compile Include="MaxPluginUtility\MaxBridgeUtility.cs" />
     <Compile Include="Defaults.cs" />
     <Compile Include="MaxPlugin\Materials\MaterialGenerators.cs" />
+    <Compile Include="MaxPlugin\Materials\MaterialGuiPropertyAttribute.cs" />
     <Compile Include="MaxPlugin\Materials\MaterialLibraryView.cs" />
     <Compile Include="MaxPlugin\MaxTypes.cs" />
     <Compile Include="MaxPlugin\PropertyAccessors.cs" />
