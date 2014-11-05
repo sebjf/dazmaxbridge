@@ -115,6 +115,9 @@ namespace MaxManagedBridge
         {
             try
             {
+                //IFPValue nodes = gi.FPValue.Create();
+                //gi.MAXScriptInterface....
+                //ManagedServices.MaxscriptSDK.
                 string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(script);
                 handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
                 System.Int64 handle = System.Int64.Parse(handle_string);

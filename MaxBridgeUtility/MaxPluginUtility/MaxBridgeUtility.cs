@@ -29,6 +29,7 @@ namespace MaxManagedBridge
         {
             Global = Autodesk.Max.GlobalInterface.Instance;
             Log.MaxLogger = Global.COREInterface.Log;
+            Log.LogLevel = LogLevel.All;
             Log.EnableLog = true;
             Log.Add("Starting DazMaxBridge.", LogLevel.Information);
 

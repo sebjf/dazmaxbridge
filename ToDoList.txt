@@ -5,7 +5,9 @@ To Do List
 2. Make enumeration of top level entities in Daz more efficient
 3. Improve efficiency of updating vertex positions in Max (or some other way improve speed such as multithreaded updates, or only updating changed vertices)
 
+
 Roadmap
 
-1. Link scene updates to changed signals in Max
-2. Include basic skinning for standard Max bones (for basic pose adjustments)
+1. Move subdivision into max so that vertex keyframe animation can be supported in the future
+2. Link scene updates to changed signals in Max
+3. Include basic skinning for standard Max bones (for basic pose adjustments)

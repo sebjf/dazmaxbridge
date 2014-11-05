@@ -31,34 +31,28 @@ namespace MaxManagedBridge
 
             try
             {
-                UpdateMeshes(scene.Items);
+                Log.Add("Disabling undo and redraw", LogLevel.Debug);
+                gi.COREInterface.DisableSceneRedraw();
+                gi.COREInterface.EnableUndo(false);
+
+                foreach (var m in scene.Items)
+                {
+                    Log.Add("Updating mesh " + m.Name, LogLevel.Debug);
+                    UpdateMeshData(m);
+                }
             }
             catch (Exception e)
             {
                 System.Windows.Forms.MessageBox.Show("Caught exception in UpdateMeshes(): " + e.Message + e.TargetSite + e.StackTrace);
             }
-        }
-
-        public void UpdateMeshes(IEnumerable<MyMesh> myMeshes)
-        {
-            Log.Add("Disabling undo and redraw", LogLevel.Debug);
-
-            gi.COREInterface.DisableSceneRedraw();
-            gi.COREInterface.EnableUndo(false);
-
-            foreach (var m in myMeshes)
+            finally
             {
-                Log.Add("Updating mesh " + m.Name, LogLevel.Debug);
+                Log.Add("Enabling undo and redraw", LogLevel.Debug);
+                gi.COREInterface.EnableUndo(true);
+                gi.COREInterface.EnableSceneRedraw();
 
-                UpdateMeshData(m);
+                gi.COREInterface10.RedrawViewportsNow(gi.COREInterface.Time, MaxFlags.VP_DONT_SIMPLIFY);
             }
-
-            Log.Add("Enabling undo and redraw", LogLevel.Debug);
-
-            gi.COREInterface.EnableUndo(true);
-            gi.COREInterface.EnableSceneRedraw();
-
-            gi.COREInterface10.RedrawViewportsNow(gi.COREInterface.Time, MaxFlags.VP_DONT_SIMPLIFY);
         }
 
         /* Ideally we would create selection sets for each character so that they can be easily included/excluded from things like lighting */

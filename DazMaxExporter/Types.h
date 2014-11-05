@@ -90,6 +90,18 @@ public:
 	/*Note this is not a messagepack capable object - these are packed into a raw array*/
 };
 
+
+/* This updates only  */ 
+class MyMeshKeyframe
+{
+public:
+	string	Name;
+	float	Time;
+	vector<float>	VertexPositions;
+
+	MSGPACK_DEFINE(Name, Time, VertexPositions);
+};
+
 class MyMesh
 {
 public:	

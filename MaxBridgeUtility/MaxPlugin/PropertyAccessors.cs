@@ -69,10 +69,8 @@ namespace MaxManagedBridge
                 short fid = iface.FindFn(name);
                 IFPFunctionDef definition = iface.Desc.GetFnDef(fid);
 
-              
-
-                //var p = GlobalInterface.Instance.FPParams;
-                //iface.Invoke(fid,
+              //  var p = GlobalInterface.Instance.FPParams;
+              //  iface.Invoke(
             }
         }
 

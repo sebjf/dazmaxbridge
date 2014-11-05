@@ -128,7 +128,6 @@ namespace MaxManagedBridge
             maxMesh.InvalidateGeomCache();
             maxMesh.InvalidateTopologyCache();
 
-            
         }
         
     }
