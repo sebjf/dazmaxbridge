@@ -137,6 +137,30 @@ namespace MaxManagedBridge
     }
 
     /*
+    class MyMeshKeyframe
+    {
+    public:
+	    string	Name;
+	    float	Time;
+	    vector<float>	VertexPositions;
+
+	    MSGPACK_DEFINE(Name, Time, VertexPositions);
+    };
+    */
+
+    public class MyMeshKeyframe
+    {
+        [MessagePackMember(0)]
+        public string Name;
+
+        [MessagePackMember(1)]
+        public float Time;
+
+        [MessagePackMember(2)]
+        public List<float> VertexPositions;
+    }
+
+    /*
     struct Face
     {
     public:
@@ -239,6 +263,9 @@ namespace MaxManagedBridge
 
         [MessagePackMember(9)]
         public int SkeletonIndex;
+
+        [MessagePackMember(10)]
+        public List<MyMeshKeyframe> Keyframes;
 
         /* The following properties are on the receiver side only (not part of the message from Daz) */
 

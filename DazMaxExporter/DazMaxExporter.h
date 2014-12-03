@@ -34,6 +34,7 @@ private:
 	void				addNodeData(DzNode* node, MyMesh& myMesh);
 	void				addGeometryData(DzFacetMesh* dazMesh, MyMesh& myMesh);
 	void				addMaterialData(DzNode* node, MyMesh& myMesh);
+	void				addAnimationData(DzNode* node, MyMesh& myMesh);
 
 	void				addBoneWeights(DzFigure* figure, MyMesh& myMesh);
 	int					addSkeletonData(DzSkeleton* skeleton, MyScene* collection);
@@ -44,6 +45,11 @@ private:
 	DzSkeletonList		getFigureFollowers(DzSkeleton* figure);
 	DzShapeList			getFigureShapes(DzSkeletonList& figures);
 	DzSkeleton*			findBoneSkeleton(DzNode* node);
+	vector<DzTime>		getKeyframeTimes(DzNode* node);
+	void				getKeyframeTimes(DzNode* node, vector<DzTime>& times);
+	void				getKeyframeTimes(DzObject* object, vector<DzTime>& times);
+	void				getKeyframeTimes(DzFloatProperty* channel, vector<DzTime>& times);
+
 
 public:
 	void				updateMySceneInformation();

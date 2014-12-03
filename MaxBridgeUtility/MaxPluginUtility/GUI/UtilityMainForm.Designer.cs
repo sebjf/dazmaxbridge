@@ -125,7 +125,7 @@ namespace MaxManagedBridge
             // removeTransparentFacesCheckbox
             // 
             this.removeTransparentFacesCheckbox.AutoSize = true;
-            this.removeTransparentFacesCheckbox.Location = new System.Drawing.Point(165, 325);
+            this.removeTransparentFacesCheckbox.Location = new System.Drawing.Point(136, 325);
             this.removeTransparentFacesCheckbox.Name = "removeTransparentFacesCheckbox";
             this.removeTransparentFacesCheckbox.Size = new System.Drawing.Size(158, 17);
             this.removeTransparentFacesCheckbox.TabIndex = 17;

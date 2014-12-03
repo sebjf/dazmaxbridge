@@ -35,6 +35,11 @@
 #include "dzshape.h"
 #include "dzskin.h"
 #include "dzskinbinding.h"
+#include "dzdformmodifier.h"
+#include "dzmorph.h"
+#include "dzpushmodifier.h"
+
+
 
  /*
  Note: it is important that _WINSOCKAPI_ is defined as a project wide preprocessor definition before
@@ -120,9 +125,11 @@ public:
 	vector<Material> Materials;
 
 	int		SkeletonIndex;
+
+	vector<MyMeshKeyframe> Keyframes;
 	
 
-	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
+	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex, Keyframes);
 
 	vector<pair<int,QString>> _materialsToProcess;
 

@@ -68,6 +68,9 @@
     <ClCompile Include="MemoryMappedFiles.cpp">
       <Filter>Source Files\Scene Server</Filter>
     </ClCompile>
+    <ClCompile Include="animationProcessing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DazMaxExporter.def">

@@ -27,11 +27,8 @@ namespace MaxManagedBridge
 
         public void UpdateMeshes(MyScene scene)
         {
-            Log.Add("Received scene from Daz. Updating mesh data...", LogLevel.Debug);
-
             try
             {
-                Log.Add("Disabling undo and redraw", LogLevel.Debug);
                 gi.COREInterface.DisableSceneRedraw();
                 gi.COREInterface.EnableUndo(false);
 
@@ -47,7 +44,6 @@ namespace MaxManagedBridge
             }
             finally
             {
-                Log.Add("Enabling undo and redraw", LogLevel.Debug);
                 gi.COREInterface.EnableUndo(true);
                 gi.COREInterface.EnableSceneRedraw();
 
@@ -95,6 +91,8 @@ namespace MaxManagedBridge
                 }
 
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
+
+                UpdateMeshAnimation((m.ObjectRef as ITriObject), myMesh.Keyframes);
 
                 if (RebuildMaterials)
                 {
