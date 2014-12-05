@@ -5,6 +5,8 @@ void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh)
 {
 	vector<DzTime> times = getKeyframeTimes(node);
 
+	DzTime originalTime = dzScene->getTime();
+
 	for(int i = 0; i < times.size(); i++)
 	{
 		dzScene->beginTimeEdit();
@@ -21,6 +23,11 @@ void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh)
 
 		myMesh.Keyframes.push_back(newKeyframe);
 	}
+
+	dzScene->beginTimeEdit();
+	dzScene->setTime(originalTime);
+	dzScene->update();
+	dzScene->finishTimeEdit();
 
 }
 

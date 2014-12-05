@@ -61,3 +61,29 @@ void MyDazExporter::addGeometryData(DzFacetMesh* mesh, MyMesh& myMesh)
 	}
 
 }
+
+int	MyDazExporter::setMeshResolution(DzNode* node, int newLevel)
+{
+	DzProperty* resolutionProperty = findDzProperty(node,"lodlevel");
+	
+	if(resolutionProperty == NULL)
+	{
+		return 0;
+	}
+
+	if(!resolutionProperty->inherits("DzIntProperty"))
+	{
+		return 0;
+	}
+
+	DzIntProperty* resolutionEnum = (DzIntProperty*)resolutionProperty;
+	int oldLevel = resolutionEnum->getValue();
+
+	if(newLevel != oldLevel)
+	{
+		resolutionEnum->setValue(newLevel);
+		dzScene->update();
+	}
+
+	return oldLevel;
+}

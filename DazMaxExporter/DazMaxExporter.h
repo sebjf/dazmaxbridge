@@ -45,6 +45,9 @@ private:
 	DzSkeletonList		getFigureFollowers(DzSkeleton* figure);
 	DzShapeList			getFigureShapes(DzSkeletonList& figures);
 	DzSkeleton*			findBoneSkeleton(DzNode* node);
+	DzProperty*			findDzProperty(DzNode* node, QString name);
+	DzProperty*			findDzProperty(DzPropertyGroup* group, QString name);
+	int					setMeshResolution(DzNode* node, int newLevel);
 	vector<DzTime>		getKeyframeTimes(DzNode* node);
 	void				getKeyframeTimes(DzNode* node, vector<DzTime>& times);
 	void				getKeyframeTimes(DzObject* object, vector<DzTime>& times);

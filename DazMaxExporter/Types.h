@@ -38,6 +38,7 @@
 #include "dzdformmodifier.h"
 #include "dzmorph.h"
 #include "dzpushmodifier.h"
+#include "dzpropertygroup.h"
 
 
 
@@ -174,6 +175,8 @@ class MyScene
 public:
 	vector<MyMesh>		Items;
 	vector<MySkeleton>	Skeletons;
+
+	bool exportAnimation;
 
 	MSGPACK_DEFINE(Items, Skeletons);
 };

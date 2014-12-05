@@ -88,6 +88,12 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 	{
 		if(node->getObject()->getCachedGeom()->inherits("DzFacetMesh"))
 		{
+			int oldResolution = 0;
+			if(collection->exportAnimation)
+			{
+				oldResolution = setMeshResolution(node,0);
+			}
+
 			if(node->inherits("DzFigure"))
 			{
 				addFigure((DzFigure*)node, collection);
@@ -95,6 +101,11 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 			else
 			{
 				addNode(node, collection);
+			}
+
+			if(collection->exportAnimation)
+			{
+				setMeshResolution(node, oldResolution);
 			}
 		}
 	}
@@ -117,6 +128,8 @@ DzError MyDazExporter::write(vector<string> labels, sharedmembuffer& sbuf)
 	updateMySceneInformation();
 
 	MyScene	sceneCollection;
+
+	sceneCollection.exportAnimation = true;
 
 	for(int i = 0; i < labels.size(); i++)
 	{
@@ -203,6 +216,8 @@ DzShapeList	MyDazExporter::getFigureShapes(DzSkeletonList& figures)
 	return shapes;
 
 }
+
+
 
 //There is a clear path to an exception here but Daz say Bones are not ever meant to be parented to a non bone/skeleton
 DzSkeleton* MyDazExporter::findBoneSkeleton(DzNode* node)

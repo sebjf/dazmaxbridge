@@ -71,6 +71,9 @@
     <ClCompile Include="animationProcessing.cpp">
       <Filter>Source Files\Scene Processing</Filter>
     </ClCompile>
+    <ClCompile Include="nodeProcessing.cpp">
+      <Filter>Source Files\Scene Processing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DazMaxExporter.def">

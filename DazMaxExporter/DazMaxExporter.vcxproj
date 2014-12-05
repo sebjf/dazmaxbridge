@@ -212,6 +212,7 @@ copy "$(TargetDir)$(TargetName).*" "$(SolutionDir)\Release\plugins\"</Command>
     <ClCompile Include="geometryProcessing.cpp" />
     <ClCompile Include="materialProcessing.cpp" />
     <ClCompile Include="moc\DazMaxExporter_moc.cpp" />
+    <ClCompile Include="nodeProcessing.cpp" />
     <ClCompile Include="SceneServer.cpp" />
     <ClCompile Include="skinningDataProcessing.cpp" />
   </ItemGroup>
