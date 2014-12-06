@@ -82,6 +82,7 @@ namespace MaxManagedBridge
     public class SceneClient
     {
         protected NamedPipeClientStream namedPipe;
+        protected BinaryWriter namedPipeBinaryWriter;
         protected StreamReader namedPipeReader;
         protected StreamWriter namedPipeWriter;
 
@@ -117,6 +118,7 @@ namespace MaxManagedBridge
 
             namedPipeReader = new StreamReader(namedPipe);
             namedPipeWriter = new StreamWriter(namedPipe);
+            namedPipeBinaryWriter = new BinaryWriter(namedPipe);
 
             DazInstanceName = GetItemStream<string>("getInstanceName()");
 
@@ -127,7 +129,8 @@ namespace MaxManagedBridge
         {
             Log.Add("(SendRequest()) Sending request to Daz...", LogLevel.Debug);
 
-            if (!Reconnect()){
+            if (!Reconnect())
+            {
                 return false;
             }
 
@@ -144,9 +147,30 @@ namespace MaxManagedBridge
             return true;
         }
 
+        protected bool SendRequest(String command, RequestParameters parameters)
+        {
+            if (!Reconnect())
+            {
+                return false;
+            }
+
+            namedPipeWriter.WriteLine(command);
+
+            byte[] parametersPacked = MessagePackSerialisers.GetUnpacker<RequestParameters>().PackSingleObject(parameters);
+            namedPipeWriter.WriteLine(parametersPacked.Length);
+            namedPipeWriter.Flush();
+            namedPipe.Write(parametersPacked, 0, parametersPacked.Length);
+            namedPipe.Flush();
+
+            namedPipe.WaitForPipeDrain();
+
+            return true;
+        }
+
         protected T GetItemStream<T>(string command)
         {
-            if (!SendRequest(new string[] { command })){
+            if (!SendRequest(new string[] { command }))
+            {
                 return default(T);
             }
 
@@ -163,10 +187,26 @@ namespace MaxManagedBridge
 
         unsafe protected T GetItemMemory<T>(IEnumerable<string> commands)
         {
-            if (!SendRequest(commands)){
+            if (!SendRequest(commands))
+            {
                 return default(T);
             }
 
+            return ReceiveItemMemory<T>();
+        }
+
+        unsafe protected T GetItemMemory<T>(String command, RequestParameters parameters)
+        {
+            if (!SendRequest(command, parameters))
+            {
+                return default(T);
+            }
+
+            return ReceiveItemMemory<T>();
+        }
+
+        unsafe protected T ReceiveItemMemory<T>()
+        {
             Log.Add("Fetching deserialiser to unpack from memory...", LogLevel.Debug);
             MessagePackSerializer<T> c = MessagePackSerialisers.GetUnpacker<T>();
 
@@ -181,13 +221,11 @@ namespace MaxManagedBridge
 
             Log.Add("(GetItemMemory<T>()) Unpacked..returning scene update.", LogLevel.Debug);
             return item;
-
         }
 
-        public MyScene GetScene(IList<string> items)
+        public MyScene GetScene(RequestParameters parameters)
         {
-            items.Insert(0, "getSceneItems()");
-            return GetItemMemory<MyScene>(items);
+            return GetItemMemory<MyScene>("getSceneItems()",parameters);
         }
 
         public MySceneInformation GetSceneInformation()
@@ -215,6 +253,7 @@ namespace MaxManagedBridge
             CreateUnpacker<MyScene>();
             CreateUnpacker<string>();
             CreateUnpacker<MySceneInformation>();
+            CreateUnpacker<RequestParameters>();
         }
 
         protected void CreateUnpacker<T>()

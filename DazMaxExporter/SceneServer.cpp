@@ -67,15 +67,19 @@ void MySceneServer::messageReceived()
 
 	if(message == "getSceneItems()")
 	{
-		vector<string> items;
+		int msglength = m_socket->readLine().trimmed().toInt();
+		QByteArray msgdata;
 
-		while(m_socket->bytesAvailable())
+		while(msgdata.length() < msglength)
 		{
-			string line = m_socket->readLine().trimmed();
-			items.push_back(line); 
+			msgdata.append(m_socket->read(msglength - msgdata.length()));
 		}
 
-		f_getScene(items);
+		msgpack::unpacked msgunpacked;
+		msgpack::unpack(&msgunpacked, msgdata.data(), msgdata.length());
+		RequestParameters params = msgunpacked.get().as<RequestParameters>();
+
+		f_getScene(params);
 		return;
 	}
 
@@ -92,20 +96,20 @@ void MySceneServer::messageReceived()
 	}
 }
 
-void MySceneServer::f_getScene(vector<string> items)
+void MySceneServer::f_getScene(RequestParameters params)
 {
 	myDazExporter.updateMySceneInformation();
 
-	if(items.size() <= 0)
+	if(params.items.size() <= 0)
 	{
-		items = myDazExporter.sceneInfo.TopLevelItemNames;
+		params.items = myDazExporter.sceneInfo.TopLevelItemNames;
 	}
 
 	dzApp->statusLine("Started exporting scene...",false);
 
 	myDazExporter.startProfiling();
 
-	myDazExporter.write(items, sbuf);
+	myDazExporter.write(params, sbuf);
 
 	myDazExporter.endProfiling("packed scene in");
 

@@ -1,9 +1,15 @@
 #ifndef DAZ_CHARACTER_EXPORTER
 #define DAZ_CHARACTER_EXPORTER
 
-#pragma warning (error: 4715)
+#pragma warning (error: 4715) //Turns the warning 'not all control paths return a value' into an error.
+
+#pragma warning(push)
+#pragma warning( disable : 4005) //This is the only way I've been able to stop the winsock macro redifintion warning from appearing all other the place
 
 #include "Types.h"
+
+#pragma warning(pop)
+
 #include "MemoryMappedFiles.h"
 
 #include <QtCore\qfile.h>
@@ -20,10 +26,7 @@ void ShowMessage(QString message);
 class MyDazExporter : public QObject {
 	Q_OBJECT
 public:
-
-	DzError		write(msgpack::sharedmembuffer& sbuf);
-	DzError		write(vector<string> labels, sharedmembuffer& sbuf);
-	DzError		write( const QString &filename );
+	DzError				write(RequestParameters params, sharedmembuffer& sbuf);
 
 private:
 
@@ -34,7 +37,7 @@ private:
 	void				addNodeData(DzNode* node, MyMesh& myMesh);
 	void				addGeometryData(DzFacetMesh* dazMesh, MyMesh& myMesh);
 	void				addMaterialData(DzNode* node, MyMesh& myMesh);
-	void				addAnimationData(DzNode* node, MyMesh& myMesh);
+	void				addAnimationData(DzNode* node, MyMesh& myMesh, vector<DzTime> times);
 
 	void				addBoneWeights(DzFigure* figure, MyMesh& myMesh);
 	int					addSkeletonData(DzSkeleton* skeleton, MyScene* collection);
@@ -48,6 +51,8 @@ private:
 	DzProperty*			findDzProperty(DzNode* node, QString name);
 	DzProperty*			findDzProperty(DzPropertyGroup* group, QString name);
 	int					setMeshResolution(DzNode* node, int newLevel);
+	vector<DzTime>		getAnimationTimes(DzNode* node, AnimationType type);
+	vector<DzTime>		getSceneKeyframeTimes();
 	vector<DzTime>		getKeyframeTimes(DzNode* node);
 	void				getKeyframeTimes(DzNode* node, vector<DzTime>& times);
 	void				getKeyframeTimes(DzObject* object, vector<DzTime>& times);

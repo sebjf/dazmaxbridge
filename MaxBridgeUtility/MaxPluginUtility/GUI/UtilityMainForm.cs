@@ -105,35 +105,38 @@ namespace MaxManagedBridge
             }
         }
 
-        private IEnumerable<MyScene> GetSelectedItemsUpdates
+        private RequestParameters GetRequestParameters(List<string> itemNames)
         {
-            get
+            RequestParameters parameters = new RequestParameters();
+            parameters.items = itemNames;
+            parameters.animation = AnimationType.Keyframes;
+            return parameters;
+        }
+
+        private IEnumerable<MyScene> GetSelectedItemsUpdates()
+        {
+            if (sceneListbox.SelectedItems.Count > 0)
             {
-                if (sceneListbox.SelectedItems.Count > 0)
+                foreach (var sceneview in scenesView)
                 {
-                    foreach (var sceneview in scenesView)
+                    if (sceneview.SelectedItems.Count > 0)
                     {
-                        if (sceneview.SelectedItems.Count > 0)
-                        {
-                            yield return sceneview.Client.GetScene(sceneview.SelectedItems);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var sceneview in scenesView)
-                    {
-                        yield return sceneview.Client.GetScene(new List<string>());
+                        yield return sceneview.Client.GetScene(GetRequestParameters(sceneview.SelectedItems));
                     }
                 }
             }
+            else
+            {
+                foreach (var sceneview in scenesView)
+                {
+                    yield return sceneview.Client.GetScene(GetRequestParameters(new List<string>()));
+                }
+            } 
         }
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            Log.Add("(updateButton_Click()) Update meshes clicked", LogLevel.Debug);
-
-            foreach (var update in GetSelectedItemsUpdates)
+            foreach (var update in GetSelectedItemsUpdates())
             {
                 Plugin.UpdateMeshes(update);
             }
@@ -235,7 +238,7 @@ namespace MaxManagedBridge
         {
             string materialContents = "Press CTRL + C with this window in focus to copy the content.\n\n";
                        
-            foreach (var update in GetSelectedItemsUpdates)
+            foreach (var update in GetSelectedItemsUpdates())
             {
                 materialContents += Plugin.PrintMaterialProperties(update);
             }

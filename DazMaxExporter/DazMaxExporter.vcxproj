@@ -149,6 +149,7 @@ copy "$(TargetDir)$(TargetName).*" "$(SolutionDir)\Release\plugins\"</Command>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DAZMAXEXPORTER_EXPORTS;_WINSOCKAPI_;QT3_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(DAZ_STUDIO_SDK)\include;$(ProjectDir)msgpack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <AdditionalOptions>/Gd %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,7 +158,7 @@ copy "$(TargetDir)$(TargetName).*" "$(SolutionDir)\Release\plugins\"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>DazMaxExporter.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(DAZ_STUDIO_SDK)\lib\x64;$(ProjectDir)msgpack\lib;$(SolutionDir)x64\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;msgpack.lib;user32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dzcore.lib;QtCore4.lib;QtGui4.lib;Qt3Support4.lib;QtScript4.lib;QtNetwork4.lib;user32.lib;Ws2_32.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetName).*" "$(DazInstallDirectory)\plugins\"

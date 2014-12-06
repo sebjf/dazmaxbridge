@@ -1,10 +1,8 @@
 
 #include "DazMaxExporter.h"
 
-void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh)
+void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh, vector<DzTime> times)
 {
-	vector<DzTime> times = getKeyframeTimes(node);
-
 	DzTime originalTime = dzScene->getTime();
 
 	for(int i = 0; i < times.size(); i++)
@@ -17,7 +15,6 @@ void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh)
 		DzVertexMesh* mesh = node->getObject()->getCachedGeom();
 
 		MyMeshKeyframe newKeyframe;
-		newKeyframe.Name = node->name();
 		newKeyframe.Time = (int)dzScene->getTime();
 		newKeyframe.VertexPositions.assign( (float*)mesh->getVerticesPtr(), (float*)mesh->getVerticesPtr() + (myMesh.NumVertices * FLOATS_PER_VERTEX) );
 
@@ -30,6 +27,43 @@ void MyDazExporter::addAnimationData(DzNode* node, MyMesh& myMesh)
 	dzScene->finishTimeEdit();
 
 }
+
+
+
+vector<DzTime> MyDazExporter::getAnimationTimes(DzNode* node, AnimationType type)
+{
+	vector<DzTime> times;
+
+	switch(type)
+	{
+	case PointCache:
+			times = getSceneKeyframeTimes();
+		break;
+	
+	case Keyframes:
+			times = getKeyframeTimes(node);
+		break;
+
+	default:
+		break;
+	}
+
+	return times;
+}
+
+vector<DzTime> MyDazExporter::getSceneKeyframeTimes()
+{
+	vector<DzTime> times;
+	DzTime timeStep = dzScene->getTimeStep();
+	DzTimeRange timeRange = dzScene->getAnimRange();
+	int numFrames = timeRange.getDuration() / timeStep;
+	for(int i = 0; i < numFrames; i++)
+	{
+		times.push_back(timeRange.getStart() + (timeStep * i));
+	}
+	return times;
+}
+
 
 vector<DzTime> MyDazExporter::getKeyframeTimes(DzNode* node)
 {

@@ -45,7 +45,7 @@ void MyDazExporter::addFigure(DzFigure* figure, MyScene* collection)
 
 	/* If headless make sure update() is called before getCachedGeom() */
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
-	addAnimationData(figure, myMesh);
+	addAnimationData(figure, myMesh, getAnimationTimes(figure, (AnimationType)collection->params.animation));
 	addMaterialData(figure, myMesh);
 
 	DzSkeleton* parentSkeleton = figure->getFollowTarget();
@@ -89,7 +89,7 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 		if(node->getObject()->getCachedGeom()->inherits("DzFacetMesh"))
 		{
 			int oldResolution = 0;
-			if(collection->exportAnimation)
+			if(collection->params.animation > None)
 			{
 				oldResolution = setMeshResolution(node,0);
 			}
@@ -103,7 +103,7 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 				addNode(node, collection);
 			}
 
-			if(collection->exportAnimation)
+			if(collection->params.animation > None)
 			{
 				setMeshResolution(node, oldResolution);
 			}
@@ -118,22 +118,16 @@ void	MyDazExporter::resolveSelectedDzNode(DzNode* node, MyScene* collection)
 	}
 }
 
-DzError MyDazExporter::write(msgpack::sharedmembuffer& sbuf)
-{
-	return write(sceneInfo.TopLevelItemNames, sbuf);
-}
-
-DzError MyDazExporter::write(vector<string> labels, sharedmembuffer& sbuf)
+DzError MyDazExporter::write(RequestParameters params, sharedmembuffer& sbuf)
 {
 	updateMySceneInformation();
 
 	MyScene	sceneCollection;
+	sceneCollection.params = params;
 
-	sceneCollection.exportAnimation = true;
-
-	for(int i = 0; i < labels.size(); i++)
+	for(int i = 0; i < params.items.size(); i++)
 	{
-		QString label = QString(labels[i].c_str());
+		QString label = QString(params.items[i].c_str());
 		DzNode* start = dzScene->findNodeByLabel(label);
 		if(start != NULL){
 			resolveSelectedDzNode(start, &sceneCollection);
@@ -141,37 +135,6 @@ DzError MyDazExporter::write(vector<string> labels, sharedmembuffer& sbuf)
 	}
 
 	msgpack::pack(sbuf, sceneCollection);
-
-	return DZ_NO_ERROR;
-}
-
-DzError MyDazExporter::write(const QString &filename)
-{	
-	QFile myFile(filename);
-	myFile.open(QIODevice::ReadWrite | QIODevice::Truncate);
-
-	msgpack::sharedmembuffer sbuf;
-	write(sbuf);
-
-	int written = myFile.write(sbuf.data(), sbuf.size());
-
-	myFile.close();
-
-	if(written != sbuf.size())
-	{
-		log.push_back("Unable to write file (reason unknown but not all bytes were written)");
-	}
-
-	if(log.size() > 0)
-	{
-		QString message = "Export completed but with problems:\n";
-		for(int i = 0; i < log.size(); i++){
-			message += (log[i] + "\n");
-		}
-		QMessageBox myMessageBox;
-		myMessageBox.setText(message);
-		myMessageBox.exec();	
-	}
 
 	return DZ_NO_ERROR;
 }

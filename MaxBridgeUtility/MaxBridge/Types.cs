@@ -52,6 +52,28 @@ namespace MaxManagedBridge
         }
     }
 
+
+    public enum AnimationType : int { None = 0, Keyframes = 1, PointCache = 2  };
+
+    //class RequestParameters
+    //{
+    //public:
+    //    vector<string>	items;
+    //    AnimationType	animationType;
+
+    //    MSGPACK_DEFINE(items, animationType);
+    //};
+
+    public class RequestParameters
+    {
+        [MessagePackMember(0)]
+        public List<string> items = new List<string>();
+        [MessagePackMember(1)]
+        public int _animation;
+
+        public AnimationType animation { get { return (AnimationType)_animation; } set { _animation = (int)value; } }
+    }
+
     /*
     class Material
     {
@@ -140,23 +162,18 @@ namespace MaxManagedBridge
     class MyMeshKeyframe
     {
     public:
-	    string	Name;
-	    float	Time;
+	    float			Time;
 	    vector<float>	VertexPositions;
 
-	    MSGPACK_DEFINE(Name, Time, VertexPositions);
+	    MSGPACK_DEFINE(Time, VertexPositions);
     };
     */
 
     public class MyMeshKeyframe
     {
         [MessagePackMember(0)]
-        public string Name;
-
-        [MessagePackMember(1)]
         public float Time;
-
-        [MessagePackMember(2)]
+        [MessagePackMember(1)]
         public List<float> VertexPositions;
     }
 

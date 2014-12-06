@@ -32,7 +32,7 @@ private:
 	QLocalServer* m_server;
 	QLocalSocket* m_socket;
 
-	void	f_getScene(vector<string>);
+	void	f_getScene(RequestParameters params);
 	void	f_getSceneInformation();
 	void	f_getInstanceName();
 

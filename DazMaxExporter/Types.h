@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MAXTYPES
 #define MAXTYPES
 
@@ -40,8 +42,6 @@
 #include "dzpushmodifier.h"
 #include "dzpropertygroup.h"
 
-
-
  /*
  Note: it is important that _WINSOCKAPI_ is defined as a project wide preprocessor definition before
  including this header along with those of Daz and Qt 
@@ -52,7 +52,7 @@
 #pragma warning( disable : 4244)
 #pragma warning( disable : 4267)
 
-#include "msgpack.hpp"
+#include <msgpack.hpp>
 
 #pragma warning(pop)
 
@@ -66,6 +66,18 @@ using namespace std;
 
 #define		FACE_SIZE_IN_BYTES				(sizeof(Face))
 #define		FLOATS_PER_VERTEX				3
+
+
+enum AnimationType : int { None = 0, Keyframes = 1, PointCache = 2  };
+
+class RequestParameters
+{
+public:
+	vector<string>	items;
+	int				animation;
+
+	MSGPACK_DEFINE(items, animation);
+};
 
 class Material
 {
@@ -101,11 +113,10 @@ public:
 class MyMeshKeyframe
 {
 public:
-	string	Name;
-	float	Time;
+	float			Time;
 	vector<float>	VertexPositions;
 
-	MSGPACK_DEFINE(Name, Time, VertexPositions);
+	MSGPACK_DEFINE(Time, VertexPositions);
 };
 
 class MyMesh
@@ -176,7 +187,7 @@ public:
 	vector<MyMesh>		Items;
 	vector<MySkeleton>	Skeletons;
 
-	bool exportAnimation;
+	RequestParameters	params;
 
 	MSGPACK_DEFINE(Items, Skeletons);
 };
