@@ -39,7 +39,7 @@ private:
 	void				addMaterialData(DzNode* node, MyMesh& myMesh);
 	void				addAnimationData(DzNode* node, MyMesh& myMesh, vector<DzTime> times);
 
-	void				addBoneWeights(DzFigure* figure, MyMesh& myMesh);
+	void				addSkinningData(DzFigure* figure, MyMesh& myMesh);
 	int					addSkeletonData(DzSkeleton* skeleton, MyScene* collection);
 
 	MATERIALPROPERTIES	getMaterialProperties(DzMaterial* material);

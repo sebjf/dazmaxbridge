@@ -2,10 +2,20 @@
 
 /*This method is not in use and is here for documentation purposes. Skinning is on the roadmap but a long way off.*/
 
-void MyDazExporter::addBoneWeights(DzFigure* figure, MyMesh& myMesh)
-{
-	int vc = figure->getObject()->getCurrentShape()->getGeometry()->getNumVertices();
+//Not sure why but the Daz default average does not include the first axis, so we define our own.
+#define OUR_DEFAULT_AVERAGE		DzBoneBinding::FIRST_AXIS | \
+								DzBoneBinding::SECOND_AXIS | \
+								DzBoneBinding::THIRD_AXIS | \
+								DzBoneBinding::SCALE_MAP | \
+								DzBoneBinding::USE_GENERAL_MAP
 
+void MyDazExporter::addSkinningData(DzFigure* figure, MyMesh& myMesh)
+{
+	if(!DzSkinBinding::isSingleSkinFigure(figure))
+	{
+		ShowMessage("DazMaxBridge can only export single skinned figures.");
+	}
+	
 	DzSkinBinding* skin = figure->getSkinBinding();
 	if(skin != NULL)
 	{
@@ -14,12 +24,19 @@ void MyDazExporter::addBoneWeights(DzFigure* figure, MyMesh& myMesh)
 		{
 			DzBoneBinding* binding = boneBindings.next();
 
-			DzNode* bone = binding->getBone();
-			bool local = binding->hasLocalWeights();
-			DzWeightMapPtr weights = binding->createAveragedGeneralMap();
-			//int cl = weightsl->getNumWeights();
-			//DzWeightMap* weights = binding->getWeights();
-			int c = weights->getNumWeights();
+			//Daz supports setting individual weights for the three axes.
+			//For now, we will have it create a general map combining all these and the scale, but may extend it
+			//in the future if the rig in Max makes good use of the information
+			//bool local = binding->hasLocalWeights();
+
+
+			DzWeightMapPtr weights = binding->createAveragedGeneralMap( OUR_DEFAULT_AVERAGE );
+			
+			MySkinningWeights skinning;
+			skinning.BoneName = binding->getBone()->getName();
+			skinning.Weights.assign(weights->getWeights(), weights->getWeights() + weights->getNumWeights());
+
+			myMesh.WeightMaps.push_back(skinning);
 		}
 	}
 }

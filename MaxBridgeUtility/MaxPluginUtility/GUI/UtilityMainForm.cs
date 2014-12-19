@@ -38,6 +38,8 @@ namespace MaxManagedBridge
 
             materialSelectDropDown.SelectedIndex = 0;
 
+            animationTypeCombo.DataSource = Enum.GetValues(typeof(AnimationType));
+
         }
 
         void UtilityMainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -109,7 +111,7 @@ namespace MaxManagedBridge
         {
             RequestParameters parameters = new RequestParameters();
             parameters.items = itemNames;
-            parameters.animation = AnimationType.Keyframes;
+            parameters.animation = (AnimationType)animationTypeCombo.SelectedItem;
             return parameters;
         }
 

@@ -25,6 +25,16 @@ namespace MaxManagedBridge
         public const uint RGB_Multiply_A = 656;
         public const uint StandardMaterial_A = 2;
         public const uint MultiMaterial = 512;
+        public const uint Skin_A = 9815843;
+        public const uint Skin_B = 87654;
+        public const uint BONE_OBJ_A = 683634317;
+        public const uint BONE_OBJ_B = 785164352;
+
+    }
+
+    public static class InterfaceIDs
+    {
+        public const uint I_SKINIMPORTDATA = 0x00020000;
     }
 
     public static class MaxFlags

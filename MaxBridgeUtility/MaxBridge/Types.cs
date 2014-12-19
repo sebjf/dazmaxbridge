@@ -224,15 +224,35 @@ namespace MaxManagedBridge
     }
 
     /*
+    class MySkinningWeights
+    {
+    public:
+	    string			BoneName;
+	    vector<short>	Weights;
+
+	    MSGPACK_DEFINE(BoneName, Weights);
+    };
+     */
+
+    public class MySkinningData
+    {
+        [MessagePackMember(0)]
+        public string BoneName;
+        [MessagePackMember(1)]
+        public List<ushort> Weights;
+    }
+
+    /*
     class MyMesh
     {
     public:	
-	    string Name;
+	    string	Name;
+	    string  ParentName;
 
-	    int NumVertices;
+	    int		NumVertices;
 	    vector<float>	Vertices;
 
-	    int NumTextureVertices;
+	    int		NumTextureVertices;
 	    vector<float>	TextureVertices;
 
 	    int		NumFaces;
@@ -241,15 +261,15 @@ namespace MaxManagedBridge
 	    vector<Material> Materials;
 
 	    int		SkeletonIndex;
+	    vector<MySkinningWeights> WeightMaps;
 
-	    MSGPACK_DEFINE(Name, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex);
+	    int		animationType;
+	    vector<MyMeshKeyframe> Keyframes;
+	
+
+	    MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex, WeightMaps, animationType, Keyframes);
 
 	    vector<pair<int,QString>> _materialsToProcess;
-
-	    MyMesh()
-	    {
-		    SkeletonIndex = -1;
-	    }
     };
     */
 
@@ -280,9 +300,15 @@ namespace MaxManagedBridge
 
         [MessagePackMember(9)]
         public int SkeletonIndex;
-
         [MessagePackMember(10)]
+        public List<MySkinningData> WeightMaps;
+
+        [MessagePackMember(11)]
+        public int _animationType;
+        [MessagePackMember(12)]
         public List<MyMeshKeyframe> Keyframes;
+
+        public AnimationType AnimationType { get { return (AnimationType)_animationType; } }
 
         /* The following properties are on the receiver side only (not part of the message from Daz) */
 
@@ -298,6 +324,8 @@ namespace MaxManagedBridge
                 return ParentName;
             }
         }
+
+        public MySkeleton Skeleton;
 
     }
 
@@ -315,10 +343,10 @@ namespace MaxManagedBridge
 	    float	EndpointY;
 	    float	EndpointZ;
 
-	    float	Qx;
-	    float	Qy;
-	    float	Qz;
-	    float	Qw;
+	    double	Qx;
+	    double	Qy;
+	    double	Qz;
+	    double	Qw;
 
 	    MSGPACK_DEFINE(Name,OriginX,OriginY,OriginZ,EndpointX,EndpointY,EndpointZ,Qx,Qy,Qz,Qw);
     };
@@ -337,13 +365,13 @@ namespace MaxManagedBridge
         public float OriginZ;
 
         [MessagePackMember(4)]
-        public float Qx;
+        public double Qx;
         [MessagePackMember(5)]
-        public float Qy;
+        public double Qy;
         [MessagePackMember(6)]
-        public float Qz;
+        public double Qz;
         [MessagePackMember(7)]
-        public float Qw;
+        public double Qw;
     }
 
     /*

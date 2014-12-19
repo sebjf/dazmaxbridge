@@ -34,6 +34,8 @@ namespace MaxManagedBridge
 
                 foreach (var m in scene.Items)
                 {
+                    m.Skeleton = scene.Skeletons[m.SkeletonIndex];
+
                     Log.Add("Updating mesh " + m.Name, LogLevel.Debug);
                     UpdateMeshData(m);
                 }
@@ -92,7 +94,8 @@ namespace MaxManagedBridge
 
                 UpdateMesh((m.ObjectRef as ITriObject).Mesh, myMesh);
 
-                UpdateMeshAnimation((m.ObjectRef as ITriObject), myMesh.Keyframes);
+                UpdateMeshAnimation(m, myMesh);
+                UpdateMeshSkin(m, myMesh);
 
                 if (RebuildMaterials)
                 {

@@ -47,6 +47,7 @@ void MyDazExporter::addFigure(DzFigure* figure, MyScene* collection)
 	addGeometryData((DzFacetMesh*)(figure->getObject()->getCachedGeom()), myMesh);
 	addAnimationData(figure, myMesh, getAnimationTimes(figure, (AnimationType)collection->params.animation));
 	addMaterialData(figure, myMesh);
+	addSkinningData(figure, myMesh);
 
 	DzSkeleton* parentSkeleton = figure->getFollowTarget();
 	if(parentSkeleton == NULL)

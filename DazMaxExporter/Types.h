@@ -119,6 +119,15 @@ public:
 	MSGPACK_DEFINE(Time, VertexPositions);
 };
 
+class MySkinningWeights
+{
+public:
+	string			BoneName;
+	vector<unsigned short>	Weights;
+
+	MSGPACK_DEFINE(BoneName, Weights);
+};
+
 class MyMesh
 {
 public:	
@@ -137,11 +146,13 @@ public:
 	vector<Material> Materials;
 
 	int		SkeletonIndex;
+	vector<MySkinningWeights> WeightMaps;
 
+	int		animationType;
 	vector<MyMeshKeyframe> Keyframes;
 	
 
-	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex, Keyframes);
+	MSGPACK_DEFINE(Name, ParentName, NumVertices, Vertices, NumTextureVertices, TextureVertices, NumFaces, Faces, Materials, SkeletonIndex, WeightMaps, animationType, Keyframes);
 
 	vector<pair<int,QString>> _materialsToProcess;
 
@@ -160,10 +171,10 @@ public:
 	float	OriginY;
 	float	OriginZ;
 
-	float	Qx;
-	float	Qy;
-	float	Qz;
-	float	Qw;
+	double	Qx;
+	double	Qy;
+	double	Qz;
+	double	Qw;
 
 	MSGPACK_DEFINE(Name,OriginX,OriginY,OriginZ,Qx,Qy,Qz,Qw);
 };

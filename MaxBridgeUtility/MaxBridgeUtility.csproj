@@ -93,6 +93,7 @@
     <Compile Include="MaxPlugin\Geometry.cs" />
     <Compile Include="MaxPlugin\MaxBridgePlugin.cs" />
     <Compile Include="MaxPlugin\MaxScriptInterop.cs" />
+    <Compile Include="MaxPlugin\Skinning.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

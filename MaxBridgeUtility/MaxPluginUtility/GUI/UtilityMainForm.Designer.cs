@@ -39,7 +39,11 @@ namespace MaxManagedBridge
             this.removeTransparentFacesCheckbox = new System.Windows.Forms.CheckBox();
             this.rebuildMaterialsCheckbox = new System.Windows.Forms.CheckBox();
             this.progressBar1 = new ProgressBarSample.CustomProgressBar();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.animationTypeCombo = new System.Windows.Forms.ComboBox();
             this.optionsGroup.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // refreshButton
@@ -59,13 +63,13 @@ namespace MaxManagedBridge
             this.sceneListbox.Location = new System.Drawing.Point(12, 12);
             this.sceneListbox.Name = "sceneListbox";
             this.sceneListbox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.sceneListbox.Size = new System.Drawing.Size(268, 277);
+            this.sceneListbox.Size = new System.Drawing.Size(268, 199);
             this.sceneListbox.TabIndex = 1;
             // 
             // updateButton
             // 
             this.updateButton.ForeColor = System.Drawing.Color.Black;
-            this.updateButton.Location = new System.Drawing.Point(286, 262);
+            this.updateButton.Location = new System.Drawing.Point(286, 184);
             this.updateButton.Name = "updateButton";
             this.updateButton.Size = new System.Drawing.Size(100, 27);
             this.updateButton.TabIndex = 3;
@@ -81,9 +85,9 @@ namespace MaxManagedBridge
             this.optionsGroup.Controls.Add(this.getMaterialProperties_button);
             this.optionsGroup.Controls.Add(this.materialControlsPanel);
             this.optionsGroup.Controls.Add(this.materialSelectDropDown);
-            this.optionsGroup.Location = new System.Drawing.Point(12, 344);
+            this.optionsGroup.Location = new System.Drawing.Point(13, 327);
             this.optionsGroup.Name = "optionsGroup";
-            this.optionsGroup.Size = new System.Drawing.Size(377, 322);
+            this.optionsGroup.Size = new System.Drawing.Size(377, 338);
             this.optionsGroup.TabIndex = 4;
             this.optionsGroup.TabStop = false;
             this.optionsGroup.Text = "Material Options";
@@ -92,7 +96,7 @@ namespace MaxManagedBridge
             // 
             this.getMaterialProperties_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.getMaterialProperties_button.ForeColor = System.Drawing.Color.Black;
-            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 293);
+            this.getMaterialProperties_button.Location = new System.Drawing.Point(10, 309);
             this.getMaterialProperties_button.Name = "getMaterialProperties_button";
             this.getMaterialProperties_button.Size = new System.Drawing.Size(140, 23);
             this.getMaterialProperties_button.TabIndex = 8;
@@ -107,7 +111,7 @@ namespace MaxManagedBridge
             | System.Windows.Forms.AnchorStyles.Right)));
             this.materialControlsPanel.Location = new System.Drawing.Point(7, 47);
             this.materialControlsPanel.Name = "materialControlsPanel";
-            this.materialControlsPanel.Size = new System.Drawing.Size(361, 240);
+            this.materialControlsPanel.Size = new System.Drawing.Size(361, 256);
             this.materialControlsPanel.TabIndex = 25;
             // 
             // materialSelectDropDown
@@ -125,7 +129,7 @@ namespace MaxManagedBridge
             // removeTransparentFacesCheckbox
             // 
             this.removeTransparentFacesCheckbox.AutoSize = true;
-            this.removeTransparentFacesCheckbox.Location = new System.Drawing.Point(136, 325);
+            this.removeTransparentFacesCheckbox.Location = new System.Drawing.Point(136, 246);
             this.removeTransparentFacesCheckbox.Name = "removeTransparentFacesCheckbox";
             this.removeTransparentFacesCheckbox.Size = new System.Drawing.Size(158, 17);
             this.removeTransparentFacesCheckbox.TabIndex = 17;
@@ -135,7 +139,7 @@ namespace MaxManagedBridge
             // rebuildMaterialsCheckbox
             // 
             this.rebuildMaterialsCheckbox.AutoSize = true;
-            this.rebuildMaterialsCheckbox.Location = new System.Drawing.Point(13, 325);
+            this.rebuildMaterialsCheckbox.Location = new System.Drawing.Point(13, 246);
             this.rebuildMaterialsCheckbox.Name = "rebuildMaterialsCheckbox";
             this.rebuildMaterialsCheckbox.Size = new System.Drawing.Size(117, 17);
             this.rebuildMaterialsCheckbox.TabIndex = 5;
@@ -146,16 +150,45 @@ namespace MaxManagedBridge
             // 
             this.progressBar1.CustomText = null;
             this.progressBar1.DisplayStyle = ProgressBarSample.ProgressBarDisplayText.CustomText;
-            this.progressBar1.Location = new System.Drawing.Point(13, 296);
+            this.progressBar1.Location = new System.Drawing.Point(13, 217);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(373, 23);
             this.progressBar1.TabIndex = 2;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.animationTypeCombo);
+            this.groupBox1.Location = new System.Drawing.Point(13, 269);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(376, 52);
+            this.groupBox1.TabIndex = 20;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Animation";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 22);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(31, 13);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "Type";
+            // 
+            // animationTypeCombo
+            // 
+            this.animationTypeCombo.FormattingEnabled = true;
+            this.animationTypeCombo.Location = new System.Drawing.Point(43, 18);
+            this.animationTypeCombo.Name = "animationTypeCombo";
+            this.animationTypeCombo.Size = new System.Drawing.Size(121, 21);
+            this.animationTypeCombo.TabIndex = 20;
             // 
             // UtilityMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(406, 694);
+            this.ClientSize = new System.Drawing.Size(406, 677);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.removeTransparentFacesCheckbox);
             this.Controls.Add(this.optionsGroup);
             this.Controls.Add(this.updateButton);
@@ -169,6 +202,8 @@ namespace MaxManagedBridge
             this.Name = "UtilityMainForm";
             this.Text = "Daz Studio 4 Bridge";
             this.optionsGroup.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -186,5 +221,8 @@ namespace MaxManagedBridge
         private System.Windows.Forms.CheckBox rebuildMaterialsCheckbox;
         private System.Windows.Forms.CheckBox removeTransparentFacesCheckbox;
         private System.Windows.Forms.Panel materialControlsPanel;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox animationTypeCombo;
     }
 }
