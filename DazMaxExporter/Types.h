@@ -166,17 +166,22 @@ class MyBone
 {
 public:
 	string	Name;
+	string	ParentName;
 
 	float	OriginX;
 	float	OriginY;
 	float	OriginZ;
+
+	float	EndpointX;
+	float	EndpointY;
+	float	EndpointZ;
 
 	double	Qx;
 	double	Qy;
 	double	Qz;
 	double	Qw;
 
-	MSGPACK_DEFINE(Name,OriginX,OriginY,OriginZ,Qx,Qy,Qz,Qw);
+	MSGPACK_DEFINE(Name,ParentName,OriginX,OriginY,OriginZ,EndpointX,EndpointY,EndpointZ,Qx,Qy,Qz,Qw);
 };
 
 class DzSkeleton; //forward declaration for the cache helper member below

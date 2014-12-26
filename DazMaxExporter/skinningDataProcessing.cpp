@@ -65,15 +65,32 @@ int	MyDazExporter::addSkeletonData(DzSkeleton* skeleton, MyScene* scene)
 		DzBone*  bone = bones[i];
 
 		myBone.Name = bone->getName();
+		if(i > 0)
+		{
+			myBone.ParentName = bone->getNodeParent()->getName();
+		}else
+		{
+			myBone.ParentName = "root";
+		}
 
+		myBone.OriginX = bone->getOrigin().m_x;
+		myBone.OriginY = bone->getOrigin().m_y;
+		myBone.OriginZ = bone->getOrigin().m_z;
+
+		myBone.EndpointX = bone->getEndPoint().m_x;
+		myBone.EndpointY = bone->getEndPoint().m_y;
+		myBone.EndpointZ = bone->getEndPoint().m_z;
+
+		/*
 		myBone.OriginX = bone->getWSPos().m_x;
 		myBone.OriginY = bone->getWSPos().m_y;
 		myBone.OriginZ = bone->getWSPos().m_z;
+		*/
 
-		myBone.Qx = bone->getWSRot().m_x;
-		myBone.Qy = bone->getWSRot().m_y;
-		myBone.Qz = bone->getWSRot().m_z;
-		myBone.Qw = bone->getWSRot().m_w;
+		myBone.Qx = bone->getOrientation().m_x;
+		myBone.Qy = bone->getOrientation().m_y;
+		myBone.Qz = bone->getOrientation().m_z;
+		myBone.Qw = bone->getOrientation().m_w;
 
 		mySkeleton.Bones.push_back(myBone);
 	}

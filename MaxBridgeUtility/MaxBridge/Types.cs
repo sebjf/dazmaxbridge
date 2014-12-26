@@ -334,6 +334,7 @@ namespace MaxManagedBridge
     {
     public:
 	    string	Name;
+	    string	ParentName;
 
 	    float	OriginX;
 	    float	OriginY;
@@ -348,7 +349,7 @@ namespace MaxManagedBridge
 	    double	Qz;
 	    double	Qw;
 
-	    MSGPACK_DEFINE(Name,OriginX,OriginY,OriginZ,EndpointX,EndpointY,EndpointZ,Qx,Qy,Qz,Qw);
+	    MSGPACK_DEFINE(Name,ParentName,OriginX,OriginY,OriginZ,EndpointX,EndpointY,EndpointZ,Qx,Qy,Qz,Qw);
     };
      */
 
@@ -356,21 +357,30 @@ namespace MaxManagedBridge
     {
         [MessagePackMember(0)]
         public string Name;
-
         [MessagePackMember(1)]
-        public float OriginX;
+        public string ParentName;
+
         [MessagePackMember(2)]
-        public float OriginY;
+        public float OriginX;
         [MessagePackMember(3)]
+        public float OriginY;
+        [MessagePackMember(4)]
         public float OriginZ;
 
-        [MessagePackMember(4)]
-        public double Qx;
         [MessagePackMember(5)]
-        public double Qy;
+        public float EndpointX;
         [MessagePackMember(6)]
-        public double Qz;
+        public float EndpointY;
         [MessagePackMember(7)]
+        public float EndpointZ;
+
+        [MessagePackMember(8)]
+        public double Qx;
+        [MessagePackMember(9)]
+        public double Qy;
+        [MessagePackMember(10)]
+        public double Qz;
+        [MessagePackMember(11)]
         public double Qw;
     }
 
