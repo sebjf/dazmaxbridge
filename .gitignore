@@ -152,3 +152,5 @@ $RECYCLE.BIN/
 	
 #Other
 gitignored/
+
+*.opendb

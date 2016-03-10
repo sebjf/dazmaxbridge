@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Max;
-using Autodesk.Max.Wrappers;
 
 /* The methods in this file are for setting properties of Max objects by name. Combined with methods such as CreateInstance() these can be used to instantiate and
  * configure most any class in the SDK. These can be used to build materials, as the example below shows. Although, we use Maxscript because it is much easier to

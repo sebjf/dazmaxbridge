@@ -20,7 +20,7 @@ namespace MaxManagedBridge
             }
 
             IPoint3 p3 = maxMesh.GetVertPtr(0);
-            Marshal.Copy(myMesh.Vertices.ToArray(), 0, p3.Handle, myMesh.NumVertices * 3);
+            Marshal.Copy(myMesh.Vertices.ToArray(), 0, p3.NativePointer, myMesh.NumVertices * 3);
 
             return countChanged;
         }
@@ -35,7 +35,7 @@ namespace MaxManagedBridge
                 countChanged = true;
             }
 
-            IntPtr p3h = maxMesh.GetTVertPtr(0).Handle;
+            IntPtr p3h = maxMesh.GetTVertPtr(0).NativePointer;
             float* p3 = (float*)p3h.ToPointer();
 
             int elementsPerVertex = myMesh.TextureCoordinates.Count / myMesh.NumTextureCoordinates;
@@ -76,13 +76,13 @@ namespace MaxManagedBridge
 
             IFace referenceFace = gi.Face.Create();
             referenceFace.SetEdgeVisFlags(EdgeVisibility.Vis, EdgeVisibility.Vis, EdgeVisibility.Vis);
-            Face referenceMaxFace = *(Face*)referenceFace.Handle.ToPointer();
+            Face referenceMaxFace = *(Face*)referenceFace.NativePointer.ToPointer();
             UInt32 referenceFlags = referenceMaxFace.flags;
 
             /* Create the faces that define the surface of the mesh */
 
-            Face* faces = (Face*)maxMesh.Faces[0].Handle.ToPointer();
-            TVFace* tvfaces = (TVFace*)maxMesh.TvFace[0].Handle.ToPointer();
+            Face* faces = (Face*)maxMesh.Faces[0].NativePointer.ToPointer();
+            TVFace* tvfaces = (TVFace*)maxMesh.TvFace[0].NativePointer.ToPointer();
 
             for (int i = 0; i < myMesh.TriangulatedFaces.Length; i++)
             {

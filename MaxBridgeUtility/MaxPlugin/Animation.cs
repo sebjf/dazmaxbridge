@@ -100,14 +100,15 @@ namespace MaxManagedBridge
                 return;
             }
 
-            Autodesk.Max.Wrappers.MasterPointControl masterPointController = null;
+
+            Autodesk.Max.IMasterPointControl masterPointController = null;
             for (int i = 0; i < maxObject.NumSubs; i++)
             {
                 /* Find the master point controller */
                 IAnimatable anim = maxObject.SubAnim(i);
-                if (anim is Autodesk.Max.Wrappers.MasterPointControl)
+                if (anim is Autodesk.Max.IMasterPointControl)
                 {
-                    masterPointController = anim as Autodesk.Max.Wrappers.MasterPointControl;
+                    masterPointController = anim as Autodesk.Max.IMasterPointControl;
                     break;
                 }
             }
@@ -139,7 +140,7 @@ namespace MaxManagedBridge
                     masterPointController.AssignController(controller, v);
                 }
 
-                Autodesk.Max.Wrappers.IKeyControl vertexKeyController = controller.GetInterface(InterfaceID.Keycontrol) as Autodesk.Max.Wrappers.IKeyControl;
+                Autodesk.Max.IIKeyControl vertexKeyController = controller.GetInterface(InterfaceID.Keycontrol) as Autodesk.Max.IIKeyControl;
 
                 vertexKeyController.NumKeys = keyframes.Count;
 

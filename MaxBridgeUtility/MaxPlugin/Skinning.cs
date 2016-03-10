@@ -70,7 +70,7 @@ namespace MaxManagedBridge
             string handle_string = ManagedServices.MaxscriptSDK.ExecuteStringMaxscriptQuery(MaxScript);
             handle_string = Regex.Replace(handle_string, "\\D", string.Empty);
             System.Int64 handle = System.Int64.Parse(handle_string);
-            Autodesk.Max.Wrappers.INode bonenode = gi.Animatable.GetAnimByHandle((UIntPtr)handle) as Autodesk.Max.Wrappers.INode;
+            Autodesk.Max.IINode bonenode = gi.Animatable.GetAnimByHandle((UIntPtr)handle) as Autodesk.Max.IINode;
 
             if (bonenode == null)
             {

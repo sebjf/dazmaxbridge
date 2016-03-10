@@ -72,11 +72,11 @@ string PropertyToString(DzProperty* v)
 	}
 	if(v->isA("DzStringProperty"))
 	{
-		return PropertyToString( ((DzEnumProperty*)v)->getRawStringValue() );
+		return PropertyToString( ((DzStringProperty*)v)->getValue() );
 	}
 	if(v->isA("DzFileProperty"))
 	{
-		return PropertyToString( ((DzEnumProperty*)v)->getRawStringValue() );
+		return PropertyToString( ((DzFileProperty*)v)->getPath() );
 	}
 	if(v->isA("DzIntProperty"))
 	{
